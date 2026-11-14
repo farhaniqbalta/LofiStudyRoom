@@ -144,16 +144,28 @@ Performance claims require measurements.
 
 ## Current milestone
 
-M1 — Modular scene packs + real clock. Built and verified on the iPad; awaiting user approval (see `docs/logs/M1.md`). M0's energy baseline is still open.
+**Engine-first (M2 + M3a).** M0 and M1 are done and approved. The plan is `docs/plans/2026-11-14-engine-first.md`; follow it task by task and log progress in `docs/logs/M2-engine.md`.
 
 Scope:
 
-- Boy/girl, orange/black cat and two city backdrops, swappable without code changes.
-- Shared pack manifest, anchors and fallback animation.
-- Real `HH:mm` clock from a digit sheet, updated on minute boundaries.
-- One saved configuration, restored on launch.
+- Routine scheduler (study, drink, stretch, rest) and pet behaviour (sleep, idle, tap reaction).
+- Tap hotspots: pet, lamp, window, computer.
+- Customization panel.
+- Hybrid time and weather: automatic or manual, independent, saved.
+- Power policy: pause in background, lower frame rate under Low Power or heat, Keep Screen Awake.
 
-Next is M2 (routine scheduler, tap interactions, customization panel). Do not start it without approval.
+Decisions for this phase:
+
+- **Order of work:** Engine-first → Spotify spike and M3b → art-direction pass → M4. Spec §9 allows reordering.
+- **Art:** the current PixelLab art stays for now but is off from the reference board. Art experiments come after the engine, by adding scene, character and pet packs with a new `perspective` tag; no Swift changes.
+- **Stand-ins:** states with no real art yet get script-made stand-ins from `Tools/build_art.py`. Their manifests carry `"provenance": "stand-in …"` and they must be replaced in the art pass.
+- **Weather location:** city search only; no location permission.
+- **Spotify:** deferred. It starts with a one-day App Remote spike that needs separate approval. Until then the computer hotspot shows a "Music coming soon" stub.
+- M0's energy baseline is still unmeasured.
+
+## Public repository
+
+This repo is public at https://github.com/farhaniqbalta/LofiStudyRoom. Never commit device IDs, Apple team IDs, API keys, personal email addresses or absolute home paths; they belong in the git-ignored `CLAUDE.local.md`. The concept images in `docs/reference/` stay local. Push after each task's commit.
 
 ## Completion requirements
 
