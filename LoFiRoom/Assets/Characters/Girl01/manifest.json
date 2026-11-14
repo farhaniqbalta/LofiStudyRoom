@@ -1,0 +1,23 @@
+{
+  "id": "girl01",
+  "type": "character",
+  "packVersion": 1,
+  "perspective": "study-room-back-3q-v1",
+  "anchor": "desk-seat",
+  "sheet": "sheet.png",
+  "frame": {
+    "w": 85,
+    "h": 155
+  },
+  "animations": {
+    "study": {
+      "frames": [
+        0,
+        1
+      ],
+      "fps": 1
+    }
+  },
+  "fallbackAnimation": "study",
+  "provenance": "PixelLab edit_image_pixen job 7ba1e19c-e5fc-45b6-a5b4-4d05c9dbe17a on a crop of the room; cut out, body continued behind the chair and bob frame added by Tools/build_art.py"
+}

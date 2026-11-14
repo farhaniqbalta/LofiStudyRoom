@@ -1,0 +1,22 @@
+{
+  "id": "neoncity01",
+  "type": "scenery",
+  "packVersion": 1,
+  "perspective": "study-room-back-3q-v1",
+  "anchor": "window-rect",
+  "sheet": "sheet.png",
+  "frame": {
+    "w": 184,
+    "h": 128
+  },
+  "animations": {
+    "idle": {
+      "frames": [
+        0
+      ],
+      "fps": 1
+    }
+  },
+  "fallbackAnimation": "idle",
+  "provenance": "PixelLab create_image_pixen job 03028076-2912-47c5-b38f-fba53c709160; border mirrored out by Tools/build_art.py"
+}

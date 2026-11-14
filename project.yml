@@ -1,0 +1,48 @@
+name: LoFiRoom
+options:
+  bundleIdPrefix: com.lofiroom
+  deploymentTarget:
+    iOS: "26.0"
+settings:
+  base:
+    DEVELOPMENT_TEAM: ${DEVELOPMENT_TEAM}  # from the environment; see README
+    CODE_SIGN_STYLE: Automatic
+    SWIFT_VERSION: "6.0"
+    TARGETED_DEVICE_FAMILY: "2"
+    MARKETING_VERSION: "0.1"
+    CURRENT_PROJECT_VERSION: "1"
+targets:
+  LoFiRoom:
+    type: application
+    platform: iOS
+    sources:
+      - path: LoFiRoom
+        excludes: [Assets]
+      # Folder reference: packs keep their directory layout in the bundle, so adding a pack is adding a folder.
+      - path: LoFiRoom/Assets
+        type: folder
+        buildPhase: resources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.lofiroom.app
+    info:
+      path: LoFiRoom/Info.plist
+      properties:
+        CFBundleDisplayName: Lo-Fi Room
+        UILaunchScreen: {}
+        UIStatusBarHidden: true
+        UIRequiresFullScreen: true
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+    scheme:
+      testTargets: [LoFiRoomTests]
+  LoFiRoomTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources: [LoFiRoomTests]
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+    dependencies:
+      - target: LoFiRoom

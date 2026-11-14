@@ -1,0 +1,23 @@
+{
+  "id": "blackcat",
+  "type": "pet",
+  "packVersion": 1,
+  "perspective": "study-room-back-3q-v1",
+  "anchor": "pet-spot",
+  "sheet": "sheet.png",
+  "frame": {
+    "w": 37,
+    "h": 27
+  },
+  "animations": {
+    "sleep": {
+      "frames": [
+        0,
+        1
+      ],
+      "fps": 0.5
+    }
+  },
+  "fallbackAnimation": "sleep",
+  "provenance": "PixelLab create_image_pixen job 23ddd82d-29af-4643-8629-8d9adee3e747; breathing frame and recolour by Tools/build_art.py"
+}

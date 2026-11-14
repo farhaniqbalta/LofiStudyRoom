@@ -1,0 +1,64 @@
+{
+  "id": "studyroom01",
+  "type": "scene",
+  "packVersion": 1,
+  "perspective": "study-room-back-3q-v1",
+  "canvas": {
+    "w": 480,
+    "h": 352
+  },
+  "safe": {
+    "x": 14,
+    "y": 12,
+    "w": 452,
+    "h": 328
+  },
+  "anchors": {
+    "window-rect": {
+      "x": 64,
+      "y": 148,
+      "w": 184,
+      "h": 128
+    },
+    "window-mask": {
+      "x": 64,
+      "y": 148,
+      "w": 184,
+      "h": 128
+    },
+    "desk-seat": {
+      "x": 336,
+      "y": 27,
+      "w": 85,
+      "h": 155
+    },
+    "pet-spot": {
+      "x": 86,
+      "y": 142,
+      "w": 37,
+      "h": 27
+    },
+    "clock-slot": {
+      "x": 294,
+      "y": 126,
+      "w": 23,
+      "h": 15
+    },
+    "lamp": {
+      "x": 282,
+      "y": 127
+    },
+    "computer": {
+      "x": 347,
+      "y": 160
+    }
+  },
+  "room": "room.png",
+  "foreground": [
+    {
+      "image": "chair_front.png",
+      "anchor": "desk-seat"
+    }
+  ],
+  "provenance": "PixelLab create_image_pixen job 0c085c34-7866-4ce7-813f-002ac93c9d1b; glass keyed out and chair-front occluder traced by Tools/build_art.py"
+}
