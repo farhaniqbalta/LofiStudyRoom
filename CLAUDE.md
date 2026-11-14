@@ -157,11 +157,20 @@ Scope:
 Decisions for this phase:
 
 - **Order of work:** Engine-first → Spotify spike and M3b → art-direction pass → M4. Spec §9 allows reordering.
-- **Art:** the current PixelLab art stays for now but is off from the reference board. Art experiments come after the engine, by adding scene, character and pet packs with a new `perspective` tag; no Swift changes.
+- **Art:** the current PixelLab art is a placeholder direction and will be replaced. The reference board is very different: side-profile, half-body characters hidden below a detailed desk, and a dense cyberpunk city. The new direction is experimental, so it is done on a branch as a new scene with its own `perspective` tag, characters, pets and art build script, chosen with `-scene <folder>`. See "Reusable engine vs art" below.
 - **Stand-ins:** states with no real art yet get script-made stand-ins from `Tools/build_art.py`. Their manifests carry `"provenance": "stand-in …"` and they must be replaced in the art pass.
 - **Weather location:** city search only; no location permission.
 - **Spotify:** deferred. It starts with a one-day App Remote spike that needs separate approval. Until then the computer hotspot shows a "Music coming soon" stub.
 - M0's energy baseline is still unmeasured.
+
+## Reusable engine vs art
+
+The engine must run unchanged with any art direction. The full table is in the plan (`docs/plans/2026-11-14-engine-first.md`, "What is reusable").
+
+- **Reusable (keep art-free):** scaling, pack loading and validation, layer order, clock, saved settings, animation timing and safe exits, routine and pet scheduling, hotspots, environment and weather, customization panel, power policy.
+- **Art-specific (expect to replace):** `ArtSource/`, `LoFiRoom/Assets/`, `Tools/build_art.py`, `Tools/cutout.py`, stand-in frames, scene manifest values.
+- **Rule:** no Swift file outside tests names an animation, pack or scene. Resting animations, routines and tap reactions come from pack manifests (`fallbackAnimation`, `routine`, `onTap`). `RoomConfig`'s default pack names are the only exception; unknown names fall back.
+- **Proof:** tests run the engine against a synthetic fixture scene with a different canvas, different animation names and no extras. Every new behaviour gets one fixture assertion.
 
 ## Public repository
 

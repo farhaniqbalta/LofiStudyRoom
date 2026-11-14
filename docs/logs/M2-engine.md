@@ -10,6 +10,7 @@
 - States with no real art get script-made stand-ins, marked `"provenance": "stand-in …"`.
 - Spotify (M3b) is deferred until after an App Remote spike.
 - Weather location is chosen by city search only; no location permission.
+- The art will change completely (side-profile half-body characters, detailed desk, cyberpunk city). The engine must be reusable with it, so the plan adds Task 1B (manifest-driven animations and routines, perspective-filtered pack lists, `-scene` choice) and a fixture-scene test that every later task extends.
 - Repo tidied and published as a public repo: specs moved to `docs/spec/`, private IDs moved to the git-ignored `CLAUDE.local.md`, concept images kept local, history squashed to one commit.
 
 ## Done
@@ -25,4 +26,4 @@
 
 ## Next step
 
-Task 1 (config schema v2 and environment rules), after the user approves the updated directions.
+Task 1 (config schema v2 and environment rules), then Task 1B, after the user approves the updated directions.

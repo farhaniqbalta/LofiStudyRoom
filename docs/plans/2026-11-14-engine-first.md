@@ -25,10 +25,52 @@ Script-made stand-in art makes every state visible.
 - **Spotify:** deferred.
 - **Weather location:** city search only, with no location permission.
 
-**Answer to the user's question:** yes, the art is replaceable.
-- **Packs:** every character, pet, scenery and clock is a pack folder.
-- **Room:** the `Scenes/StudyRoom01` pack.
-- **Camera changes:** a new camera angle means a new scene pack plus matching character and pet packs (the `perspective` tag enforces this), but no Swift changes.
+## Why engine first: the art will change completely
+
+The current PixelLab art is a placeholder direction. The reference board (`docs/reference/mvp-board.png`, local only) is very different:
+- **Characters:** side profile, half-body, with the lower body hidden behind the desk. The current art is a full body seen from behind.
+- **Desk:** much more detailed (monitor with code, lamp, mug, clock, cat on the desk, shelves).
+- **City:** dense cyberpunk (neon signs, elevated train, rain). The current art is a quiet lo-fi skyline.
+
+That is a new scene, new characters and new pets, not a re-skin. The new direction is **experimental**, so the engine must work unchanged with either art set, and both must be able to live side by side.
+
+### What is reusable (art-independent)
+
+| Area | Code | Why it survives an art change |
+|---|---|---|
+| Scaling | `Rendering/ScalePolicy.swift` | Works from the scene manifest's canvas and safe rectangle, at any size |
+| Pack loading and validation | `Infrastructure/SpriteAssetRepository.swift`, `Domain/SpritePack.swift`, `Domain/ScenePack.swift` | Reads whatever the manifests declare; rejects mismatched `perspective` |
+| Layer order | `Rendering/LoFiSKScene.swift` groups | `foreground` holds any occluder: today the chair back, in the new art the desk front that hides the half-body |
+| Clock | `Domain/ClockTime.swift`, `Application/ClockDriver.swift`, `Rendering/PixelClockNode.swift` | Glyph size, slot positions and bezel come from the clock skin manifest |
+| Saved settings | `Application/RoomStateStore.swift` | Stores folder names; unknown names fall back to the first pack that loads |
+| Animation timing, safe exits | Task 2 `ActorTimeline` | Pure arithmetic on whatever frames and fps a manifest declares |
+| Routine and pet scheduling | Task 3 `RoutineScheduler` | Driven by manifest-declared routines (see Task 1B), never by built-in names |
+| Hotspots | Task 4 manifest `hotspots`, Task 5 `HotspotOverlay` | Rectangles come from the scene manifest; 44 pt padding is applied at runtime |
+| Environment and weather | Tasks 1 and 6 | No art at all; the scene only receives a `ResolvedScene` |
+| Customization panel | Task 7 | Lists whatever packs the active scene accepts |
+| Power policy | Task 8 | No art at all |
+
+### What is art-specific (expected to be replaced)
+
+- `ArtSource/`, `LoFiRoom/Assets/`, `Tools/build_art.py` and `Tools/cutout.py`: the current images and the script that cuts them. The new direction gets its own source images and build script.
+- The stand-in frames from Task 4: they shift pixels of the current sprites, so they are throwaway.
+- The scene manifest values: anchors, hotspot rectangles, canvas and safe sizes.
+
+### What was not yet art-independent in M1 (fixed by Task 1B)
+
+Earlier I said a new camera angle needs "no Swift changes". That was too optimistic. Four things are tied to the current art:
+- `LoFiSKScene.show` hardcodes the resting animations `"study"`, `"sleep"` and `"idle"`.
+- The planned `RoutineConfig` hardcoded `drink`, `stretch` and `rest`.
+- The scene is fixed to `StudyRoom01` (a constructor default, with no way to choose another).
+- `SpriteAssetRepository.folders(in:)` lists every pack, even ones made for a different `perspective`, so two art directions in one build would offer incompatible packs.
+
+### How an art experiment is done later
+
+1. Work on a branch, for example `art/cyberpunk-profile`, so `main` keeps working.
+2. Add a new scene folder (for example `Scenes/CyberDesk01`) with its own `perspective` tag, plus character, pet and scenery packs carrying that tag. Old packs stay.
+3. Write that direction's own art build script beside `Tools/build_art.py`.
+4. Launch with `-scene CyberDesk01`. The engine, tests and settings are unchanged.
+5. Compare both directions on the iPad, then keep one.
 
 ## Global Constraints
 
@@ -47,6 +89,7 @@ Script-made stand-in art makes every state visible.
 - **Hotspots:** at least 44×44 pt each, with VoiceOver labels "Cat", "Desk lamp", "Window", "Computer".
 - **Keep Screen Awake:** off by default. Label: "Keep screen awake (uses more battery)".
 - **Public repo:** never commit device IDs, team IDs, API keys or personal emails. Push after each task's commit.
+- **Art independence:** no Swift file outside tests may name an animation, pack folder or scene. Names come from manifests. The only exception is `RoomConfig`'s default pack names, which are preferences with a fallback.
 - **Out of scope:** Spotify, production art, long-run profiling. The computer hotspot only toggles a "Music coming soon" stub panel.
 
 ## Review Focus
@@ -56,6 +99,7 @@ Script-made stand-in art makes every state visible.
 3. **First launch offline with Automatic weather.** The room shows Clear plus clock-based day/night, never a blank or a hang. Settings say "Weather unavailable". Test lives in Task 6.
 4. **Background mid-routine, then foreground.** Exactly one routine timer and one weather timer exist afterwards, not two. Test lives in Task 3 (routines) and Task 6 (weather).
 5. **City search with no results or a network error.** The panel shows a message and the previous city stays. Test lives in Task 6.
+6. **A differently drawn scene.** A scene with another canvas size, other animation names and no rain must run the whole engine. Test lives in Task 1B, and later tasks extend it.
 
 ---
 
@@ -191,6 +235,50 @@ docs/reference/            git-ignored: the two concept images, renamed mvp-boar
 - [ ] **Step 4: Run** the tests. Expect all 5 to pass, and the 14 existing tests to still pass.
 - [ ] **Step 5: Commit** `feat: config v2 and environment rules`.
 
+### Task 1B: Make the engine art-independent
+
+**Files:**
+- Modify: `LoFiRoom/Domain/SpritePack.swift`, `LoFiRoom/Rendering/LoFiSKScene.swift`, `LoFiRoom/Infrastructure/SpriteAssetRepository.swift`, `LoFiRoom/Presentation/SceneContainer.swift`, `Tools/build_art.py`, `Tools/preview.py`
+- Create: `LoFiRoomTests/FixtureScene.swift`
+- Test: `LoFiRoomTests/ArtIndependenceTests.swift`
+
+**Interfaces:**
+- Produces:
+  - `SpritePack.Animation` gains two fields:
+    - `routine: RoutineSpec?` with `struct RoutineSpec: Codable, Equatable { var weight: Double; var cooldown: TimeInterval }`. An animation with a `routine` can be picked by the scheduler.
+    - `onTap: Bool?`. The animation played when the actor is tapped.
+  - The resting animation of every pack is its `fallbackAnimation`. `LoFiSKScene.show` uses it instead of a hardcoded name.
+  - `SpriteAssetRepository.folders(in:)` returns only packs whose manifest `perspective` matches the active scene.
+  - `SpriteAssetRepository(sceneName:)` is chosen by the `-scene <folder>` launch argument. The default is the first folder in `Scenes/`.
+  - **Test helper** `FixtureScene.make(in: URL) throws -> URL` writes a synthetic scene to a temporary folder, using tiny PNGs made with `UIGraphicsImageRenderer`:
+    - a 320×240 canvas with different anchors
+    - perspective `fixture-profile-v1`
+    - a character with animations `type` (fallback), `sip` (routine) and `lean` (routine)
+    - a pet with `nap` (fallback) and `purr` (onTap)
+    - a scenery pack and a clock skin with 4×6 glyphs
+    - no rain or day/night extras
+  - `build_art.py` writes `routine` and `onTap` into the current packs: Boy01 and Girl01 `drink`, `stretch` and `rest` with the weights and cooldowns from Task 3; cats `react` with `onTap`.
+  - `preview.py` gets a `--scene` option, and reads the clock skin from the scene's packs instead of a fixed name.
+
+- [ ] **Step 1: Write the failing tests:**
+  - `testFixtureSceneLoadsAndRuns`
+    - Load the fixture with `SpriteAssetRepository(root:sceneName:)` and start a `SceneCoordinator`.
+    - Expect: the character rests on `type` and the pet on `nap`; the clock shows text; the scene's canvas is 320×240.
+  - `testPackListsAreFilteredByPerspective`
+    - Copy one bundled character pack into the fixture root.
+    - Expect: `folders(in: "Characters")` does not list it.
+  - `testRestingAnimationComesFromTheManifest`
+    - Expect: bundled Boy01 rests on `study` because its manifest says so, not because the code does.
+  - `testNoArtNamesInAppSource`
+    - Read the app's Swift sources from the test bundle's source path (`#filePath`, up to the project root).
+    - Expect: none contains the strings `"study"`, `"sleep"`, `"drink"`, `"Boy01"` or `"StudyRoom01"`, except inside `RoomStateStore.swift`.
+- [ ] **Step 2: Run** `-only-testing:LoFiRoomTests/ArtIndependenceTests`. Expect a fail.
+- [ ] **Step 3: Implement** the manifest fields, the perspective filter, the `-scene` argument, the build-script and preview changes, and rebuild the packs.
+- [ ] **Step 4: Run** all tests. Expect a pass, with the existing 14 tests unchanged.
+- [ ] **Step 5: Commit and push** `refactor: drive resting animations, routines and scene choice from manifests`.
+
+**Rule for every later task:** each new behaviour gets one assertion against the fixture scene as well as the bundled scene. Tasks 3 to 7 list theirs.
+
 ### Task 2: One-shot animations with safe exits
 
 **Files:**
@@ -245,10 +333,10 @@ docs/reference/            git-ignored: the two concept images, renamed mvp-boar
 - Produces:
   - `struct RoutineConfig`:
     - `var idle: String`
-    - `var routines: [String: (weight: Double, cooldown: TimeInterval)]`
+    - `var routines: [String: RoutineSpec]`
     - `var delay: ClosedRange<TimeInterval>`
-    - `static let character = RoutineConfig(idle: "study", routines: ["drink": (3, 300), "stretch": (1, 900), "rest": (2, 600)], delay: 90...240)`
-    - `static let pet = RoutineConfig(idle: "sleep", routines: ["idle": (1, 120)], delay: 60...180)`
+    - `static func from(_ pack: SpritePack, delay: ClosedRange<TimeInterval>) -> RoutineConfig`. The idle animation is the pack's `fallbackAnimation`; routines are its animations with a `routine` spec.
+    - Pacing is not art, so it stays in code: characters `90...240` s, pets `60...180` s.
   - `struct RoutineScheduler`:
     - `init(config:)`
     - `mutating func next(now: Date, random: inout some RandomNumberGenerator) -> (routine: String?, delay: TimeInterval)`. A nil routine means stay idle because everything is on cooldown.
@@ -257,7 +345,7 @@ docs/reference/            git-ignored: the two concept images, renamed mvp-boar
     - `var timers: TimerScheduling` (default live)
     - `var routineSpeed: Double = 1`, set from the `-routineSpeed` launch argument
     - `func setActive(_ active: Bool)`. False cancels both routine timers; true schedules each once.
-    - `func petTapped()` plays `react` at the pet's next safe exit, then returns to the pet's previous animation.
+    - `func petTapped()` plays the pet's `onTap` animation at its next safe exit, then returns to the previous animation. A pet without one ignores the tap.
 
 - [ ] **Step 1: Write the failing tests:**
   - `testNextRespectsWeightsAndCooldowns`
@@ -271,6 +359,9 @@ docs/reference/            git-ignored: the two concept images, renamed mvp-boar
   - `testPetTapReturnsToPreviousState`
     - Pet in `idle`, tapped.
     - Expect: after the fake timers fire, `currentAnimation` goes `react`, then `idle`.
+  - `testFixtureRoutinesUseOnlyDeclaredNames`
+    - Fixture scene, 200 fake timer firings.
+    - Expect: the character plays only `sip` and `lean`; the pet's tap plays `purr`.
   - `testTapDuringDrinkWaitsForSafeExit`
     - Character in `drink`; call `select("Girl01")`.
     - Expect: the swap happens only after the scheduled safe-exit timer fires — Review Focus 2.
@@ -299,11 +390,11 @@ docs/reference/            git-ignored: the two concept images, renamed mvp-boar
     - `rain: SceneEffect?` with `struct SceneEffect: Codable, Equatable { var sheet: String; var frame: PixelSize; var fps: Double; var anchor: String }`.
     - `dayOverlay: String?`, `nightOverlay: String?`
     - `roomLampOff: String?`: a full room image with the lamp cone painted out. It replaces the room texture while the lamp is off.
-    - `hotspots: [String: ScenePack.Anchor]`, keyed `pet`, `lamp`, `window`, `computer`, in logical pixels, each at least 18×18 (44 pt at 5×).
+    - `hotspots: [String: ScenePack.Anchor]`, keyed `pet`, `lamp`, `window`, `computer`, in logical pixels. The 44 pt minimum is applied at runtime (Task 5), because the pixel scale depends on the scene's canvas size.
   - `LoFiSKScene`:
     - `func apply(_ scene: ResolvedScene, reduceMotion: Bool)`
     - `func viewRect(forHotspot: String) -> CGRect?` in view coordinates.
-- Stand-in recipes:
+- Stand-in recipes. These are **throwaway**: they shift pixels of the current sprites and will not carry over to the new art. Only the manifest fields and scene nodes above are reusable.
   - **drink:** existing frames with a 4×5 mug sprite moved from the desk to the head.
   - **stretch:** arms rows shifted up 1–3 px.
   - **rest:** head rows shifted 2 px toward the window.
@@ -319,7 +410,9 @@ docs/reference/            git-ignored: the two concept images, renamed mvp-boar
     - Apply night, rain and lamp-off, then day, clear and lamp-on, 50 times.
     - Expect: node count is unchanged. The rain node is hidden when clear and paused when hidden.
   - `testReduceMotionHalvesRainFps`
-  - `testHotspotsAreAtLeast18LogicalPixels`
+  - `testFixtureWithoutExtrasApplies`
+    - Fixture scene (no rain, no overlays, no lamp-off image).
+    - Expect: `apply` succeeds and changes nothing visible.
 - [ ] **Step 2: Run** `python3 Tools/build_art.py`, then `-only-testing:LoFiRoomTests/SceneVisualsTests`. Expect a fail.
 - [ ] **Step 3: Implement** the `build_art.py` additions and the scene nodes.
   - Rain lives in the scenery group.
@@ -353,7 +446,7 @@ docs/reference/            git-ignored: the two concept images, renamed mvp-boar
     - Expect: NeonCity01 → NeonCity02 → NeonCity01.
   - `testComputerTogglesMusicStub`
   - `testHotspotViewRectsAreAtLeast44Points`
-    - Use an SKView at 1194×834 pt.
+    - Use an SKView at 1194×834 pt, with both the bundled and the fixture scene.
 - [ ] **Step 2: Run** `-only-testing:LoFiRoomTests/InteractionTests`. Expect a fail.
 - [ ] **Step 3: Implement.**
   - `SceneContainer` becomes a `ZStack` of the `SKView` representable, `HotspotOverlay` and the stub panel.
@@ -438,6 +531,8 @@ docs/reference/            git-ignored: the two concept images, renamed mvp-boar
   - `testManualNightKeepsRealClock`
     - Real time 10:15 UTC; call `setTime(.manual(.night))`.
     - Expect: the clock text is still `"10:15"`.
+  - `testPickersListOnlyTheActiveScenesPacks`
+    - Expect: with the fixture scene, the character picker lists only the fixture character.
   - `testFailedCitySearchKeepsPreviousCity`
     - Provider throws.
     - Expect: `config.city` is unchanged, and an error message is published — Review Focus 5.
@@ -489,7 +584,7 @@ docs/reference/            git-ignored: the two concept images, renamed mvp-boar
 ## Execution
 
 The recommended method is **Native**: I implement every task in this session, then one fresh reviewer checks the whole branch. Reasons:
-- The 8 tasks share interfaces tightly. `SceneCoordinator` is touched in tasks 3, 5, 6, 7 and 8.
+- The 9 tasks share interfaces tightly. `SceneCoordinator` is touched in tasks 3, 5, 6, 7 and 8.
 - Every test run needs the one physical iPad, so parallel subagents would queue on it anyway.
 
 The alternative is **Subagent-driven**: a fresh implementer and reviewer per task. It is more thorough and slower.
