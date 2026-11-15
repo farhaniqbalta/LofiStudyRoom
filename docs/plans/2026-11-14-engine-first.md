@@ -257,7 +257,7 @@ docs/reference/            git-ignored: the two concept images, renamed mvp-boar
     - a pet with `nap` (fallback) and `purr` (onTap)
     - a scenery pack and a clock skin with 4×6 glyphs
     - no rain or day/night extras
-  - `build_art.py` writes `routine` and `onTap` into the current packs: Boy01 and Girl01 `drink`, `stretch` and `rest` with the weights and cooldowns from Task 3; cats `react` with `onTap`.
+  - `build_art.py` writes `routine` and `onTap` into the current packs in Task 4, when those animations exist: characters `drink` (weight 3, cooldown 300 s), `stretch` (1, 900 s), `rest` (2, 600 s); cats `idle` (1, 120 s) and `react` with `onTap`.
   - `preview.py` gets a `--scene` option, and reads the clock skin from the scene's packs instead of a fixed name.
 
 - [ ] **Step 1: Write the failing tests:**
@@ -269,9 +269,7 @@ docs/reference/            git-ignored: the two concept images, renamed mvp-boar
     - Expect: `folders(in: "Characters")` does not list it.
   - `testRestingAnimationComesFromTheManifest`
     - Expect: bundled Boy01 rests on `study` because its manifest says so, not because the code does.
-  - `testNoArtNamesInAppSource`
-    - Read the app's Swift sources from the test bundle's source path (`#filePath`, up to the project root).
-    - Expect: none contains the strings `"study"`, `"sleep"`, `"drink"`, `"Boy01"` or `"StudyRoom01"`, except inside `RoomStateStore.swift`.
+  - The "no art names in app source" rule is checked on the Mac with the `grep` in the lead's review, not as a device test: tests on the iPad cannot read source files.
 - [ ] **Step 2: Run** `-only-testing:LoFiRoomTests/ArtIndependenceTests`. Expect a fail.
 - [ ] **Step 3: Implement** the manifest fields, the perspective filter, the `-scene` argument, the build-script and preview changes, and rebuild the packs.
 - [ ] **Step 4: Run** all tests. Expect a pass, with the existing 14 tests unchanged.

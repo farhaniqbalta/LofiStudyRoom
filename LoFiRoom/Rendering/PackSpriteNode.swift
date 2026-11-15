@@ -4,8 +4,16 @@ import SpriteKit
 final class PackSpriteNode: SKSpriteNode {
     private(set) var pack: LoadedPack?
 
+    /// The animation actually playing; the fallback's name when the requested one is missing.
+    private(set) var currentAnimation: String?
+
+    func show(_ pack: LoadedPack) {
+        show(pack, animation: pack.manifest.fallbackAnimation ?? "")
+    }
+
     func show(_ pack: LoadedPack, animation name: String) {
         self.pack = pack
+        currentAnimation = pack.manifest.animations?[name] != nil ? name : pack.manifest.fallbackAnimation
         removeAllActions()
         anchorPoint = .zero
         size = CGSize(width: pack.manifest.frame.w, height: pack.manifest.frame.h)

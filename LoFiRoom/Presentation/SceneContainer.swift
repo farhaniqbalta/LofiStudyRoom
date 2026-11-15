@@ -3,12 +3,12 @@ import SwiftUI
 
 /// Hosts the SpriteKit scene. A wrapped SKView (not SpriteView) so frame rate and pause are directly controllable.
 /// Launch arguments: `-fps 12`, `-paused YES`, `-debugAnchors YES` (anchor overlay + FPS counter), and
-/// `-character Girl01`, `-pet BlackCat`, `-scenery NeonCity02` to choose packs (the choice is saved).
+/// `-scene <folder>` (default: first scene folder), `-character Girl01`, `-pet BlackCat`, `-scenery NeonCity02` to choose packs (the choice is saved).
 struct SceneContainer: UIViewRepresentable {
     func makeCoordinator() -> SceneCoordinator {
         let defaults = UserDefaults.standard
         do {
-            let repository = try SpriteAssetRepository()
+            let repository = try SpriteAssetRepository(sceneName: defaults.string(forKey: "scene"))
             let scene = try LoFiSKScene(repository: repository, showAnchors: defaults.bool(forKey: "debugAnchors"))
             let coordinator = SceneCoordinator(repository: repository, store: RoomStateStore(), scene: scene)
             coordinator.start()

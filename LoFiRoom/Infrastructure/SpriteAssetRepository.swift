@@ -20,8 +20,11 @@ final class SpriteAssetRepository {
     let scene: ScenePack
     private let sceneFolder: URL
 
-    init(root: URL = Bundle.main.resourceURL!.appendingPathComponent("Assets"), sceneName: String = "StudyRoom01") throws {
+    init(root: URL = Bundle.main.resourceURL!.appendingPathComponent("Assets"), sceneName: String? = nil) throws {
         self.root = root
+        let sceneName = try sceneName ?? FileManager.default
+            .contentsOfDirectory(at: root.appendingPathComponent("Scenes"), includingPropertiesForKeys: nil)
+            .filter(\.hasDirectoryPath).map(\.lastPathComponent).min() ?? { throw PackError("Scenes: no scene folder found") }()
         sceneFolder = root.appendingPathComponent("Scenes/\(sceneName)")
         scene = try Self.decode(ScenePack.self, in: sceneFolder, label: "Scenes/\(sceneName)")
         let problems = scene.problems()
@@ -31,7 +34,10 @@ final class SpriteAssetRepository {
     /// Folder names of the packs in a category, sorted.
     func folders(in category: String) -> [String] {
         let urls = (try? FileManager.default.contentsOfDirectory(at: root.appendingPathComponent(category), includingPropertiesForKeys: nil)) ?? []
-        return urls.filter(\.hasDirectoryPath).map(\.lastPathComponent).sorted()
+        return urls.filter { url in
+            url.hasDirectoryPath
+                && (try? Self.decode(SpritePack.self, in: url, label: ""))?.perspective == scene.perspective
+        }.map(\.lastPathComponent).sorted()
     }
 
     func sceneTexture(_ file: String) throws -> SKTexture {

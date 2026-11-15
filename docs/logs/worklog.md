@@ -6,4 +6,4 @@ One line per checkpoint. Detail lives in the linked file.
 |---|---|---|
 | M0 — Visual + energy PoC | Done; energy baseline still unmeasured | [M0.md](M0.md) |
 | M1 — Packs + real clock | Done and approved | [M1.md](M1.md) |
-| Engine-first (M2 + M3a) | In progress: Task 1 of 1B–8 done | [M2-engine.md](M2-engine.md) |
+| Engine-first (M2 + M3a) | In progress: Tasks 1 and 1B done; Task 2 next | [M2-engine.md](M2-engine.md) |

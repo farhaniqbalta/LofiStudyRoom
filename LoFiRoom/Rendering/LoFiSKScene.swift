@@ -65,13 +65,13 @@ final class LoFiSKScene: SKScene {
         switch pack.manifest.type {
         case "character":
             character.position = position
-            character.show(pack, animation: "study")
+            character.show(pack)
         case "pet":
             pet.position = position
-            pet.show(pack, animation: "sleep")
+            pet.show(pack)
         case "scenery":
             scenery.position = position
-            scenery.show(pack, animation: "idle")
+            scenery.show(pack)
         case "clock":
             clock.position = position
             clock.use(pack)

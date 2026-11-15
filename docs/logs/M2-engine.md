@@ -1,6 +1,6 @@
 # Engine-first (M2 + M3a)
 
-**Status:** In progress (Task 1 done)
+**Status:** In progress (Tasks 1 and 1B done)
 **Scope:** [`docs/plans/2026-11-14-engine-first.md`](../plans/2026-11-14-engine-first.md)
 **Date:** 2026-11-14
 
@@ -18,11 +18,14 @@
 - Task 0: repo tidied and published.
 - Task 0B: plan and directions written.
 - Task 1: `RoomConfig` v2 (lamp, time, weather, city, keep awake; old saves keep their pack choices) and `Domain/Environment.swift` (weather-code mapping, sunrise/sunset day phase with 06:00–18:00 fallback, manual-over-automatic, 2-hour staleness).
+- Task 1B: engine made art-independent. Resting animation is each pack's `fallbackAnimation`; manifests can mark animations as `routine` or `onTap`; the scene is the first scene folder or `-scene <folder>`; pack lists are filtered by the scene's `perspective`. A synthetic fixture scene (320×240, other animation names) runs the engine in tests.
+- Working method from Task 1B on: the lead writes each task's brief and acceptance tests, a Sonnet subagent implements, the lead reviews, runs the tests and commits.
 
 ## Build / test results
 
 - After the tidy-up: `Executed 14 tests, with 0 failures` / `** TEST SUCCEEDED **` on the iPad.
 - After Task 1: `Executed 20 tests, with 0 failures` / `** TEST SUCCEEDED **` on the iPad.
+- After Task 1B: `Executed 25 tests, with 0 failures` / `** TEST SUCCEEDED **` on the iPad. Source search for art names outside `RoomStateStore.swift`: none.
 
 ## Open issues
 
@@ -30,4 +33,4 @@
 
 ## Next step
 
-Task 1B (make the engine art-independent).
+Task 2 (one-shot animations with safe exits).

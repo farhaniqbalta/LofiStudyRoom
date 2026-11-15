@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Composites the packs the way the app layers them, for a quick look without a device.
-Usage: python3 Tools/preview.py <Character> <Pet> <Scenery> <out.png> [HH:mm]"""
+Usage: python3 Tools/preview.py <Character> <Pet> <Scenery> <out.png> [HH:mm] [--scene <Folder>]"""
 import json, os, sys
 import pngio
 
@@ -11,9 +11,16 @@ def load(*parts):
     return d, json.load(open(os.path.join(d, "manifest.json")))
 
 def main():
-    character, pet, scenery, out = sys.argv[1:5]
-    text = sys.argv[5] if len(sys.argv) > 5 else "22:47"
-    sdir, scene = load("Scenes", "StudyRoom01")
+    args = sys.argv[1:]
+    first = lambda *parts: sorted(os.listdir(os.path.join(A, *parts)))[0]
+    scene_name = first("Scenes")
+    if "--scene" in args:
+        i = args.index("--scene")
+        scene_name = args[i + 1]
+        del args[i:i + 2]
+    character, pet, scenery, out = args[:4]
+    text = args[4] if len(args) > 4 else "22:47"
+    sdir, scene = load("Scenes", scene_name)
     W, H = scene["canvas"]["w"], scene["canvas"]["h"]
     canvas = [[(0, 0, 0, 255)] * W for _ in range(H)]
     def blit(img, x, y):  # x,y = bottom-left in SpriteKit coordinates
@@ -33,7 +40,9 @@ def main():
         a = scene["anchors"][fg["anchor"]]
         blit(pngio.read(os.path.join(sdir, fg["image"])), a["x"], a["y"])
     frame0("Pets", pet)
-    cdir, clock = load("Clocks", "RetroDigital01")
+    skin = next(c for c in sorted(os.listdir(os.path.join(A, "Clocks")))
+                if load("Clocks", c)[1]["perspective"] == scene["perspective"])
+    cdir, clock = load("Clocks", skin)
     a = scene["anchors"][clock["anchor"]]
     blit(pngio.read(os.path.join(cdir, clock["bezel"])), a["x"], a["y"])
     glyphs = pngio.read(os.path.join(cdir, clock["sheet"]))

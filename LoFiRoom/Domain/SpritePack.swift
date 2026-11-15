@@ -1,9 +1,17 @@
 import Foundation
 
+/// How often an animation is picked as an idle routine: relative weight and minimum seconds between plays.
+struct RoutineSpec: Codable, Equatable { var weight: Double; var cooldown: TimeInterval }
+
 /// Manifest of one swappable pack: a character, pet, scenery or clock skin.
 /// The sheet is a single row of equally sized frames.
 struct SpritePack: Codable, Equatable {
-    struct Animation: Codable, Equatable { var frames: [Int], fps: Double }
+    struct Animation: Codable, Equatable {
+        var frames: [Int]
+        var fps: Double
+        var routine: RoutineSpec?
+        var onTap: Bool?
+    }
 
     var id: String
     var type: String
