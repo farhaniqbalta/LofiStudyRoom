@@ -1,0 +1,6 @@
+{
+  "category": "Scenery", "type": "scenery", "scene": "StudyRoomCyber01",
+  "perspective": "cyber-desk-side-v1", "anchor": "window-rect",
+  "fallbackAnimation": "night",
+  "provenance": "Art-direction spike. PixelLab create_image_pixen job c0ec1568-201f-48bc-9ea5-3b74a682cc44, imported unchanged."
+}
