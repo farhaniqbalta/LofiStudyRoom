@@ -1,6 +1,6 @@
 # Engine-first (M2 + M3a)
 
-**Status:** In progress (Tasks 1–4 done)
+**Status:** In progress (Tasks 1–5 done)
 **Scope:** [`docs/plans/2026-11-14-engine-first.md`](../plans/2026-11-14-engine-first.md)
 **Date:** 2026-11-14
 
@@ -25,6 +25,7 @@
   - Art (`Tools/build_art.py`, no PixelLab generations): character `drink`, `stretch`, `rest`; cat `idle` and `react`; 6-frame rain; day frames for both cities; four room images (`night-on`, `night-off`, `day-on`, `day-off`); hotspots for pet, lamp, window, computer. All marked as stand-ins in `provenance` / `standIns`.
   - Engine: scene manifest gains optional `rooms`, `rain`, `hotspots`; scenery packs gain optional `phases`. `LoFiSKScene.apply(_:reduceMotion:)` swaps the room texture, shows or hides rain (half speed under Reduce Motion) and picks the scenery picture for the phase, without adding nodes. The coordinator applies the environment at start and on every clock tick. Debug launch arguments `-time`, `-weather`, `-lamp`.
   - Change from the plan: day/night and lamp are four baked room images, not overlay sprites (no extra nodes, and new art can supply its own four).
+- Task 5: hotspots and taps. `HotspotOverlay` puts invisible SwiftUI buttons (at least 44×44 pt, VoiceOver labels Pet / Desk lamp / Window / Computer) over the manifest's hotspot rectangles; smaller frames sit on top. Pet tap plays the manifest's tap reaction, lamp toggles and saves, window cycles scenery, computer toggles a "Music coming soon" card. `SceneCoordinator` is now an `ObservableObject` created by `SceneCoordinator.live()`; `RoomView` is the root view. `-debugAnchors YES` outlines the tap areas.
 - Working method from Task 1B on: the lead writes each task's brief and acceptance tests, a Sonnet subagent implements, the lead reviews, runs the tests and commits.
 
 ## Build / test results
@@ -35,6 +36,7 @@
 - After Task 2: `Executed 35 tests, with 0 failures` / `** TEST SUCCEEDED **` on the iPad (run by the subagent and again by the lead).
 - After Task 3: `Executed 46 tests, with 0 failures` / `** TEST SUCCEEDED **` on the iPad (subagent and lead).
 - After Task 4: `Executed 56 tests, with 0 failures` / `** TEST SUCCEEDED **` on the iPad (subagent and lead). Device screenshots checked for night/rain/lamp-off, day/clear/lamp-on and night/clear/lamp-on: rain shows only inside the window.
+- After Task 5: `Executed 64 tests, with 0 failures` / `** TEST SUCCEEDED **` on the iPad (subagent and lead). Debug screenshot: the four tap areas sit on the cat, lamp, window and monitor; nothing is visible without the debug flag.
 
 ## Open issues
 
@@ -42,9 +44,11 @@
 - `testFixtureRoutinesUseOnlyDeclaredNames` uses the system random generator, so it could fail by chance (about 1 in 100,000 runs).
 - Stand-in quality (all to be replaced in the art pass): the day room is a pale wash and the character looks too dark against it, with ragged edge pixels; lamp-off still shows a faint cone; the drink mug is 4×5 px and easy to miss; the cat's idle twitch is 1 px; rain is faint.
 - Characters and pets have no day variant.
+- Real finger taps on the iPad have not been tried yet (taps cannot be sent from the Mac); the user needs to try the four hotspots.
+- The VoiceOver label for the pet is "Pet", not "Cat" as the plan said, to stay art-independent.
 - A Reduce Motion change is only picked up on the next clock tick (up to a minute).
 - Automatic time shows the stand-in day room during daylight until the settings panel exists; use `-time night` to force night.
 
 ## Next step
 
-Task 5 (hotspots and taps).
+Task 6 (weather provider and environment controller).

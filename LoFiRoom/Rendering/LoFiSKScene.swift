@@ -80,6 +80,17 @@ final class LoFiSKScene: SKScene {
     @available(*, unavailable)
     required init?(coder: NSCoder) { fatalError() }
 
+    /// Called after every layout, so overlays can follow the canvas.
+    var onLayout: (() -> Void)?
+
+    /// A manifest hotspot in the SKView's UIKit coordinates (points, origin top-left); nil if unknown or not in a view.
+    func viewRect(forHotspot name: String) -> CGRect? {
+        guard let view, let h = manifest.hotspots?[name], let w = h.w, let height = h.h else { return nil }
+        func toView(_ x: Int, _ y: Int) -> CGPoint { convertPoint(toView: canvas.convert(CGPoint(x: x, y: y), to: self)) }
+        let a = toView(h.x, h.y), b = toView(h.x + w, h.y + height)
+        return CGRect(x: min(a.x, b.x), y: min(a.y, b.y), width: abs(a.x - b.x), height: abs(a.y - b.y))
+    }
+
     override func didMove(to view: SKView) { layout() }
     override func didChangeSize(_ oldSize: CGSize) { layout() }
 
@@ -160,5 +171,6 @@ final class LoFiSKScene: SKScene {
         func snap(_ v: CGFloat) -> CGFloat { (v * pixelsPerPoint).rounded() / pixelsPerPoint }
         canvas.position = CGPoint(x: snap((size.width - CGFloat(manifest.canvas.w) * scale) / 2),
                                   y: snap((size.height - CGFloat(manifest.canvas.h) * scale) / 2))
+        onLayout?()
     }
 }
