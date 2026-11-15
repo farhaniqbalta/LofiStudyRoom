@@ -12,6 +12,7 @@ final class SceneCoordinator: ObservableObject {
     /// Tap frames in view points, already padded.
     @Published private(set) var hotspotFrames: [String: CGRect] = [:]
     @Published var musicPanelVisible = false
+    @Published private(set) var musicState = MusicState(connection: .notConfigured, track: nil)
     @Published private(set) var weatherStatus: WeatherStatus = .off
     @Published var panelVisible = false
     @Published private(set) var controlsVisible = false
@@ -32,13 +33,17 @@ final class SceneCoordinator: ObservableObject {
         ("Scenery", \.scenery), ("Characters", \.character), ("Pets", \.pet), ("Clocks", \.clock),
     ]
 
+    private var music: MusicController?
+    let musicRemote: MusicRemote?
     private let characterDirector: ActorDirector
     private let petDirector: ActorDirector
 
     init(repository: SpriteAssetRepository, store: RoomStateStore, scene: LoFiSKScene,
          timers: TimerScheduling = LiveTimers(), clock: @escaping () -> TimeInterval = CACurrentMediaTime,
          routineSpeed: Double = 1, now: @escaping () -> Date = Date.init,
-         weather: WeatherProviding = OpenMeteoProvider(), weatherCacheURL: URL = SceneCoordinator.defaultWeatherCacheURL()) {
+         weather: WeatherProviding = OpenMeteoProvider(), weatherCacheURL: URL = SceneCoordinator.defaultWeatherCacheURL(),
+         music: MusicRemote? = nil) {
+        musicRemote = music
         self.now = now
         self.timers = timers
         self.weather = weather
@@ -54,6 +59,13 @@ final class SceneCoordinator: ObservableObject {
             applyEnvironment()
             weatherStatus = environment.status
         }
+        self.music = music.map { remote in
+            MusicController(remote: remote) { [weak self] in
+                guard let self, let state = self.music?.state else { return }
+                musicState = state
+            }
+        }
+        if let state = self.music?.state { musicState = state }
         scene.onLayout = { [weak self, weak scene] in
             guard let self, let scene else { return }
             var frames: [String: CGRect] = [:]
@@ -159,6 +171,7 @@ final class SceneCoordinator: ObservableObject {
         if active { Task { await environment.refreshIfStale() } } else { environment.stop() }
         characterDirector.setActive(active)
         petDirector.setActive(active)
+        if active { music?.becameActive() } else { music?.resignedActive() }
     }
 
     func petTapped() { petDirector.tapped() }
@@ -192,7 +205,16 @@ final class SceneCoordinator: ObservableObject {
         select(folders[next], in: "Scenery")
     }
 
-    func computerTapped() { musicPanelVisible.toggle() }
+    func computerTapped() {
+        musicPanelVisible.toggle()
+        if musicPanelVisible { music?.cardOpened() } else { music?.cardClosed() }
+    }
+
+    func musicPrimaryAction() { music?.primaryAction() }
+    func musicTogglePlayPause() { music?.togglePlayPause() }
+    func musicNext() { music?.next() }
+    func musicPrevious() { music?.previous() }
+    func handleCallback(_ url: URL) { _ = music?.handleCallback(url) }
 
     /// Shows the saved configuration and starts the clock.
     func start(clockDriver: ClockDriver? = nil) {

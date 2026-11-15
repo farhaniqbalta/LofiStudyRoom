@@ -22,17 +22,9 @@ struct RoomView: View {
                 .allowsHitTesting(false)
             }
             if coordinator.musicPanelVisible {
-                Button { coordinator.computerTapped() } label: {
-                    Text("Music coming soon")
-                        .font(.headline)
-                        .foregroundStyle(.white)
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 10)
-                        .background(.black.opacity(0.7), in: RoundedRectangle(cornerRadius: 12))
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel("Music coming soon")
-                .padding(24)
+                MusicCard(coordinator: coordinator)
+                    .padding(24)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
             }
             Button { coordinator.panelVisible = true } label: {
                 Image(systemName: "gearshape.fill")
@@ -48,6 +40,7 @@ struct RoomView: View {
             .padding(8)
         }
         .sheet(isPresented: $coordinator.panelVisible) { CustomizationSheet(coordinator: coordinator) }
+        .onOpenURL { coordinator.handleCallback($0) }
         .ignoresSafeArea()
         .statusBarHidden()
         .persistentSystemOverlays(.hidden)

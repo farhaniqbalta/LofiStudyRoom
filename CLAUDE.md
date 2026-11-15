@@ -95,6 +95,7 @@ Launch switches: `-fps N`, `-paused YES`, `-debugAnchors YES` (anchor overlay + 
 - **Time-based logic:** everything uses injected one-shot timers (`TimerScheduling`) and clocks, never per-frame code. `ActorTimeline` is pure timing; `RoutineScheduler` picks routines; `ActorDirector` runs the chain for one actor and waits for a safe exit only while a one-shot plays. Tests drive time with `FakeTimers`.
 - **Clock:** `ClockTime` → `ClockDriver` (one timer per minute boundary plus system notifications) → `PixelClockNode`. Each tick also re-applies the environment.
 - **Environment:** `EnvironmentRules` (pure) resolves config + weather snapshot into a `ResolvedScene`; `LoFiSKScene.apply` swaps the room texture, rain and scenery picture without adding nodes. `OpenMeteoProvider` / `EnvironmentController` fetch only when a city is set and time or weather is automatic.
+- **Music:** `MusicController` (all logic, behind the `MusicRemote` protocol) → `SpotifyRemoteAdapter` (the only file importing the Spotify SDK, the one third-party dependency) → `MusicCard`. App switches happen only from a button tap; the token lives in the Keychain.
 - **Power:** `PowerPolicy` (pure) plus wiring in `RoomView` / `SceneContainer`: inactive means paused view and no timers.
 - **Aseprite pipeline (proof of concept):** `ArtLab/aseprite/<Name>.aseprite` + `<Name>.pack.json` → `python3 Tools/aseprite_export.py <source>` → `ArtLab/aseprite/out/`, which is a test-bundle resource loaded by `AsepritePipelineTests`. See `docs/ASEPRITE_WORKFLOW.md`.
 - **Art pipeline:** `ArtSource/` holds raw PixelLab output; `Tools/build_art.py` is the single source for anchors and builds every pack, including the stand-ins. Never hand-edit `LoFiRoom/Assets`.
@@ -173,7 +174,7 @@ What exists: routine and pet scheduling, tap hotspots, the customization panel, 
 
 What comes next, in order (spec §9 allows reordering):
 
-1. Spotify: a one-day App Remote spike, then M3b. Needs separate approval. Until then the computer hotspot shows a "Music coming soon" card.
+1. Spotify now-playing (M3b) is built and hand-tested (`docs/logs/spotify-now-playing.md`); how the card and artwork fit the room's look is still open. Building needs `SPOTIFY_CLIENT_ID` in the environment before `xcodegen generate`, like `DEVELOPMENT_TEAM`; without it the card says Spotify is not set up.
 2. Art-direction pass: the reference board is side-profile, half-body characters hidden below a detailed desk, and a dense cyberpunk city. Art set B is a first, saved attempt (see `docs/logs/art-B-cyberdesk.md`); further attempts are new sets (C, ...) per `docs/ART_SETS.md`. Stand-ins (marked `"stand-in"` in `provenance` / `standIns`) are replaced then, through the Aseprite workflow (proof of concept done, see `docs/ASEPRITE_WORKFLOW.md`).
 3. M4: power tuning and polish. M0's energy baseline is still unmeasured.
 

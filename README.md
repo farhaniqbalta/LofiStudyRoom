@@ -2,7 +2,7 @@
 
 A quiet, customizable, living 2D pixel-art lo-fi study room for iPad. It runs as a full-screen foreground app that looks like an animated screensaver: a character studies at a desk, a cat sleeps on the window sill, a city glows outside, and the clock in the room shows the real time. It is not a game, and it is built to stay open for hours on little power.
 
-Built with SwiftUI and SpriteKit. No backend and no third-party dependencies.
+Built with SwiftUI and SpriteKit. No backend. The only third-party dependency is Spotify's iOS SDK, for the optional now-playing card.
 
 ## Status
 
@@ -23,6 +23,7 @@ You need Xcode 27, [XcodeGen](https://github.com/yonaskolb/XcodeGen), Python 3 a
 
 ```sh
 export DEVELOPMENT_TEAM=<your Apple team ID>
+export SPOTIFY_CLIENT_ID=<your Spotify app's client ID>   # optional; without it the music card says Spotify is not set up
 IPAD=<your device UDID>            # xcrun devicectl list devices
 
 xcodegen generate

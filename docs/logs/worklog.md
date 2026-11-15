@@ -10,3 +10,4 @@ One line per checkpoint. Detail lives in the linked file.
 | Aseprite pipeline proof of concept | Done 2026-11-15 (88 tests on the iPad); awaiting review. No PixelLab credits used, no runtime code changed | [ASEPRITE_WORKFLOW.md](../ASEPRITE_WORKFLOW.md) |
 | Art set B — cyberpunk side desk | Experimental spike, saved; run with `-artSet B` | [art-B-cyberdesk.md](art-B-cyberdesk.md) |
 | Spotify App Remote spike | Done; connection drops about 30 s after a pause, app-switch resume works | [spotify-spike.md](spotify-spike.md) |
+| Spotify now-playing (M3b) | Built, 105 tests, hand-tested by the user; visual integration of the card still open | [spotify-now-playing.md](spotify-now-playing.md) |
