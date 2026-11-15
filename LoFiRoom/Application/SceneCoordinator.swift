@@ -16,6 +16,9 @@ final class SceneCoordinator: ObservableObject {
     @Published var panelVisible = false
     @Published private(set) var controlsVisible = false
     @Published private(set) var citySearchMessage: String?
+    @Published private(set) var isActive = false
+    @Published private(set) var lowPower = ProcessInfo.processInfo.isLowPowerModeEnabled
+    @Published private(set) var thermal = ProcessInfo.processInfo.thermalState
     private let timers: TimerScheduling
     private let weather: WeatherProviding
     private var hideControls: Cancellable?
@@ -145,7 +148,14 @@ final class SceneCoordinator: ObservableObject {
         await task.value
     }
 
+    func powerStateChanged(lowPower: Bool, thermal: ProcessInfo.ThermalState) {
+        self.lowPower = lowPower
+        self.thermal = thermal
+    }
+
     func setActive(_ active: Bool) {
+        guard active != isActive else { return }
+        isActive = active
         if active { Task { await environment.refreshIfStale() } } else { environment.stop() }
         characterDirector.setActive(active)
         petDirector.setActive(active)

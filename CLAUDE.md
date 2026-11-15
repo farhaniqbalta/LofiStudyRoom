@@ -67,14 +67,18 @@ xcrun devicectl device capture screenshot --device $IPAD --destination build/sho
 
 Launch switches: `-fps N`, `-paused YES`, `-debugAnchors YES` (anchor overlay + FPS counter), `-scene <folder>`, `-character <folder>`, `-pet <folder>`, `-scenery <folder>`, `-time auto|day|night`, `-weather auto|clear|rain`, `-lamp on|off` (choices are saved), `-routineSpeed N` (shortens routine delays for watching). The tests hang if the iPad is locked: check `xcrun devicectl device info lockState` first.
 
-## Code layout (as of M1)
+## Code layout (as of the engine-first phase)
 
-- **Flow:** `LoFiRoomApp` → `SceneContainer` (wrapped `SKView`) creates a `SceneCoordinator`, which owns the `SpriteAssetRepository`, `RoomStateStore` (one saved `RoomConfig` in `UserDefaults`), `ClockDriver` and the `LoFiSKScene`. The coordinator is the only thing that pushes state into the scene.
-- **Packs:** `LoFiRoom/Assets/<Category>/<Folder>/{manifest.json, sheet.png}` is a folder reference, so adding a pack is adding a folder. A sheet is one row of equal frames. `SpritePack.problems()` validates a pack against the scene (perspective, anchor, frame indices, fallback animation); a bad pack is rejected with a readable message and the scene keeps what it had.
-- **Scene pack:** `Scenes/StudyRoom01/manifest.json` holds the canvas (480×352), the safe rectangle (452×328), anchors and foreground pieces. Coordinates are logical pixels, origin bottom-left; every pack sprite sits with its bottom-left corner on its anchor. Anchors must be inside the safe rectangle.
-- **Scaling:** `ScalePolicy` picks the largest integer scale at which the safe rectangle fits (5× on the 11-inch, 6× on 13-inch); the rest letterboxes.
-- **Clock:** `ClockTime` (pure maths) → `ClockDriver` (one timer per minute boundary, plus foreground / time-zone / clock-change notifications) → `PixelClockNode` (swaps only glyphs that changed).
-- **Art pipeline:** `ArtSource/` holds raw PixelLab output; `Tools/build_art.py` is the single source for anchors and builds every pack (keys out the window glass, cuts characters out of their edits, traces the chair occluder, draws the clock digits). Never hand-edit `LoFiRoom/Assets`.
+- **Flow:** `LoFiRoomApp` → `RoomView` (SwiftUI root: `SceneContainer` for the `SKView`, `HotspotOverlay`, gear, `CustomizationSheet`) → `SceneCoordinator` (`ObservableObject`, built by `SceneCoordinator.live()`). The coordinator is the only thing that pushes state into `LoFiSKScene`; it owns the `SpriteAssetRepository`, `RoomStateStore` (one saved `RoomConfig` in `UserDefaults`), `ClockDriver`, two `ActorDirector`s and the `EnvironmentController`.
+- **Packs:** `LoFiRoom/Assets/<Category>/<Folder>/{manifest.json, sheet.png}` is a folder reference, so adding a pack is adding a folder. A sheet is one row of equal frames. `SpritePack.problems()` validates a pack against the scene; a bad pack is rejected with a readable message and the scene keeps what it had. Pack lists are filtered to the active scene's `perspective`.
+- **Manifests drive behaviour:** `fallbackAnimation` is the resting animation; an animation with `routine {weight, cooldown}` can be scheduled; `onTap` marks the tap reaction; `loop: false` makes a one-shot; `safeExits` lists frames where it may be interrupted (empty: only at its end); scenery `phases` maps day/night to animations.
+- **Scene pack:** `Scenes/<Folder>/manifest.json` holds the canvas, safe rectangle, anchors, foreground pieces and optional `rooms` (four images keyed `<phase>-<on|off>`), `rain`, `hotspots`. Coordinates are logical pixels, origin bottom-left; every pack sprite sits with its bottom-left corner on its anchor. Anchors and hotspots must be inside the safe rectangle. The scene is the first folder in `Scenes/` or `-scene <folder>`.
+- **Scaling:** `ScalePolicy` picks the largest integer scale at which the safe rectangle fits; the rest letterboxes.
+- **Time-based logic:** everything uses injected one-shot timers (`TimerScheduling`) and clocks, never per-frame code. `ActorTimeline` is pure timing; `RoutineScheduler` picks routines; `ActorDirector` runs the chain for one actor and waits for a safe exit only while a one-shot plays. Tests drive time with `FakeTimers`.
+- **Clock:** `ClockTime` → `ClockDriver` (one timer per minute boundary plus system notifications) → `PixelClockNode`. Each tick also re-applies the environment.
+- **Environment:** `EnvironmentRules` (pure) resolves config + weather snapshot into a `ResolvedScene`; `LoFiSKScene.apply` swaps the room texture, rain and scenery picture without adding nodes. `OpenMeteoProvider` / `EnvironmentController` fetch only when a city is set and time or weather is automatic.
+- **Power:** `PowerPolicy` (pure) plus wiring in `RoomView` / `SceneContainer`: inactive means paused view and no timers.
+- **Art pipeline:** `ArtSource/` holds raw PixelLab output; `Tools/build_art.py` is the single source for anchors and builds every pack, including the stand-ins. Never hand-edit `LoFiRoom/Assets`.
 
 ## Layered sprite rendering (mandatory)
 
@@ -144,24 +148,17 @@ Performance claims require measurements.
 
 ## Current milestone
 
-**Engine-first (M2 + M3a).** M0 and M1 are done and approved. The plan is `docs/plans/2026-11-14-engine-first.md`; follow it task by task and log progress in `docs/logs/M2-engine.md`.
+**Engine-first (M2 + M3a): built and tested, awaiting the user's hand checks and approval.** See `docs/logs/M2-engine.md` for what was verified and what was not. Do not start the next phase without approval.
 
-Scope:
+What exists: routine and pet scheduling, tap hotspots, the customization panel, hybrid time and weather (Open-Meteo, city search, cache), and the power policy, all on script-made stand-in art.
 
-- Routine scheduler (study, drink, stretch, rest) and pet behaviour (sleep, idle, tap reaction).
-- Tap hotspots: pet, lamp, window, computer.
-- Customization panel.
-- Hybrid time and weather: automatic or manual, independent, saved.
-- Power policy: pause in background, lower frame rate under Low Power or heat, Keep Screen Awake.
+What comes next, in order (spec §9 allows reordering):
 
-Decisions for this phase:
+1. Spotify: a one-day App Remote spike, then M3b. Needs separate approval. Until then the computer hotspot shows a "Music coming soon" card.
+2. Art-direction pass (experimental, on a branch): the reference board is side-profile, half-body characters hidden below a detailed desk, and a dense cyberpunk city. It is done as a new scene with its own `perspective` tag, characters, pets and art build script, chosen with `-scene <folder>`. Stand-ins (marked `"stand-in"` in `provenance` / `standIns`) are replaced then.
+3. M4: power tuning and polish. M0's energy baseline is still unmeasured.
 
-- **Order of work:** Engine-first → Spotify spike and M3b → art-direction pass → M4. Spec §9 allows reordering.
-- **Art:** the current PixelLab art is a placeholder direction and will be replaced. The reference board is very different: side-profile, half-body characters hidden below a detailed desk, and a dense cyberpunk city. The new direction is experimental, so it is done on a branch as a new scene with its own `perspective` tag, characters, pets and art build script, chosen with `-scene <folder>`. See "Reusable engine vs art" below.
-- **Stand-ins:** states with no real art yet get script-made stand-ins from `Tools/build_art.py`. Their manifests carry `"provenance": "stand-in …"` and they must be replaced in the art pass.
-- **Weather location:** city search only; no location permission.
-- **Spotify:** deferred. It starts with a one-day App Remote spike that needs separate approval. Until then the computer hotspot shows a "Music coming soon" stub.
-- M0's energy baseline is still unmeasured.
+Working method: the lead writes each task's brief and acceptance tests, a subagent implements, the lead reviews, re-runs the tests on the iPad and commits.
 
 ## Reusable engine vs art
 

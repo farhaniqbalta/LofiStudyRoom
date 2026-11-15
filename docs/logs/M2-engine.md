@@ -1,6 +1,6 @@
 # Engine-first (M2 + M3a)
 
-**Status:** In progress (Tasks 1–7 done)
+**Status:** Built and tested; hand checks on the iPad and user approval pending
 **Scope:** [`docs/plans/2026-11-14-engine-first.md`](../plans/2026-11-14-engine-first.md)
 **Date:** 2026-11-14
 
@@ -28,6 +28,7 @@
 - Task 5: hotspots and taps. `HotspotOverlay` puts invisible SwiftUI buttons (at least 44×44 pt, VoiceOver labels Pet / Desk lamp / Window / Computer) over the manifest's hotspot rectangles; smaller frames sit on top. Pet tap plays the manifest's tap reaction, lamp toggles and saves, window cycles scenery, computer toggles a "Music coming soon" card. `SceneCoordinator` is now an `ObservableObject` created by `SceneCoordinator.live()`; `RoomView` is the root view. `-debugAnchors YES` outlines the tap areas.
 - Task 6: weather. `OpenMeteoProvider` (forecast and city search; requests carry only coordinates or the typed name), `EnvironmentController` (disk cache per city, one 30-minute refresh timer, stale after 2 hours, results after stop or a city change are discarded, never throws). The coordinator fetches only when a city is set and time or weather is automatic; otherwise the network is unused. `weatherStatus` is published for the panel. Debug: `-cityName/-cityLat/-cityLon` and a status line under `-debugAnchors`.
 - Task 7: customization panel. `CustomizationSheet` (character, pet, scenery, time, weather with city search and status line, keep awake, Open-Meteo credit). Tapping empty room shows a gear at the top-right for 4 seconds; the gear's corner is always tappable and labelled "Room settings" for VoiceOver. All config writes go through one coordinator helper that notifies SwiftUI. `-showPanel YES` opens the panel at launch.
+- Task 8: power policy. `PowerPolicy` (frame rate capped at 15 under Low Power Mode or a serious/critical thermal state; idle timer disabled only while active and chosen). `RoomView` follows the scene phase (`setActive`), power and thermal notifications, and Reduce Motion changes; `SceneContainer.updateUIView` applies pause and frame rate. `setActive` is idempotent.
 - Working method from Task 1B on: the lead writes each task's brief and acceptance tests, a Sonnet subagent implements, the lead reviews, runs the tests and commits.
 
 ## Build / test results
@@ -41,6 +42,7 @@
 - After Task 5: `Executed 64 tests, with 0 failures` / `** TEST SUCCEEDED **` on the iPad (subagent and lead). Debug screenshot: the four tap areas sit on the cat, lamp, window and monitor; nothing is visible without the debug flag.
 - After Task 6: `Executed 75 tests, with 0 failures` / `** TEST SUCCEEDED **` on the iPad (subagent twice, lead once). Real-network check on the iPad with Tokyo coordinates showed `weather: current · day · rain · lamp on`.
 - After Task 7: `Executed 83 tests, with 0 failures` / `** TEST SUCCEEDED **` on the iPad (subagent twice, lead once). Screenshot of the panel checked down to the Weather mode control; the city search, Display and About sections are below the fold and were not seen.
+- After Task 8: `Executed 87 tests, with 0 failures` / `** TEST SUCCEEDED **` on the iPad (lead; the subagent could not reach the iPad). Device run with `-routineSpeed 20 -debugAnchors YES`: FPS counter 30.0; status line `weather: off · night · rain · lamp on`; of six screenshots 4 s apart, three differ from rest in the character region (410, 14,810 and 21,910 pixels at device resolution), so routines play on the device.
 
 ## Open issues
 
@@ -54,9 +56,17 @@
 - Changed from the plan: the panel opens from a gear revealed by tapping empty room, not a two-finger tap (the window's tap area would swallow it).
 - The panel's lower sections and the gear have not been tried by hand on the iPad.
 - A pack picker shows blank if the saved name is not in the list.
-- A Reduce Motion change is only picked up on the next clock tick (up to a minute).
 - Automatic time shows the stand-in day room during daylight until the settings panel exists; use `-time night` to force night.
+
+- Not tried by hand on the iPad: finger taps on the four hotspots, the gear and the panel's lower sections (city search, keep awake), backgrounding and returning, Low Power Mode, VoiceOver, airplane-mode launch with cached weather.
+- If the app launches while not fully active it counts as active until the next scene-phase change.
+- M0's energy baseline is still unmeasured; no power claim is made for this phase.
+
+## Reusable vs throwaway (for the art-direction pass)
+
+- Reusable as is: everything under `LoFiRoom/Domain`, `Application`, `Infrastructure`, `Rendering`, `Presentation`, and the tests' fixture scene.
+- Throwaway: `ArtSource/`, `LoFiRoom/Assets/`, `Tools/build_art.py`, `Tools/cutout.py`, and every manifest value. A new direction adds its own scene folder, packs and build script and is launched with `-scene <folder>`.
 
 ## Next step
 
-Task 8 (power policy, device check, docs).
+User tries the hand checks above and approves. Then, in this order: Spotify App Remote spike and M3b (needs separate approval), the art-direction pass, M4.

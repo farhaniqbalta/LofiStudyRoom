@@ -10,7 +10,7 @@ Built with SwiftUI and SpriteKit. No backend and no third-party dependencies.
 |---|---|---|
 | M0 | SpriteKit room, integer pixel scaling, anchors | Done |
 | M1 | Swappable sprite packs, layered scene, real pixel clock, saved setup | Done |
-| Engine-first (M2 + M3a) | Routine scheduler, tap interactions, customization panel, time and weather | Next |
+| Engine-first (M2 + M3a) | Routine scheduler, tap interactions, customization panel, time and weather, power policy (on stand-in art) | Built and tested |
 | M3b | Spotify now-playing | Later |
 | Art pass | Art-direction experiments, replacing stand-ins | Later |
 | M4 | Power tuning and polish | Later |
@@ -30,7 +30,9 @@ xcodebuild test -project LoFiRoom.xcodeproj -scheme LoFiRoom \
   -destination "platform=iOS,id=$IPAD" -allowProvisioningUpdates -derivedDataPath build
 ```
 
-Launch options: `-character Girl01`, `-pet BlackCat`, `-scenery NeonCity02`, `-fps 12`, `-debugAnchors YES`.
+Launch options include `-character Girl01`, `-pet BlackCat`, `-scenery NeonCity02`, `-time night`, `-weather rain`, `-lamp off`, `-routineSpeed 20`, `-fps 12`, `-debugAnchors YES`; the full list is in `CLAUDE.md`.
+
+In the app: tap the cat, lamp, window or monitor; tap empty room to reveal the settings gear at the top-right.
 
 ## Repository map
 

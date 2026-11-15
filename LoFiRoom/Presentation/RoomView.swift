@@ -2,6 +2,7 @@ import SwiftUI
 
 struct RoomView: View {
     @StateObject private var coordinator = SceneCoordinator.live()
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
         ZStack(alignment: .topLeading) {
@@ -51,5 +52,23 @@ struct RoomView: View {
         .statusBarHidden()
         .persistentSystemOverlays(.hidden)
         .background(.black)
+        .onChange(of: scenePhase) { _, phase in coordinator.setActive(phase == .active) }
+        .onReceive(NotificationCenter.default.publisher(for: .NSProcessInfoPowerStateDidChange)) { _ in powerChanged() }
+        .onReceive(NotificationCenter.default.publisher(for: ProcessInfo.thermalStateDidChangeNotification)) { _ in powerChanged() }
+        .onReceive(NotificationCenter.default.publisher(for: UIAccessibility.reduceMotionStatusDidChangeNotification)) { _ in
+            coordinator.applyEnvironment()
+        }
+        .onChange(of: coordinator.config.keepAwake) { updateIdleTimer() }
+        .onChange(of: coordinator.isActive) { updateIdleTimer() }
+        .onAppear { updateIdleTimer() }
+    }
+
+    private func powerChanged() {
+        let info = ProcessInfo.processInfo
+        coordinator.powerStateChanged(lowPower: info.isLowPowerModeEnabled, thermal: info.thermalState)
+    }
+
+    private func updateIdleTimer() {
+        UIApplication.shared.isIdleTimerDisabled = PowerPolicy.idleTimerDisabled(keepAwake: coordinator.config.keepAwake, active: coordinator.isActive)
     }
 }
