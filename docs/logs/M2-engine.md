@@ -1,6 +1,6 @@
 # Engine-first (M2 + M3a)
 
-**Status:** Planned
+**Status:** In progress (Task 1 done)
 **Scope:** [`docs/plans/2026-11-14-engine-first.md`](../plans/2026-11-14-engine-first.md)
 **Date:** 2026-11-14
 
@@ -17,13 +17,17 @@
 
 - Task 0: repo tidied and published.
 - Task 0B: plan and directions written.
+- Task 1: `RoomConfig` v2 (lamp, time, weather, city, keep awake; old saves keep their pack choices) and `Domain/Environment.swift` (weather-code mapping, sunrise/sunset day phase with 06:00–18:00 fallback, manual-over-automatic, 2-hour staleness).
 
 ## Build / test results
 
 - After the tidy-up: `Executed 14 tests, with 0 failures` / `** TEST SUCCEEDED **` on the iPad.
+- After Task 1: `Executed 20 tests, with 0 failures` / `** TEST SUCCEEDED **` on the iPad.
 
 ## Open issues
 
+- Tests hang if the iPad locks; set Auto-Lock to Never while testing.
+
 ## Next step
 
-Task 1 (config schema v2 and environment rules), then Task 1B, after the user approves the updated directions.
+Task 1B (make the engine art-independent).

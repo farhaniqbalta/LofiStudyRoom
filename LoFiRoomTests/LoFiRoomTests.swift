@@ -134,7 +134,10 @@ final class LoFiRoomTests: XCTestCase {
         coordinator.select("Girl01", in: "Characters")
         coordinator.select("NeonCity02", in: "Scenery")
         let restored = RoomStateStore(defaults: defaults).config
-        XCTAssertEqual(restored, RoomConfig(character: "Girl01", pet: "OrangeCat", scenery: "NeonCity02"))
+        var expected = RoomConfig()
+        expected.character = "Girl01"
+        expected.scenery = "NeonCity02"
+        XCTAssertEqual(restored, expected)
     }
 
     func testSavedPackThatNoLongerExistsFallsBack() {
