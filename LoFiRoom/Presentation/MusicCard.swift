@@ -9,7 +9,7 @@ struct MusicCard: View {
 
     var body: some View {
         HStack(alignment: .center, spacing: 12) {
-            if showsTrack { art }
+            if state.showsTrack, let track = state.track { MusicArtwork(coordinator: coordinator, track: track).frame(width: 48, height: 48) }
             VStack(alignment: .leading, spacing: 4) { content }
             Spacer(minLength: 0)
             Button { coordinator.computerTapped() } label: {
@@ -22,25 +22,19 @@ struct MusicCard: View {
         .padding(12)
         .frame(width: 320)
         .background(.black.opacity(0.75), in: RoundedRectangle(cornerRadius: 16))
-        .task(id: state.track?.imageID) { await loadArtwork() }
     }
 
-    private var showsTrack: Bool { state.track != nil && (state.connection == .connected || state.connection == .dropped) }
-
     @ViewBuilder private var content: some View {
-        switch state.connection {
-        case .notConfigured: Text("Spotify isn't set up in this build")
-        case .notInstalled:
-            Text("Spotify isn't installed")
-            Link("Get Spotify", destination: URL(string: "https://apps.apple.com/app/id324684580")!).font(.callout.bold())
-        case .neverConnected: Text("Connect Spotify"); action("Connect Spotify")
-        case .connecting: Text("Connecting…")
-        case .connected:
-            if let track = state.track { trackText(track); controls(track) } else { Text("Nothing playing") }
-        case .dropped:
-            if let track = state.track { trackText(track).opacity(0.6) } else { Text("Spotify is paused") }
-            action("Resume in Spotify")
-        case .needsReconnect: Text("Reconnect Spotify"); action("Reconnect Spotify")
+        if state.showsTrack, let track = state.track {
+            trackText(track).opacity(state.connection == .connected ? 1 : 0.6)
+            if state.connection == .connected { controls(track) }
+        } else if let message = state.message {
+            Text(message)
+        }
+        if state.connection == .notInstalled {
+            Link(state.actionTitle!, destination: MusicState.getSpotifyURL).font(.callout.bold())
+        } else if let title = state.actionTitle {
+            action(title)
         }
     }
 
@@ -69,22 +63,61 @@ struct MusicCard: View {
         Button(action: run) { Image(systemName: symbol).frame(width: 44, height: 44).contentShape(Rectangle()) }
             .accessibilityLabel(label)
     }
+}
 
-    private var art: some View {
+/// Texts shared by `MusicCard` and `MusicSkinOverlay` so the two cannot drift apart.
+extension MusicState {
+    static let getSpotifyURL = URL(string: "https://apps.apple.com/app/id324684580")!
+
+    var showsTrack: Bool { track != nil && (connection == .connected || connection == .dropped) }
+
+    /// Status line for states that show no track; nil when the track is shown.
+    var message: String? {
+        switch connection {
+        case .notConfigured: "Spotify isn't set up in this build"
+        case .notInstalled: "Spotify isn't installed"
+        case .neverConnected: "Connect Spotify"
+        case .connecting: "Connecting…"
+        case .connected: track == nil ? "Nothing playing" : nil
+        case .dropped: track == nil ? "Spotify is paused" : nil
+        case .needsReconnect: "Reconnect Spotify"
+        }
+    }
+
+    /// The one text button; for `.notInstalled` it is a link to the App Store, otherwise it calls `musicPrimaryAction`.
+    var actionTitle: String? {
+        switch connection {
+        case .notInstalled: "Get Spotify"
+        case .neverConnected: "Connect Spotify"
+        case .dropped: "Resume in Spotify"
+        case .needsReconnect: "Reconnect Spotify"
+        default: nil
+        }
+    }
+}
+
+/// The cover exactly as Spotify provides it: never altered or covered. Rounded corners only.
+struct MusicArtwork: View {
+    let coordinator: SceneCoordinator
+    let track: NowPlaying
+    var cornerRadius: CGFloat = 8
+    @State private var image: UIImage?
+
+    var body: some View {
         Group {
-            if let artwork { Image(uiImage: artwork).resizable() } else {
+            if let image { Image(uiImage: image).resizable().scaledToFit() } else {
                 Image(systemName: "music.note").foregroundStyle(.white.opacity(0.6)).frame(maxWidth: .infinity, maxHeight: .infinity).background(.white.opacity(0.1))
             }
         }
-        .frame(width: 48, height: 48)
-        .clipShape(RoundedRectangle(cornerRadius: 8))
+        .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
+        .task(id: track.imageID) { await load() }
     }
 
-    private func loadArtwork() async {
-        artwork = nil
-        guard let track = state.track, let adapter = coordinator.musicRemote as? SpotifyRemoteAdapter else { return }
-        artwork = await withCheckedContinuation { continuation in
-            adapter.artwork(for: track, size: CGSize(width: 96, height: 96)) { continuation.resume(returning: $0) }
+    private func load() async {
+        image = nil
+        guard let adapter = coordinator.musicRemote as? SpotifyRemoteAdapter else { return }
+        image = await withCheckedContinuation { continuation in
+            adapter.artwork(for: track, size: CGSize(width: 192, height: 192)) { continuation.resume(returning: $0) }
         }
     }
 }

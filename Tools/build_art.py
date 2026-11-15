@@ -245,6 +245,79 @@ def rain_sheet():
         frames.append(img)
     return frames
 
+# ---------- music skin: a wall-mounted pixel player (panel, icons, notes) for the Spotify now-playing display
+PANEL_AT, PANEL_SIZE = (58, 228), (176, 56)    # top-left on the room, size
+BODY_C, EDGE_C, HILITE_C, WELL_C, LED_C, ICON_C = (22, 18, 40, 255), (118, 92, 160, 255), (58, 46, 92, 255), (12, 10, 24, 255), (240, 170, 70, 255), (243, 233, 210, 255)
+CYAN_C = (120, 220, 235, 255)
+MUSIC_SLOTS = dict(artwork=(6, 6, 44, 44), title=(56, 6, 104, 13), artist=(56, 20, 104, 11), attribution=(128, 38, 42, 12),
+                   previous=(58, 36, 16, 16), toggle=(80, 36, 16, 16), next=(102, 36, 16, 16), close=(164, 4, 8, 8),
+                   message=(56, 6, 114, 24), action=(56, 34, 114, 16))
+
+def panel_image():
+    pw, ph = PANEL_SIZE
+    img = [[BODY_C] * pw for _ in range(ph)]
+    def px(x, y, c): img[y][x] = c
+    for x in range(pw):
+        px(x, 0, EDGE_C); px(x, ph - 1, EDGE_C)
+    for y in range(ph):
+        px(0, y, EDGE_C); px(pw - 1, y, EDGE_C)
+    for x, y in ((0, 0), (pw - 1, 0), (0, ph - 1), (pw - 1, ph - 1)):
+        px(x, y, CLEAR)
+    for x in range(2, pw - 2):
+        px(x, 1, HILITE_C)
+    for i in range(46):  # recessed cover well
+        for x, y in ((5 + i, 5), (5 + i, 50), (5, 5 + i), (50, 5 + i)):
+            px(x, y, HILITE_C)
+    for y in range(6, 50):
+        for x in range(6, 50):
+            px(x, y, WELL_C)
+    for x in range(56, 170):  # divider under the text area
+        px(x, 33, HILITE_C)
+    px(166, 16, LED_C); px(169, 16, LED_C)
+    return img
+
+def bitmap(rows, colour=ICON_C):
+    return [[colour if c == "X" else CLEAR for c in row] for row in rows]
+
+def paste(canvas, rows, x, y):
+    for j, row in enumerate(rows):
+        for i, c in enumerate(row):
+            if c == "X":
+                canvas[y + j][x + i] = ICON_C
+
+TRI_R = ["X....", "XX...", "XXX..", "XXXX.", "XXXXX", "XXXX.", "XXX..", "XX...", "X...."]
+PLAY = ["X......", "XX.....", "XXX....", "XXXX...", "XXXXX..", "XXXXXX.", "XXXXX..", "XXXX...", "XXX....", "XX.....", "X......"]
+BAR = ["XX"] * 9
+PAUSE_BAR = ["XXX"] * 11
+CLOSE = [["X" if abs(x - y) <= 1 or abs(x - (7 - y)) <= 1 else "." for x in range(8)] for y in range(8)]
+def icon(*parts):
+    canvas = [[CLEAR] * 16 for _ in range(16)]
+    for rows, x, y in parts:
+        paste(canvas, rows, x, y)
+    return canvas
+ICON_NEXT = icon((TRI_R, 3, 3), (TRI_R, 8, 3), (BAR, 13, 3))
+ICON_PREVIOUS = [row[::-1] for row in ICON_NEXT]
+ICON_PLAY = icon((PLAY, 4, 2))
+ICON_PAUSE = icon((PAUSE_BAR, 4, 2), (PAUSE_BAR, 9, 2))
+ICON_CLOSE = icon((["".join(r) for r in CLOSE], 4, 4))
+
+def note(canvas, x, y, colour):
+    """Eighth note, 5x8 px, top-left at x, y."""
+    for j, row in enumerate(("..XXX", "..X.X", "..X..", "..X..", "..X..", ".XX..", "XXX..", ".X...")):
+        for i, c in enumerate(row):
+            if c == "X" and 0 <= y + j < 24 and 0 <= x + i < 20:
+                canvas[y + j][x + i] = colour
+def notes_frame(f):
+    canvas = [[CLEAR] * 20 for _ in range(24)]
+    note(canvas, 3 + (f % 2) * 2, 16 - 4 * f, LED_C)             # amber note rises and sways
+    note(canvas, 12 - (f % 2) * 2, 16 - 4 * ((f + 2) % 4), CYAN_C)  # cyan note half a loop behind
+    return canvas
+
+music_dir = pack_dir("Scenes", "StudyRoom01")
+pngio.write(os.path.join(music_dir, "music_panel.png"), panel_image())
+pngio.write(os.path.join(music_dir, "music_icons.png"), sheet([ICON_PREVIOUS, ICON_PLAY, ICON_PAUSE, ICON_NEXT, ICON_CLOSE]))
+pngio.write(os.path.join(music_dir, "music_notes.png"), sheet([notes_frame(f) for f in range(4)]))
+
 # ---------- scene
 scene_dir = pack_dir("Scenes", "StudyRoom01")
 pngio.write(os.path.join(scene_dir, "room.png"), room)
@@ -257,12 +330,24 @@ pngio.write(os.path.join(scene_dir, "chair_front.png"), pngio.crop(front, fx, fy
 anchors = {"window-rect": rect(*WINDOW), "window-mask": rect(*WINDOW), "desk-seat": seat, "pet-spot": pet,
            "clock-slot": rect(CLOCK[0], CLOCK[1], 23, 15)}
 anchors.update({k: dict(x=x, y=H - top) for k, (x, top) in POINTS.items()})
+def panel_slot(name):
+    x, y, w, h = MUSIC_SLOTS[name]
+    return rect(PANEL_AT[0] + x, PANEL_AT[1] + y, w, h)
+# Notes frame: 2 px above the higher of the two rest-pose heads, centred on them (top-left room pixels).
+seat_top = sy + fy - PAD
+head_top = seat_top + min(next(j for j, row in enumerate(pngio.crop(f[0], fx, fy, fw, fh)) if any(p[3] for p in row)) for f, _ in characters.values())
+anchors["music-notes"] = dict(x=sx + fx + 57 - 2, y=H - (head_top - 2))
 write_manifest(scene_dir, id="studyroom01", type="scene", artSet="A", packVersion=1, perspective=PERSPECTIVE,
                canvas=dict(w=W, h=H), safe=SAFE, anchors=anchors, room="room.png",
                foreground=[dict(image="chair_front.png", anchor="desk-seat")],
                provenance="PixelLab create_image_pixen job 0c085c34-7866-4ce7-813f-002ac93c9d1b; glass keyed out and "
                           "chair-front occluder traced by Tools/build_art.py. Stand-in frames: room variants, rain.",
-               rooms=files, standIns=["rooms", "rain"],
+               rooms=files, standIns=["rooms", "rain", "music"],
+               music=dict(panel="music_panel.png", frame=rect(*PANEL_AT, *PANEL_SIZE),
+                          icons=dict(sheet="music_icons.png", frame=dict(w=16, h=16), names=["previous", "play", "pause", "next", "close"]),
+                          slots={name: panel_slot(name) for name in MUSIC_SLOTS},
+                          textColor="#F3E9D2", dimColor="#8B7FA8",
+                          notes=dict(sheet="music_notes.png", frame=dict(w=20, h=24), fps=2, anchor="music-notes")),
                rain=dict(sheet="rain.png", frame=dict(w=ww, h=wh), fps=8, anchor="window-rect"),
                hotspots=dict(pet=pet, window=rect(*WINDOW), lamp=rect(*LAMP_BOX), computer=rect(*COMPUTER_BOX)))
 print("built packs in", os.path.normpath(OUT))

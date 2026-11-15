@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Composites the packs the way the app layers them, for a quick look without a device.
 Usage: python3 Tools/preview.py <Character> <Pet> <Scenery> <out.png> [HH:mm] [--scene <Folder>]
-  [--room <key>] [--rain <frame>] [--scenery-anim <name>] [--character-frame <n>] [--pet-frame <n>]"""
+  [--room <key>] [--rain <frame>] [--scenery-anim <name>] [--character-frame <n>] [--pet-frame <n>]
+  [--music <playing|paused|off>]  music skin: panel, icons, flat placeholders for cover and texts, notes while playing"""
 import json, os, sys
 import pngio
 
@@ -14,13 +15,14 @@ def load(*parts):
 def main():
     args = sys.argv[1:]
     first = lambda *parts: sorted(os.listdir(os.path.join(A, *parts)))[0]
-    scene_name = first("Scenes")
+    registry = json.load(open(os.path.join(A, "art-sets.json")))
+    scene_name = registry["sets"][registry["active"]]["scene"]
     if "--scene" in args:
         i = args.index("--scene")
         scene_name = args[i + 1]
         del args[i:i + 2]
     opts = {}
-    for flag in ("--room", "--rain", "--scenery-anim", "--character-frame", "--pet-frame"):
+    for flag in ("--music", "--room", "--rain", "--scenery-anim", "--character-frame", "--pet-frame"):
         if flag in args:
             i = args.index(flag)
             opts[flag] = args[i + 1]
@@ -66,6 +68,28 @@ def main():
     for ch, slot in zip(text, clock["slots"]):
         i = clock["glyphs"].index(ch)
         blit(pngio.crop(glyphs, i * clock["frame"]["w"], 0, clock["frame"]["w"], clock["frame"]["h"]), a["x"] + slot["x"], a["y"] + slot["y"])
+    skin = scene.get("music")
+    if skin and opts.get("--music", "off") != "off":
+        state = opts["--music"]
+        blit(pngio.read(os.path.join(sdir, skin["panel"])), skin["frame"]["x"], skin["frame"]["y"])
+        isheet = pngio.read(os.path.join(sdir, skin["icons"]["sheet"]))
+        iw, ih = skin["icons"]["frame"]["w"], skin["icons"]["frame"]["h"]
+        def centre(slot, name):
+            sl = skin["slots"][slot]
+            i = skin["icons"]["names"].index(name)
+            blit(pngio.crop(isheet, i * iw, 0, iw, ih), sl["x"] + (sl["w"] - iw) // 2, sl["y"] + (sl["h"] - ih) // 2)
+        def flat(slot, colour, shrink=0):
+            sl = skin["slots"][slot]
+            blit([[colour] * (sl["w"] - shrink) for _ in range(sl["h"] - 2 * (sl["h"] // 4))], sl["x"], sl["y"] + sl["h"] // 4)
+        flat("artwork", (90, 120, 150, 255)); blit([[(90, 120, 150, 255)] * 44 for _ in range(44)], skin["slots"]["artwork"]["x"], skin["slots"]["artwork"]["y"])
+        flat("title", (243, 233, 210, 255), 40); flat("artist", (139, 127, 168, 255), 60)
+        flat("attribution", (139, 127, 168, 255), 4)
+        centre("previous", "previous"); centre("toggle", "pause" if state == "playing" else "play")
+        centre("next", "next"); centre("close", "close")
+        if state == "playing" and skin.get("notes"):
+            n = skin["notes"]
+            a = scene["anchors"][n["anchor"]]
+            blit(pngio.crop(pngio.read(os.path.join(sdir, n["sheet"])), 0, 0, n["frame"]["w"], n["frame"]["h"]), a["x"], a["y"])
     pngio.write(out, [[p for p in row for _ in range(3)] for row in canvas for _ in range(3)])
 
 main()

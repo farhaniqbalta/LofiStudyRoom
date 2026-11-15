@@ -22,9 +22,13 @@ struct RoomView: View {
                 .allowsHitTesting(false)
             }
             if coordinator.musicPanelVisible {
-                MusicCard(coordinator: coordinator)
-                    .padding(24)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                if coordinator.hasMusicSkin {
+                    MusicSkinOverlay(coordinator: coordinator)
+                } else {
+                    MusicCard(coordinator: coordinator)
+                        .padding(24)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                }
             }
             Button { coordinator.panelVisible = true } label: {
                 Image(systemName: "gearshape.fill")

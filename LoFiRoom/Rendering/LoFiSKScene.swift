@@ -27,6 +27,14 @@ final class LoFiSKScene: SKScene {
     /// 0 when there is no rain effect or it is not raining.
     private(set) var rainFramesPerSecond: Double = 0
 
+    /// Music skin sprites, all created at init and only shown, hidden or retextured afterwards.
+    private var musicPanel: SKSpriteNode?
+    private var musicIcons: [String: SKSpriteNode] = [:]
+    private var iconTextures: [String: SKTexture] = [:]
+    private var notesSprite: SKSpriteNode?
+    private var notesFrames: [SKTexture] = []
+    private var musicApplied: (panelVisible: Bool, state: MusicState, reduceMotion: Bool)?
+
     let scenery = PackSpriteNode()
     let character = PackSpriteNode()
     let pet = PackSpriteNode()
@@ -70,11 +78,72 @@ final class LoFiSKScene: SKScene {
             groups[.scenery]!.addChild(node)
             rainSprite = node
         }
+        if let music = manifest.music { try addMusicSkin(music, repository) }
         groups[.actors]!.addChild(character)
         pet.zPosition = 1
         groups[.actors]!.addChild(pet)
         groups[.objects]!.addChild(clock)
         if showAnchors { addAnchorOverlay() }
+    }
+
+    private func addMusicSkin(_ music: MusicSkin, _ repository: SpriteAssetRepository) throws {
+        let panel = SKSpriteNode(texture: try repository.sceneTexture(music.panel))
+        panel.anchorPoint = .zero
+        panel.position = CGPoint(x: music.frame.x, y: music.frame.y)
+        panel.isHidden = true
+        groups[.objects]!.addChild(panel)
+        musicPanel = panel
+        let sheet = try repository.sceneTexture(music.icons.sheet)
+        let frames = SpriteAssetRepository.frames(of: sheet, count: Int(sheet.size().width) / music.icons.frame.w)
+        for (name, texture) in zip(music.icons.names, frames) { iconTextures[name] = texture }
+        for name in ["previous", "toggle", "next", "close"] {
+            let slot = music.slots[name]!
+            let node = SKSpriteNode(texture: iconTextures[name == "toggle" ? "play" : name],
+                                    size: CGSize(width: music.icons.frame.w, height: music.icons.frame.h))
+            node.position = CGPoint(x: slot.x + (slot.w ?? 0) / 2, y: slot.y + (slot.h ?? 0) / 2)
+            node.zPosition = 1
+            node.isHidden = true
+            groups[.objects]!.addChild(node)
+            musicIcons[name] = node
+        }
+        if let notes = music.notes {
+            let sheet = try repository.sceneTexture(notes.sheet)
+            notesFrames = SpriteAssetRepository.frames(of: sheet, count: Int(sheet.size().width) / notes.frame.w)
+            let node = SKSpriteNode(texture: notesFrames.first, size: CGSize(width: notes.frame.w, height: notes.frame.h))
+            node.anchorPoint = .zero
+            node.position = point(notes.anchor)
+            node.zPosition = 2
+            node.isHidden = true
+            groups[.objects]!.addChild(node)
+            notesSprite = node
+        }
+    }
+
+    var hasMusicSkin: Bool { musicPanel != nil }
+    var musicPanelIsShown: Bool { musicPanel?.isHidden == false }
+    var musicTransportIsShown: Bool { musicIcons["toggle"]?.isHidden == false }
+    var musicToggleShowsPause: Bool { musicIcons["toggle"]?.texture === iconTextures["pause"] }
+    var musicNotesAreShown: Bool { notesSprite?.isHidden == false }
+    var musicNotesAreAnimating: Bool { notesSprite?.hasActions() == true }
+
+    /// Shows the player and its icons, swaps play/pause, and runs the notes only while a track plays. Never adds nodes.
+    func applyMusic(panelVisible: Bool, state: MusicState, reduceMotion: Bool) {
+        guard let music = manifest.music else { return }
+        if let a = musicApplied, a.panelVisible == panelVisible, a.state == state, a.reduceMotion == reduceMotion { return }
+        musicApplied = (panelVisible, state, reduceMotion)
+        let connected = state.connection == .connected
+        let playing = connected && state.track?.isPaused == false
+        musicPanel?.isHidden = !panelVisible
+        musicIcons["close"]?.isHidden = !panelVisible
+        for name in ["previous", "toggle", "next"] { musicIcons[name]?.isHidden = !(panelVisible && connected) }
+        musicIcons["toggle"]?.texture = iconTextures[playing ? "pause" : "play"]
+        guard let notes = notesSprite, let spec = music.notes else { return }
+        notes.removeAllActions()
+        notes.isHidden = !playing
+        notes.texture = notesFrames.first
+        if !notes.isHidden && !reduceMotion {
+            notes.run(.repeatForever(.animate(with: notesFrames, timePerFrame: 1 / spec.fps, resize: false, restore: false)))
+        }
     }
 
     @available(*, unavailable)
@@ -84,8 +153,13 @@ final class LoFiSKScene: SKScene {
     var onLayout: (() -> Void)?
 
     /// A manifest hotspot in the SKView's UIKit coordinates (points, origin top-left); nil if unknown or not in a view.
-    func viewRect(forHotspot name: String) -> CGRect? {
-        guard let view, let h = manifest.hotspots?[name], let w = h.w, let height = h.h else { return nil }
+    func viewRect(forHotspot name: String) -> CGRect? { viewRect(of: manifest.hotspots?[name]) }
+
+    /// A music skin slot in the SKView's UIKit coordinates; nil without a skin, a view or that slot.
+    func viewRect(forMusicSlot name: String) -> CGRect? { viewRect(of: manifest.music?.slots[name]) }
+
+    private func viewRect(of area: ScenePack.Anchor?) -> CGRect? {
+        guard let view, let h = area, let w = h.w, let height = h.h else { return nil }
         func toView(_ x: Int, _ y: Int) -> CGPoint { convertPoint(toView: canvas.convert(CGPoint(x: x, y: y), to: self)) }
         let a = toView(h.x, h.y), b = toView(h.x + w, h.y + height)
         return CGRect(x: min(a.x, b.x), y: min(a.y, b.y), width: abs(a.x - b.x), height: abs(a.y - b.y))

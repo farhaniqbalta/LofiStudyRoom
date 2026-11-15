@@ -3,6 +3,20 @@ import Foundation
 struct PixelSize: Codable, Equatable { var w: Int, h: Int }
 struct PixelPoint: Codable, Equatable { var x: Int, y: Int }
 
+/// An optional pixel-art music player: sprites drawn in the room, with text and cover art laid over its slots.
+struct MusicSkin: Codable, Equatable {
+    struct Icons: Codable, Equatable { var sheet: String; var frame: PixelSize; var names: [String] }
+    var panel: String
+    var frame: ScenePack.Anchor
+    var icons: Icons
+    var slots: [String: ScenePack.Anchor]
+    var textColor: String
+    var dimColor: String
+    var notes: ScenePack.Effect?
+    static let requiredSlots = ["artwork", "title", "artist", "attribution", "previous", "toggle", "next", "close", "message", "action"]
+    static let requiredIcons = ["previous", "play", "pause", "next", "close"]
+}
+
 /// The room: canvas, safe area, anchors and fixed art. Logical pixels, origin bottom-left.
 /// Packs refer to anchors by ID only and are placed with their bottom-left corner on the anchor.
 struct ScenePack: Codable, Equatable {
@@ -23,6 +37,7 @@ struct ScenePack: Codable, Equatable {
     var rooms: [String: String]?
     var rain: Effect?
     var hotspots: [String: Anchor]?
+    var music: MusicSkin?
 
     static let requiredAnchors = ["desk-seat", "pet-spot", "clock-slot", "lamp", "computer", "window-rect", "window-mask"]
 
@@ -41,6 +56,19 @@ struct ScenePack: Codable, Equatable {
         for (name, h) in hotspots ?? [:] {
             if h.w == nil || h.h == nil { problems.append("hotspot '\(name)' needs a width and height") }
             if outside(h) { problems.append("hotspot '\(name)' is outside the safe area") }
+        }
+        if let music {
+            if outside(music.frame) { problems.append("music frame is outside the safe area") }
+            let f = music.frame
+            for name in MusicSkin.requiredSlots {
+                guard let s = music.slots[name] else { problems.append("music is missing slot '\(name)'"); continue }
+                if s.w == nil || s.h == nil { problems.append("music slot '\(name)' needs a width and height") }
+                if s.x < f.x || s.y < f.y || s.x + (s.w ?? 0) > f.x + (f.w ?? 0) || s.y + (s.h ?? 0) > f.y + (f.h ?? 0) {
+                    problems.append("music slot '\(name)' is outside the music frame")
+                }
+            }
+            problems += MusicSkin.requiredIcons.filter { !music.icons.names.contains($0) }.map { "music is missing icon '\($0)'" }
+            if let notes = music.notes, anchors[notes.anchor] == nil { problems.append("music notes use unknown anchor '\(notes.anchor)'") }
         }
         problems += foreground.filter { anchors[$0.anchor] == nil }.map { "foreground '\($0.image)' uses unknown anchor '\($0.anchor)'" }
         return problems.sorted()

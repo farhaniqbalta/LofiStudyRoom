@@ -52,6 +52,10 @@
     "computer": {
       "x": 347,
       "y": 160
+    },
+    "music-notes": {
+      "x": 391,
+      "y": 184
     }
   },
   "room": "room.png",
@@ -70,8 +74,105 @@
   },
   "standIns": [
     "rooms",
-    "rain"
+    "rain",
+    "music"
   ],
+  "music": {
+    "panel": "music_panel.png",
+    "frame": {
+      "x": 58,
+      "y": 68,
+      "w": 176,
+      "h": 56
+    },
+    "icons": {
+      "sheet": "music_icons.png",
+      "frame": {
+        "w": 16,
+        "h": 16
+      },
+      "names": [
+        "previous",
+        "play",
+        "pause",
+        "next",
+        "close"
+      ]
+    },
+    "slots": {
+      "artwork": {
+        "x": 64,
+        "y": 74,
+        "w": 44,
+        "h": 44
+      },
+      "title": {
+        "x": 114,
+        "y": 105,
+        "w": 104,
+        "h": 13
+      },
+      "artist": {
+        "x": 114,
+        "y": 93,
+        "w": 104,
+        "h": 11
+      },
+      "attribution": {
+        "x": 186,
+        "y": 74,
+        "w": 42,
+        "h": 12
+      },
+      "previous": {
+        "x": 116,
+        "y": 72,
+        "w": 16,
+        "h": 16
+      },
+      "toggle": {
+        "x": 138,
+        "y": 72,
+        "w": 16,
+        "h": 16
+      },
+      "next": {
+        "x": 160,
+        "y": 72,
+        "w": 16,
+        "h": 16
+      },
+      "close": {
+        "x": 222,
+        "y": 112,
+        "w": 8,
+        "h": 8
+      },
+      "message": {
+        "x": 114,
+        "y": 94,
+        "w": 114,
+        "h": 24
+      },
+      "action": {
+        "x": 114,
+        "y": 74,
+        "w": 114,
+        "h": 16
+      }
+    },
+    "textColor": "#F3E9D2",
+    "dimColor": "#8B7FA8",
+    "notes": {
+      "sheet": "music_notes.png",
+      "frame": {
+        "w": 20,
+        "h": 24
+      },
+      "fps": 2,
+      "anchor": "music-notes"
+    }
+  },
   "rain": {
     "sheet": "rain.png",
     "frame": {

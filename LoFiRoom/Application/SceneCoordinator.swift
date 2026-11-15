@@ -11,8 +11,10 @@ final class SceneCoordinator: ObservableObject {
     let scene: LoFiSKScene
     /// Tap frames in view points, already padded.
     @Published private(set) var hotspotFrames: [String: CGRect] = [:]
-    @Published var musicPanelVisible = false
-    @Published private(set) var musicState = MusicState(connection: .notConfigured, track: nil)
+    /// View-coordinate frames of every music skin slot; empty without a skin.
+    @Published private(set) var musicSlotFrames: [String: CGRect] = [:]
+    @Published var musicPanelVisible = false { didSet { applyMusic() } }
+    @Published private(set) var musicState = MusicState(connection: .notConfigured, track: nil) { didSet { applyMusic() } }
     @Published private(set) var weatherStatus: WeatherStatus = .off
     @Published var panelVisible = false
     @Published private(set) var controlsVisible = false
@@ -73,6 +75,11 @@ final class SceneCoordinator: ObservableObject {
                 if let rect = scene.viewRect(forHotspot: name) { frames[name] = Self.tapFrame(rect) }
             }
             if frames != hotspotFrames { hotspotFrames = frames }
+            var slots: [String: CGRect] = [:]
+            for name in scene.manifest.music?.slots.keys ?? [:].keys {
+                if let rect = scene.viewRect(forMusicSlot: name) { slots[name] = rect }
+            }
+            if slots != musicSlotFrames { musicSlotFrames = slots }
         }
     }
 
@@ -236,7 +243,14 @@ final class SceneCoordinator: ObservableObject {
         setActive(true)
     }
 
+    var hasMusicSkin: Bool { scene.hasMusicSkin }
+
+    private func applyMusic() {
+        scene.applyMusic(panelVisible: musicPanelVisible, state: musicState, reduceMotion: UIAccessibility.isReduceMotionEnabled)
+    }
+
     func applyEnvironment() {
+        applyMusic()
         scene.apply(EnvironmentRules.resolve(config: store.config, snapshot: environment.snapshot, now: now(), calendar: .autoupdatingCurrent),
                     reduceMotion: UIAccessibility.isReduceMotionEnabled)
     }

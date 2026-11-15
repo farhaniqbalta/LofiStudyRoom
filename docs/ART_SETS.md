@@ -13,8 +13,8 @@ What each set contains (folders under `LoFiRoom/Assets/`):
 
 | Set | Characters | Pets | Scenery | Clock | Extras |
 |---|---|---|---|---|---|
-| A | `Boy01`, `Girl01` | `OrangeCat`, `BlackCat` | `NeonCity01`, `NeonCity02` | `RetroDigital01` | Routines, tap reaction, rain, day/night, lamp on/off, hotspots |
-| B | `CyberBoy` | `CyberCat` (A's orange cat reused) | `CyberCity01` | `CyberClock` (A's clock reused) | Hotspots only. No routines for the character, no rain, day or lamp-off art |
+| A | `Boy01`, `Girl01` | `OrangeCat`, `BlackCat` | `NeonCity01`, `NeonCity02` | `RetroDigital01` | Routines, tap reaction, rain, day/night, lamp on/off, hotspots, music skin (wall player and floating notes) |
+| B | `CyberBoy` | `CyberCat` (A's orange cat reused) | `CyberCity01` | `CyberClock` (A's clock reused) | Hotspots only. No routines for the character, no rain, day or lamp-off art, no music skin (falls back to the plain card) |
 
 ## How to switch
 
@@ -46,7 +46,7 @@ It is the one hand-edited file under `LoFiRoom/Assets`; everything else there is
 
 1. Pick a scene folder name and a new perspective tag, for example `SideProfile01` and `side-profile-v1`.
 2. Put the sources in `ArtLab/type-c-<name>/`: raw images, `.aseprite` files, a `.pack.json` sidecar per pack, and an export script. Copy `ArtLab/type-b-cyberdesk/` as the starting point; `cut_layers.py` and `export.py` hold all its coordinates.
-3. The export script writes `Scenes/<folder>/` (with `"artSet": "C"`, canvas, safe rectangle, the seven anchors, foreground pieces, optional hotspots, rooms and rain) and runs `Tools/aseprite_export.py` for each pack with `LoFiRoom/Assets` as the out root.
+3. The export script writes `Scenes/<folder>/` (with `"artSet": "C"`, canvas, safe rectangle, the seven anchors, foreground pieces, optional hotspots, rooms, rain and a `music` skin) and runs `Tools/aseprite_export.py` for each pack with `LoFiRoom/Assets` as the out root.
 4. Add `"C"` to `art-sets.json` and a row to both tables above.
 5. Add a log `docs/logs/art-C-<name>.md` and a line in `docs/logs/worklog.md`.
 6. Run the tests on the iPad, then launch with `-artSet C`.
