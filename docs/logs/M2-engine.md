@@ -1,6 +1,6 @@
 # Engine-first (M2 + M3a)
 
-**Status:** In progress (Tasks 1–5 done)
+**Status:** In progress (Tasks 1–6 done)
 **Scope:** [`docs/plans/2026-11-14-engine-first.md`](../plans/2026-11-14-engine-first.md)
 **Date:** 2026-11-14
 
@@ -26,6 +26,7 @@
   - Engine: scene manifest gains optional `rooms`, `rain`, `hotspots`; scenery packs gain optional `phases`. `LoFiSKScene.apply(_:reduceMotion:)` swaps the room texture, shows or hides rain (half speed under Reduce Motion) and picks the scenery picture for the phase, without adding nodes. The coordinator applies the environment at start and on every clock tick. Debug launch arguments `-time`, `-weather`, `-lamp`.
   - Change from the plan: day/night and lamp are four baked room images, not overlay sprites (no extra nodes, and new art can supply its own four).
 - Task 5: hotspots and taps. `HotspotOverlay` puts invisible SwiftUI buttons (at least 44×44 pt, VoiceOver labels Pet / Desk lamp / Window / Computer) over the manifest's hotspot rectangles; smaller frames sit on top. Pet tap plays the manifest's tap reaction, lamp toggles and saves, window cycles scenery, computer toggles a "Music coming soon" card. `SceneCoordinator` is now an `ObservableObject` created by `SceneCoordinator.live()`; `RoomView` is the root view. `-debugAnchors YES` outlines the tap areas.
+- Task 6: weather. `OpenMeteoProvider` (forecast and city search; requests carry only coordinates or the typed name), `EnvironmentController` (disk cache per city, one 30-minute refresh timer, stale after 2 hours, results after stop or a city change are discarded, never throws). The coordinator fetches only when a city is set and time or weather is automatic; otherwise the network is unused. `weatherStatus` is published for the panel. Debug: `-cityName/-cityLat/-cityLon` and a status line under `-debugAnchors`.
 - Working method from Task 1B on: the lead writes each task's brief and acceptance tests, a Sonnet subagent implements, the lead reviews, runs the tests and commits.
 
 ## Build / test results
@@ -37,6 +38,7 @@
 - After Task 3: `Executed 46 tests, with 0 failures` / `** TEST SUCCEEDED **` on the iPad (subagent and lead).
 - After Task 4: `Executed 56 tests, with 0 failures` / `** TEST SUCCEEDED **` on the iPad (subagent and lead). Device screenshots checked for night/rain/lamp-off, day/clear/lamp-on and night/clear/lamp-on: rain shows only inside the window.
 - After Task 5: `Executed 64 tests, with 0 failures` / `** TEST SUCCEEDED **` on the iPad (subagent and lead). Debug screenshot: the four tap areas sit on the cat, lamp, window and monitor; nothing is visible without the debug flag.
+- After Task 6: `Executed 75 tests, with 0 failures` / `** TEST SUCCEEDED **` on the iPad (subagent twice, lead once). Real-network check on the iPad with Tokyo coordinates showed `weather: current · day · rain · lamp on`.
 
 ## Open issues
 
@@ -46,9 +48,10 @@
 - Characters and pets have no day variant.
 - Real finger taps on the iPad have not been tried yet (taps cannot be sent from the Mac); the user needs to try the four hotspots.
 - The VoiceOver label for the pet is "Pet", not "Cat" as the plan said, to stay art-independent.
+- The `-cityLat`/`-cityLon` launch arguments cannot take negative numbers (the system reads `-6.2` as another argument name), so southern or western cities cannot be set that way; the settings panel (Task 7) is the real way to choose a city.
 - A Reduce Motion change is only picked up on the next clock tick (up to a minute).
 - Automatic time shows the stand-in day room during daylight until the settings panel exists; use `-time night` to force night.
 
 ## Next step
 
-Task 6 (weather provider and environment controller).
+Task 7 (customization panel).

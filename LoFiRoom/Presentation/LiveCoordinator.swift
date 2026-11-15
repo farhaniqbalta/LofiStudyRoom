@@ -5,6 +5,7 @@ extension SceneCoordinator {
     /// Launch arguments: `-fps 12`, `-paused YES`, `-debugAnchors YES` (anchor overlay + FPS counter), and
     /// `-scene <folder>` (default: first scene folder), `-character Girl01`, `-pet BlackCat`, `-scenery NeonCity02` to choose packs (the choice is saved),
     /// `-time auto|day|night`, `-weather auto|clear|rain`, `-lamp on|off` (saved too; unknown values are ignored),
+    /// `-cityName <text> -cityLat <number> -cityLon <number>` (all three) set the weather city,
     /// and `-routineSpeed 20` to run routine delays that many times faster (testing).
     static func live() -> SceneCoordinator {
         let defaults = UserDefaults.standard
@@ -31,6 +32,10 @@ extension SceneCoordinator {
             case "on": store.config.lampOn = true
             case "off": store.config.lampOn = false
             default: break
+            }
+            if let name = defaults.string(forKey: "cityName"), defaults.object(forKey: "cityLat") != nil,
+               defaults.object(forKey: "cityLon") != nil {
+                store.config.city = City(name: name, latitude: defaults.double(forKey: "cityLat"), longitude: defaults.double(forKey: "cityLon"))
             }
             coordinator.start()
             for (category, argument) in [("Characters", "character"), ("Pets", "pet"), ("Scenery", "scenery")] {

@@ -12,6 +12,9 @@ final class SceneCoordinator: ObservableObject {
     /// Tap frames in view points, already padded.
     @Published private(set) var hotspotFrames: [String: CGRect] = [:]
     @Published var musicPanelVisible = false
+    @Published private(set) var weatherStatus: WeatherStatus = .off
+    private var environment: EnvironmentController!
+    private var reloading: Task<Void, Never>?
     private var clockDriver: ClockDriver?
     private let now: () -> Date
     private let log = Logger(subsystem: "com.lofiroom.app", category: "packs")
@@ -25,7 +28,8 @@ final class SceneCoordinator: ObservableObject {
 
     init(repository: SpriteAssetRepository, store: RoomStateStore, scene: LoFiSKScene,
          timers: TimerScheduling = LiveTimers(), clock: @escaping () -> TimeInterval = CACurrentMediaTime,
-         routineSpeed: Double = 1, now: @escaping () -> Date = Date.init) {
+         routineSpeed: Double = 1, now: @escaping () -> Date = Date.init,
+         weather: WeatherProviding = OpenMeteoProvider(), weatherCacheURL: URL = SceneCoordinator.defaultWeatherCacheURL()) {
         self.now = now
         self.repository = repository
         self.store = store
@@ -34,6 +38,11 @@ final class SceneCoordinator: ObservableObject {
                                           clock: clock, speed: routineSpeed) { [scene] in scene.show($0) }
         petDirector = ActorDirector(node: scene.pet, delay: RoutineConfig.petDelay, timers: timers,
                                     clock: clock, speed: routineSpeed) { [scene] in scene.show($0) }
+        environment = EnvironmentController(provider: weather, timers: timers, cacheURL: weatherCacheURL, now: now) { [weak self] in
+            guard let self else { return }
+            applyEnvironment()
+            weatherStatus = environment.status
+        }
         scene.onLayout = { [weak self, weak scene] in
             guard let self, let scene else { return }
             var frames: [String: CGRect] = [:]
@@ -44,7 +53,34 @@ final class SceneCoordinator: ObservableObject {
         }
     }
 
+    static func defaultWeatherCacheURL() -> URL {
+        let directory = URL.applicationSupportDirectory
+        try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        return directory.appendingPathComponent("weather.json")
+    }
+
+    /// Call after `store.config.time`, `.weather` or `.city` changed.
+    func environmentSettingsChanged() {
+        applyEnvironment()
+        Task { await reloadWeather() }
+    }
+
+    /// Fetches only with a city and at least one automatic setting; otherwise the network stays unused.
+    /// Reloads run one after another, so overlapping calls cannot discard each other's result.
+    func reloadWeather() async {
+        let previous = reloading
+        let task = Task { @MainActor in
+            await previous?.value
+            let config = store.config
+            let automatic = config.time == .automatic || config.weather == .automatic
+            await environment.start(city: automatic ? config.city : nil)
+        }
+        reloading = task
+        await task.value
+    }
+
     func setActive(_ active: Bool) {
+        if active { Task { await environment.refreshIfStale() } } else { environment.stop() }
         characterDirector.setActive(active)
         petDirector.setActive(active)
     }
@@ -92,6 +128,7 @@ final class SceneCoordinator: ObservableObject {
             }
         }
         applyEnvironment()
+        Task { await reloadWeather() }
         let driver = clockDriver ?? ClockDriver { [weak self] in
             self?.scene.clock.show($0)
             self?.applyEnvironment()
@@ -102,8 +139,7 @@ final class SceneCoordinator: ObservableObject {
     }
 
     func applyEnvironment() {
-        // snapshot is nil until weather data arrives in a later task.
-        scene.apply(EnvironmentRules.resolve(config: store.config, snapshot: nil, now: now(), calendar: .autoupdatingCurrent),
+        scene.apply(EnvironmentRules.resolve(config: store.config, snapshot: environment.snapshot, now: now(), calendar: .autoupdatingCurrent),
                     reduceMotion: UIAccessibility.isReduceMotionEnabled)
     }
 
