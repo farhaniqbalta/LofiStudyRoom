@@ -148,7 +148,7 @@ Performance claims require measurements.
 
 ## Current milestone
 
-**Engine-first (M2 + M3a): built and tested, awaiting the user's hand checks and approval.** See `docs/logs/M2-engine.md` for what was verified and what was not. Do not start the next phase without approval.
+**Engine-first (M2 + M3a) is done:** built, tested (87 tests on the iPad) and hand-tested by the user. See `docs/logs/M2-engine.md` for what was verified and what was not. No next phase is active; do not start one without the user's go-ahead.
 
 What exists: routine and pet scheduling, tap hotspots, the customization panel, hybrid time and weather (Open-Meteo, city search, cache), and the power policy, all on script-made stand-in art.
 

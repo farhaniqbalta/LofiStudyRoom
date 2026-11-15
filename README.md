@@ -10,7 +10,7 @@ Built with SwiftUI and SpriteKit. No backend and no third-party dependencies.
 |---|---|---|
 | M0 | SpriteKit room, integer pixel scaling, anchors | Done |
 | M1 | Swappable sprite packs, layered scene, real pixel clock, saved setup | Done |
-| Engine-first (M2 + M3a) | Routine scheduler, tap interactions, customization panel, time and weather, power policy (on stand-in art) | Built and tested |
+| Engine-first (M2 + M3a) | Routine scheduler, tap interactions, customization panel, time and weather, power policy (on stand-in art) | Done |
 | M3b | Spotify now-playing | Later |
 | Art pass | Art-direction experiments, replacing stand-ins | Later |
 | M4 | Power tuning and polish | Later |

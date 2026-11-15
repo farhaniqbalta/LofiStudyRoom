@@ -1,6 +1,6 @@
 # Engine-first (M2 + M3a)
 
-**Status:** Built and tested; hand checks on the iPad and user approval pending
+**Status:** Done. The user tested by hand on the iPad on 2026-11-15 and reported it works.
 **Scope:** [`docs/plans/2026-11-14-engine-first.md`](../plans/2026-11-14-engine-first.md)
 **Date:** 2026-11-14
 
@@ -58,7 +58,7 @@
 - A pack picker shows blank if the saved name is not in the list.
 - Automatic time shows the stand-in day room during daylight until the settings panel exists; use `-time night` to force night.
 
-- Not tried by hand on the iPad: finger taps on the four hotspots, the gear and the panel's lower sections (city search, keep awake), backgrounding and returning, Low Power Mode, VoiceOver, airplane-mode launch with cached weather.
+- The user's hand test on the iPad (2026-11-15) passed; the requested checks were taps on the four hotspots, the gear and panel including city search and keep awake, and backgrounding and returning. Not known to be tried: Low Power Mode, VoiceOver, airplane-mode launch with cached weather.
 - If the app launches while not fully active it counts as active until the next scene-phase change.
 - M0's energy baseline is still unmeasured; no power claim is made for this phase.
 
@@ -69,4 +69,4 @@
 
 ## Next step
 
-User tries the hand checks above and approves. Then, in this order: Spotify App Remote spike and M3b (needs separate approval), the art-direction pass, M4.
+In this order, each needing the user's go-ahead: Spotify App Remote spike and M3b (needs separate approval), the art-direction pass, M4.
