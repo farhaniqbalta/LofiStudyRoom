@@ -25,12 +25,12 @@ enum FixtureScene {
 
         try pack(root, "Characters/Typist", type: "character", anchor: "desk-seat", frame: (20, 30), frames: 3, animations: [
             "type": ["frames": [0], "fps": 1],
-            "sip": ["frames": [1], "fps": 1, "routine": ["weight": 1, "cooldown": 10]],
-            "lean": ["frames": [2], "fps": 1, "routine": ["weight": 1, "cooldown": 10]],
+            "sip": ["frames": [1], "fps": 1, "loop": false, "routine": ["weight": 1, "cooldown": 10]],
+            "lean": ["frames": [2], "fps": 1, "loop": false, "routine": ["weight": 1, "cooldown": 10]],
         ], fallback: "type")
         try pack(root, "Pets/Nappy", type: "pet", anchor: "pet-spot", frame: (12, 8), frames: 2, animations: [
             "nap": ["frames": [0], "fps": 1],
-            "purr": ["frames": [1], "fps": 1, "onTap": true],
+            "purr": ["frames": [1], "fps": 1, "loop": false, "onTap": true],
         ], fallback: "nap")
         try pack(root, "Scenery/Skyline", type: "scenery", anchor: "window-rect", frame: (100, 80), frames: 1, animations: [
             "still": ["frames": [0], "fps": 1],

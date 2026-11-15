@@ -11,6 +11,10 @@ struct SpritePack: Codable, Equatable {
         var fps: Double
         var routine: RoutineSpec?
         var onTap: Bool?
+        /// nil means it loops.
+        var loop: Bool?
+        /// Sheet frame indices where a routine or tap may cut in; nil means every frame.
+        var safeExits: [Int]?
     }
 
     var id: String
@@ -62,6 +66,9 @@ struct SpritePack: Codable, Equatable {
                 if animation.fps <= 0 || animation.frames.isEmpty { problems.append("animation '\(name)' needs frames and a positive fps") }
                 for index in animation.frames where !(0..<frameCount).contains(index) {
                     problems.append("animation '\(name)' uses frame \(index) but the sheet has \(frameCount) frames")
+                }
+                for exit in animation.safeExits ?? [] where !animation.frames.contains(exit) {
+                    problems.append("animation '\(name)' safe exit \(exit) is not one of its frames")
                 }
             }
         }
