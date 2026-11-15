@@ -37,9 +37,16 @@ Use them for composition, palette (warm amber lamp vs cyan/violet city) and anch
 - The always-visible Spotify and weather HUD panels are mock-ups; in the app they are hidden by default/compact (spec §1.1, §1.3).
 - The "15–30 FPS" label is a hypothesis, not a target (see review D1).
 
-## Sprite generation
+## Art workflow
 
-Generate sprites with the **PixelLab MCP** (`pixellab` server). Keep every generated asset on one logical pixel grid, one camera angle and shared anchors; record the prompt/settings and licence for each pack in its manifest or the checkpoint worklog. Generated output still needs a consistency pass before it counts as production art.
+**PixelLab (optional draft) → Aseprite (edit, animate, clean up) → `Tools/aseprite_export.py` → sprite pack.** Full steps: `docs/ASEPRITE_WORKFLOW.md`.
+
+- **Draft (optional):** the **PixelLab MCP** (`pixellab` server) costs credits. Use it only for a first draft of a pose, never to test the workflow, and ask before spending.
+- **Edit:** the **Aseprite MCP** (`aseprite-diivi` server) or Aseprite itself. The `.aseprite` file is the editable source; a tag is an animation; the sidecar `<Name>.pack.json` holds what Aseprite cannot (anchor, perspective, routines, tap reaction, safe exits). Inspect with `view_sprite`, `compare_frames` and `audit_animation` before exporting.
+- **Export:** `python3 Tools/aseprite_export.py <source>`. PNG and manifest are generated output: never hand-edit them, re-export.
+- **Validate:** `AsepritePipelineTests` on the iPad.
+
+Keep every asset on one logical pixel grid, one camera angle and shared anchors; record the prompt/settings and licence for each pack in the sidecar `provenance`. Generated output still needs a consistency pass before it counts as production art. The shipped stand-in packs still come from `Tools/build_art.py`; a pack moves to the Aseprite pipeline when it is redrawn, and two pipelines never write the same folder.
 
 ## Commands
 
@@ -52,6 +59,7 @@ export DEVELOPMENT_TEAM=<Apple team ID> # read by project.yml when xcodegen runs
 
 xcodegen generate                      # regenerate LoFiRoom.xcodeproj after editing project.yml or adding source files
 python3 Tools/build_art.py             # rebuild LoFiRoom/Assets packs from the raw PixelLab images in ArtSource/
+python3 Tools/aseprite_export.py ArtLab/aseprite/OrangeCatAse.aseprite   # export one .aseprite source as a pack (needs Aseprite; ASEPRITE_PATH overrides the default app path)
 python3 Tools/preview.py Boy01 OrangeCat NeonCity01 build/art/preview.png 22:47   # layered composite without a device
 
 # build + run all tests on the iPad (must be unlocked)
@@ -78,6 +86,7 @@ Launch switches: `-fps N`, `-paused YES`, `-debugAnchors YES` (anchor overlay + 
 - **Clock:** `ClockTime` → `ClockDriver` (one timer per minute boundary plus system notifications) → `PixelClockNode`. Each tick also re-applies the environment.
 - **Environment:** `EnvironmentRules` (pure) resolves config + weather snapshot into a `ResolvedScene`; `LoFiSKScene.apply` swaps the room texture, rain and scenery picture without adding nodes. `OpenMeteoProvider` / `EnvironmentController` fetch only when a city is set and time or weather is automatic.
 - **Power:** `PowerPolicy` (pure) plus wiring in `RoomView` / `SceneContainer`: inactive means paused view and no timers.
+- **Aseprite pipeline (proof of concept):** `ArtLab/aseprite/<Name>.aseprite` + `<Name>.pack.json` → `python3 Tools/aseprite_export.py <source>` → `ArtLab/aseprite/out/`, which is a test-bundle resource loaded by `AsepritePipelineTests`. See `docs/ASEPRITE_WORKFLOW.md`.
 - **Art pipeline:** `ArtSource/` holds raw PixelLab output; `Tools/build_art.py` is the single source for anchors and builds every pack, including the stand-ins. Never hand-edit `LoFiRoom/Assets`.
 
 ## Layered sprite rendering (mandatory)
@@ -133,7 +142,7 @@ Performance claims require measurements.
 - Do not introduce complex physics.
 - Do not introduce additional room layouts.
 - Do not implement features from later milestones prematurely.
-- PixelLab art is first-pass; it still needs a consistency pass before it counts as production art.
+- PixelLab art is first-pass; it still needs a consistency pass in Aseprite before it counts as production art.
 
 ## Working rules
 
@@ -155,7 +164,7 @@ What exists: routine and pet scheduling, tap hotspots, the customization panel, 
 What comes next, in order (spec §9 allows reordering):
 
 1. Spotify: a one-day App Remote spike, then M3b. Needs separate approval. Until then the computer hotspot shows a "Music coming soon" card.
-2. Art-direction pass (experimental, on a branch): the reference board is side-profile, half-body characters hidden below a detailed desk, and a dense cyberpunk city. It is done as a new scene with its own `perspective` tag, characters, pets and art build script, chosen with `-scene <folder>`. Stand-ins (marked `"stand-in"` in `provenance` / `standIns`) are replaced then.
+2. Art-direction pass (experimental, on a branch): the reference board is side-profile, half-body characters hidden below a detailed desk, and a dense cyberpunk city. It is done as a new scene with its own `perspective` tag, characters, pets and art build script, chosen with `-scene <folder>`. Stand-ins (marked `"stand-in"` in `provenance` / `standIns`) are replaced then, through the Aseprite workflow (proof of concept done, see `docs/ASEPRITE_WORKFLOW.md`).
 3. M4: power tuning and polish. M0's energy baseline is still unmeasured.
 
 Working method: the lead writes each task's brief and acceptance tests, a subagent implements, the lead reviews, re-runs the tests on the iPad and commits.

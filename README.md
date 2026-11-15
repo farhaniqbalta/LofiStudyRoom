@@ -42,6 +42,7 @@ In the app: tap the cat, lamp, window or monitor; tap empty room to reveal the s
 | `LoFiRoom/Assets/` | Generated sprite packs (do not edit by hand) |
 | `LoFiRoomTests/` | Unit tests |
 | `ArtSource/` | Raw generated images the packs are built from |
+| `ArtLab/aseprite/` | Editable `.aseprite` sources and their exported packs (pipeline proof of concept, see `docs/ASEPRITE_WORKFLOW.md`) |
 | `Tools/` | `build_art.py` builds the packs; `preview.py` composites the layers without a device |
 | `docs/spec/` | The locked MVP specification, design brief and review report |
 | `docs/logs/` | Per-milestone work logs |

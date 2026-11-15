@@ -40,7 +40,12 @@ targets:
   LoFiRoomTests:
     type: bundle.unit-test
     platform: iOS
-    sources: [LoFiRoomTests]
+    sources:
+      - path: LoFiRoomTests
+      # Packs exported from .aseprite sources; tested on the device without shipping in the app.
+      - path: ArtLab/aseprite/out
+        type: folder
+        buildPhase: resources
     settings:
       base:
         GENERATE_INFOPLIST_FILE: YES
