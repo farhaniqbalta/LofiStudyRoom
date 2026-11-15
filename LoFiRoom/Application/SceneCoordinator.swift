@@ -1,4 +1,5 @@
 import Foundation
+import QuartzCore
 import os
 
 /// Turns application state and events into scene updates. The scene never reads state or services itself.
@@ -14,11 +15,27 @@ final class SceneCoordinator {
         ("Scenery", \.scenery), ("Characters", \.character), ("Pets", \.pet), ("Clocks", \.clock),
     ]
 
-    init(repository: SpriteAssetRepository, store: RoomStateStore, scene: LoFiSKScene) {
+    private let characterDirector: ActorDirector
+    private let petDirector: ActorDirector
+
+    init(repository: SpriteAssetRepository, store: RoomStateStore, scene: LoFiSKScene,
+         timers: TimerScheduling = LiveTimers(), clock: @escaping () -> TimeInterval = CACurrentMediaTime,
+         routineSpeed: Double = 1) {
         self.repository = repository
         self.store = store
         self.scene = scene
+        characterDirector = ActorDirector(node: scene.character, delay: RoutineConfig.characterDelay, timers: timers,
+                                          clock: clock, speed: routineSpeed) { [scene] in scene.show($0) }
+        petDirector = ActorDirector(node: scene.pet, delay: RoutineConfig.petDelay, timers: timers,
+                                    clock: clock, speed: routineSpeed) { [scene] in scene.show($0) }
     }
+
+    func setActive(_ active: Bool) {
+        characterDirector.setActive(active)
+        petDirector.setActive(active)
+    }
+
+    func petTapped() { petDirector.tapped() }
 
     /// Shows the saved configuration and starts the clock.
     func start(clockDriver: ClockDriver? = nil) {
@@ -32,6 +49,7 @@ final class SceneCoordinator {
         let driver = clockDriver ?? ClockDriver { [scene] in scene.clock.show($0) }
         driver.start()
         self.clockDriver = driver
+        setActive(true)
     }
 
     /// Swaps one pack and saves the choice. Returns false, leaving the scene as it was, if the pack is unusable.
@@ -39,7 +57,12 @@ final class SceneCoordinator {
     func select(_ folder: String, in category: String) -> Bool {
         guard let key = Self.categories.first(where: { $0.name == category })?.key else { return false }
         do {
-            scene.show(try repository.load(category, folder))
+            let pack = try repository.load(category, folder)
+            switch category {
+            case "Characters": characterDirector.show(pack)
+            case "Pets": petDirector.show(pack)
+            default: scene.show(pack)
+            }
             store.config[keyPath: key] = folder
             return true
         } catch {

@@ -13,6 +13,12 @@ final class PackSpriteNode: SKSpriteNode {
     private var startTime: TimeInterval = 0
     private var pending: Cancellable?
 
+    /// True while the current animation is a one-shot that has not finished yet.
+    var isPlayingOneShot: Bool {
+        guard let name = currentAnimation, let animation = pack?.manifest.animations?[name], animation.loop == false else { return false }
+        return !ActorTimeline(animation: animation).isFinished(at: clock() - startTime)
+    }
+
     /// Plays a one-shot of the current pack, then calls `next` (the caller decides what follows).
     /// Anything that is not a one-shot there changes nothing and calls `next` at once.
     func play(_ name: String, then next: @escaping @MainActor () -> Void) {
