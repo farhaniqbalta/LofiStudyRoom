@@ -56,18 +56,22 @@ final class SpriteAssetRepository {
         let problems = manifest.problems(folder: folder, scene: scene, sheetSize: sheetSize)
         guard problems.isEmpty, let sheet, let sheetSize else { throw PackError("\(label): " + problems.joined(separator: "; ")) }
 
-        let count = sheetSize.w / manifest.frame.w
-        let frames = (0..<count).map { index -> SKTexture in
-            let frame = SKTexture(rect: CGRect(x: CGFloat(index) / CGFloat(count), y: 0, width: 1 / CGFloat(count), height: 1), in: sheet)
-            frame.filteringMode = .nearest
-            return frame
-        }
+        let frames = Self.frames(of: sheet, count: sheetSize.w / manifest.frame.w)
         var bezel: SKTexture?
         if let file = manifest.bezel {
             bezel = Self.texture(at: directory.appendingPathComponent(file))
             if bezel == nil { throw PackError("\(label): bezel '\(file)' is missing or not a readable image") }
         }
         return LoadedPack(manifest: manifest, frames: frames, bezel: bezel)
+    }
+
+    /// Cuts a one-row sheet into equal nearest-filtered frames.
+    static func frames(of sheet: SKTexture, count: Int) -> [SKTexture] {
+        (0..<count).map { index in
+            let frame = SKTexture(rect: CGRect(x: CGFloat(index) / CGFloat(count), y: 0, width: 1 / CGFloat(count), height: 1), in: sheet)
+            frame.filteringMode = .nearest
+            return frame
+        }
     }
 
     private static func decode<T: Decodable>(_ type: T.Type, in directory: URL, label: String) throws -> T {

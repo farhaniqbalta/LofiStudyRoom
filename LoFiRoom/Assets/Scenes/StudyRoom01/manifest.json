@@ -30,13 +30,13 @@
       "x": 336,
       "y": 27,
       "w": 85,
-      "h": 155
+      "h": 159
     },
     "pet-spot": {
       "x": 86,
       "y": 142,
       "w": 37,
-      "h": 27
+      "h": 28
     },
     "clock-slot": {
       "x": 294,
@@ -60,5 +60,50 @@
       "anchor": "desk-seat"
     }
   ],
-  "provenance": "PixelLab create_image_pixen job 0c085c34-7866-4ce7-813f-002ac93c9d1b; glass keyed out and chair-front occluder traced by Tools/build_art.py"
+  "provenance": "PixelLab create_image_pixen job 0c085c34-7866-4ce7-813f-002ac93c9d1b; glass keyed out and chair-front occluder traced by Tools/build_art.py. Stand-in frames: room variants, rain.",
+  "rooms": {
+    "night-on": "room.png",
+    "night-off": "room_night_off.png",
+    "day-on": "room_day.png",
+    "day-off": "room_day_off.png"
+  },
+  "standIns": [
+    "rooms",
+    "rain"
+  ],
+  "rain": {
+    "sheet": "rain.png",
+    "frame": {
+      "w": 184,
+      "h": 128
+    },
+    "fps": 8,
+    "anchor": "window-rect"
+  },
+  "hotspots": {
+    "pet": {
+      "x": 86,
+      "y": 142,
+      "w": 37,
+      "h": 28
+    },
+    "window": {
+      "x": 64,
+      "y": 148,
+      "w": 184,
+      "h": 128
+    },
+    "lamp": {
+      "x": 268,
+      "y": 124,
+      "w": 42,
+      "h": 66
+    },
+    "computer": {
+      "x": 315,
+      "y": 129,
+      "w": 75,
+      "h": 60
+    }
+  }
 }

@@ -81,17 +81,19 @@ final class LoFiRoomTests: XCTestCase {
     }
 
     func testPackValidationGivesActionableErrors() throws {
-        let good = try repository.load("Characters", "Boy01").manifest
-        let sheet = PixelSize(w: good.frame.w * 2, h: good.frame.h)
+        let loaded = try repository.load("Characters", "Boy01")
+        let good = loaded.manifest
+        let frameCount = loaded.frames.count
+        let sheet = PixelSize(w: good.frame.w * frameCount, h: good.frame.h)
         XCTAssertEqual(good.problems(folder: "Boy01", scene: repository.scene, sheetSize: sheet), [])
 
         var bad = good
         bad.perspective = "top-down"
         bad.anchor = "ceiling"
-        bad.animations = ["study": .init(frames: [0, 7], fps: 1)]
+        bad.animations = ["study": .init(frames: [0, frameCount], fps: 1)]
         bad.fallbackAnimation = "nap"
         XCTAssertEqual(bad.problems(folder: "Boy01", scene: repository.scene, sheetSize: sheet), [
-            "animation 'study' uses frame 7 but the sheet has 2 frames",
+            "animation 'study' uses frame \(frameCount) but the sheet has \(frameCount) frames",
             "fallbackAnimation is missing or not one of the animations",
             "perspective 'top-down' does not match the scene's 'study-room-back-3q-v1'",
             "unknown anchor 'ceiling'",
@@ -106,7 +108,7 @@ final class LoFiRoomTests: XCTestCase {
 
     func testMissingAnimationFallsBack() throws {
         let manifest = try repository.load("Characters", "Boy01").manifest
-        XCTAssertEqual(manifest.animation(named: "stretch"), manifest.animations?["study"])
+        XCTAssertEqual(manifest.animation(named: "no-such-animation"), manifest.animations?[manifest.fallbackAnimation!])
     }
 
     // MARK: Swapping and persistence

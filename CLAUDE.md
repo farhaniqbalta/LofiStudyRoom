@@ -65,7 +65,7 @@ xcrun devicectl device process launch --terminate-existing --device $IPAD com.lo
 xcrun devicectl device capture screenshot --device $IPAD --destination build/shots/shot.png
 ```
 
-Launch switches: `-fps N`, `-paused YES`, `-debugAnchors YES` (anchor overlay + FPS counter), `-character <folder>`, `-pet <folder>`, `-scenery <folder>` (pack choices are saved). There is no in-app picker until M2.
+Launch switches: `-fps N`, `-paused YES`, `-debugAnchors YES` (anchor overlay + FPS counter), `-scene <folder>`, `-character <folder>`, `-pet <folder>`, `-scenery <folder>`, `-time auto|day|night`, `-weather auto|clear|rain`, `-lamp on|off` (choices are saved), `-routineSpeed N` (shortens routine delays for watching). The tests hang if the iPad is locked: check `xcrun devicectl device info lockState` first.
 
 ## Code layout (as of M1)
 

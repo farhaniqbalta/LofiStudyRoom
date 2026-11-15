@@ -1,5 +1,6 @@
 import Foundation
 import QuartzCore
+import UIKit
 import os
 
 /// Turns application state and events into scene updates. The scene never reads state or services itself.
@@ -9,6 +10,7 @@ final class SceneCoordinator {
     let store: RoomStateStore
     let scene: LoFiSKScene
     private var clockDriver: ClockDriver?
+    private let now: () -> Date
     private let log = Logger(subsystem: "com.lofiroom.app", category: "packs")
 
     static let categories: [(name: String, key: WritableKeyPath<RoomConfig, String>)] = [
@@ -20,7 +22,8 @@ final class SceneCoordinator {
 
     init(repository: SpriteAssetRepository, store: RoomStateStore, scene: LoFiSKScene,
          timers: TimerScheduling = LiveTimers(), clock: @escaping () -> TimeInterval = CACurrentMediaTime,
-         routineSpeed: Double = 1) {
+         routineSpeed: Double = 1, now: @escaping () -> Date = Date.init) {
+        self.now = now
         self.repository = repository
         self.store = store
         self.scene = scene
@@ -46,10 +49,20 @@ final class SceneCoordinator {
                 log.error("No usable pack in \(category, privacy: .public)")
             }
         }
-        let driver = clockDriver ?? ClockDriver { [scene] in scene.clock.show($0) }
+        applyEnvironment()
+        let driver = clockDriver ?? ClockDriver { [weak self] in
+            self?.scene.clock.show($0)
+            self?.applyEnvironment()
+        }
         driver.start()
         self.clockDriver = driver
         setActive(true)
+    }
+
+    func applyEnvironment() {
+        // snapshot is nil until weather data arrives in a later task.
+        scene.apply(EnvironmentRules.resolve(config: store.config, snapshot: nil, now: now(), calendar: .autoupdatingCurrent),
+                    reduceMotion: UIAccessibility.isReduceMotionEnabled)
     }
 
     /// Swaps one pack and saves the choice. Returns false, leaving the scene as it was, if the pack is unusable.

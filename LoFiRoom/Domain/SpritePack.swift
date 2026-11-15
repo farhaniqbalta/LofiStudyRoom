@@ -26,6 +26,8 @@ struct SpritePack: Codable, Equatable {
     var frame: PixelSize
     var animations: [String: Animation]?
     var fallbackAnimation: String?
+    /// Scenery only: day-phase name to animation name.
+    var phases: [String: String]?
     // Clock skins only
     var glyphs: String?
     var bezel: String?
@@ -37,6 +39,8 @@ struct SpritePack: Codable, Equatable {
     func animation(named name: String) -> Animation? {
         animations?[name] ?? fallbackAnimation.flatMap { animations?[$0] }
     }
+
+    func animation(forPhase phase: DayPhase) -> String? { phases?[phase.rawValue] ?? fallbackAnimation }
 
     /// Human-readable problems; empty means the pack fits the scene. `sheetSize` is nil when the sheet is missing.
     func problems(folder: String, scene: ScenePack, sheetSize: PixelSize?) -> [String] {
@@ -62,6 +66,9 @@ struct SpritePack: Codable, Equatable {
             let animations = animations ?? [:]
             if animations.isEmpty { problems.append("no animations") }
             if fallbackAnimation.flatMap({ animations[$0] }) == nil { problems.append("fallbackAnimation is missing or not one of the animations") }
+            for (phase, name) in phases ?? [:] where animations[name] == nil {
+                problems.append("phase '\(phase)' uses unknown animation '\(name)'")
+            }
             for (name, animation) in animations {
                 if animation.fps <= 0 || animation.frames.isEmpty { problems.append("animation '\(name)' needs frames and a positive fps") }
                 for index in animation.frames where !(0..<frameCount).contains(index) {

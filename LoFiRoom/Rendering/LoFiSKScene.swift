@@ -18,6 +18,15 @@ final class LoFiSKScene: SKScene {
     private var groups: [Layer: SKNode] = [:]
     private(set) var pixelScale = 1
 
+    let roomSprite = SKSpriteNode()
+    private var roomTextures: [String: SKTexture] = [:]
+    private var rainSprite: SKSpriteNode?
+    private var rainFrames: [SKTexture] = []
+    private var reduceMotion = false
+    private(set) var applied: ResolvedScene?
+    /// 0 when there is no rain effect or it is not raining.
+    private(set) var rainFramesPerSecond: Double = 0
+
     let scenery = PackSpriteNode()
     let character = PackSpriteNode()
     let pet = PackSpriteNode()
@@ -36,9 +45,13 @@ final class LoFiSKScene: SKScene {
             groups[layer] = group
         }
 
-        let room = SKSpriteNode(texture: try repository.sceneTexture(manifest.room))
-        room.anchorPoint = .zero
-        groups[.room]!.addChild(room)
+        for file in Set((manifest.rooms ?? [:]).values).union([manifest.room]) {
+            roomTextures[file] = try repository.sceneTexture(file)
+        }
+        roomSprite.texture = roomTextures[manifest.room]
+        roomSprite.size = roomSprite.texture!.size()
+        roomSprite.anchorPoint = .zero
+        groups[.room]!.addChild(roomSprite)
         for piece in manifest.foreground {
             let node = SKSpriteNode(texture: try repository.sceneTexture(piece.image))
             node.anchorPoint = .zero
@@ -46,6 +59,17 @@ final class LoFiSKScene: SKScene {
             groups[.foreground]!.addChild(node)
         }
         groups[.scenery]!.addChild(scenery)
+        if let rain = manifest.rain {
+            let sheet = try repository.sceneTexture(rain.sheet)
+            rainFrames = SpriteAssetRepository.frames(of: sheet, count: Int(sheet.size().width) / rain.frame.w)
+            let node = SKSpriteNode(texture: rainFrames.first, size: CGSize(width: rain.frame.w, height: rain.frame.h))
+            node.anchorPoint = .zero
+            node.position = point(rain.anchor)
+            node.zPosition = 1
+            node.isHidden = true
+            groups[.scenery]!.addChild(node)
+            rainSprite = node
+        }
         groups[.actors]!.addChild(character)
         pet.zPosition = 1
         groups[.actors]!.addChild(pet)
@@ -71,12 +95,37 @@ final class LoFiSKScene: SKScene {
             pet.show(pack)
         case "scenery":
             scenery.position = position
-            scenery.show(pack)
+            if let applied, let name = pack.manifest.animation(forPhase: applied.phase) {
+                scenery.show(pack, animation: name)
+            } else {
+                scenery.show(pack)
+            }
         case "clock":
             clock.position = position
             clock.use(pack)
         default:
             break
+        }
+    }
+
+    /// Swaps state in place: room texture, rain on or off, scenery picture. Never adds or removes nodes.
+    func apply(_ resolved: ResolvedScene, reduceMotion: Bool) {
+        guard resolved != applied || reduceMotion != self.reduceMotion else { return }
+        applied = resolved
+        self.reduceMotion = reduceMotion
+        roomSprite.texture = roomTextures[manifest.roomImage(for: resolved)]
+        if let rain = manifest.rain, let rainSprite, resolved.sky == .rain {
+            rainFramesPerSecond = reduceMotion ? rain.fps / 2 : rain.fps
+            rainSprite.isHidden = false
+            rainSprite.removeAllActions()
+            rainSprite.run(.repeatForever(.animate(with: rainFrames, timePerFrame: 1 / rainFramesPerSecond, resize: false, restore: false)))
+        } else {
+            rainFramesPerSecond = 0
+            rainSprite?.isHidden = true
+            rainSprite?.removeAllActions()
+        }
+        if let pack = scenery.pack, let name = pack.manifest.animation(forPhase: resolved.phase), name != scenery.currentAnimation {
+            scenery.show(pack, animation: name)
         }
     }
 

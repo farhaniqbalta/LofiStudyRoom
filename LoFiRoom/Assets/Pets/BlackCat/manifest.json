@@ -7,7 +7,7 @@
   "sheet": "sheet.png",
   "frame": {
     "w": 37,
-    "h": 27
+    "h": 28
   },
   "animations": {
     "sleep": {
@@ -16,8 +16,33 @@
         1
       ],
       "fps": 0.5
+    },
+    "idle": {
+      "frames": [
+        2,
+        0,
+        2,
+        0
+      ],
+      "fps": 2,
+      "loop": false,
+      "routine": {
+        "weight": 1,
+        "cooldown": 120
+      }
+    },
+    "react": {
+      "frames": [
+        3,
+        4,
+        3,
+        0
+      ],
+      "fps": 4,
+      "loop": false,
+      "onTap": true
     }
   },
   "fallbackAnimation": "sleep",
-  "provenance": "PixelLab create_image_pixen job 23ddd82d-29af-4643-8629-8d9adee3e747; breathing frame and recolour by Tools/build_art.py"
+  "provenance": "PixelLab create_image_pixen job 23ddd82d-29af-4643-8629-8d9adee3e747; breathing frame and recolour by Tools/build_art.py. Stand-in frames: idle, react."
 }

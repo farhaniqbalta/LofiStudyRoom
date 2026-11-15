@@ -10,13 +10,23 @@
     "h": 128
   },
   "animations": {
-    "idle": {
+    "night": {
       "frames": [
         0
       ],
       "fps": 1
+    },
+    "day": {
+      "frames": [
+        1
+      ],
+      "fps": 1
     }
   },
-  "fallbackAnimation": "idle",
-  "provenance": "PixelLab create_image_pixen job 03028076-2912-47c5-b38f-fba53c709160; border mirrored out by Tools/build_art.py"
+  "fallbackAnimation": "night",
+  "provenance": "PixelLab create_image_pixen job 03028076-2912-47c5-b38f-fba53c709160; border mirrored out by Tools/build_art.py. Stand-in frames: day.",
+  "phases": {
+    "night": "night",
+    "day": "day"
+  }
 }

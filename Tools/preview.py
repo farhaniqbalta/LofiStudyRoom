@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Composites the packs the way the app layers them, for a quick look without a device.
-Usage: python3 Tools/preview.py <Character> <Pet> <Scenery> <out.png> [HH:mm] [--scene <Folder>]"""
+Usage: python3 Tools/preview.py <Character> <Pet> <Scenery> <out.png> [HH:mm] [--scene <Folder>]
+  [--room <key>] [--rain <frame>] [--scenery-anim <name>] [--character-frame <n>] [--pet-frame <n>]"""
 import json, os, sys
 import pngio
 
@@ -18,6 +19,12 @@ def main():
         i = args.index("--scene")
         scene_name = args[i + 1]
         del args[i:i + 2]
+    opts = {}
+    for flag in ("--room", "--rain", "--scenery-anim", "--character-frame", "--pet-frame"):
+        if flag in args:
+            i = args.index(flag)
+            opts[flag] = args[i + 1]
+            del args[i:i + 2]
     character, pet, scenery, out = args[:4]
     text = args[4] if len(args) > 4 else "22:47"
     sdir, scene = load("Scenes", scene_name)
@@ -28,18 +35,28 @@ def main():
         for j, row in enumerate(img):
             for i, p in enumerate(row):
                 if p[3] and 0 <= top + j < H and 0 <= x + i < W:
-                    canvas[top + j][x + i] = p
-    def frame0(category, name):
+                    q = canvas[top + j][x + i]
+                    canvas[top + j][x + i] = p if p[3] == 255 else tuple((a * p[3] + b * (255 - p[3])) // 255 for a, b in zip(p, q))
+    def draw_frame(category, name, index):
         d, m = load(category, name)
         a = scene["anchors"][m["anchor"]]
-        blit(pngio.crop(pngio.read(os.path.join(d, m["sheet"])), 0, 0, m["frame"]["w"], m["frame"]["h"]), a["x"], a["y"])
-    frame0("Scenery", scenery)
-    blit(pngio.read(os.path.join(sdir, scene["room"])), 0, 0)
-    frame0("Characters", character)
+        fw = m["frame"]["w"]
+        blit(pngio.crop(pngio.read(os.path.join(d, m["sheet"])), index * fw, 0, fw, m["frame"]["h"]), a["x"], a["y"])
+    _, sm = load("Scenery", scenery)
+    anim = opts.get("--scenery-anim", sm["fallbackAnimation"])
+    draw_frame("Scenery", scenery, sm["animations"][anim]["frames"][0])
+    if "--rain" in opts:
+        r = scene["rain"]
+        a = scene["anchors"][r["anchor"]]
+        fw = r["frame"]["w"]
+        blit(pngio.crop(pngio.read(os.path.join(sdir, r["sheet"])), int(opts["--rain"]) * fw, 0, fw, r["frame"]["h"]), a["x"], a["y"])
+    room_file = scene["rooms"][opts["--room"]] if "--room" in opts else scene["room"]
+    blit(pngio.read(os.path.join(sdir, room_file)), 0, 0)
+    draw_frame("Characters", character, int(opts.get("--character-frame", 0)))
     for fg in scene["foreground"]:
         a = scene["anchors"][fg["anchor"]]
         blit(pngio.read(os.path.join(sdir, fg["image"])), a["x"], a["y"])
-    frame0("Pets", pet)
+    draw_frame("Pets", pet, int(opts.get("--pet-frame", 0)))
     skin = next(c for c in sorted(os.listdir(os.path.join(A, "Clocks")))
                 if load("Clocks", c)[1]["perspective"] == scene["perspective"])
     cdir, clock = load("Clocks", skin)

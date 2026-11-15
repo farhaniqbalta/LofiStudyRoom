@@ -1,6 +1,6 @@
 # Engine-first (M2 + M3a)
 
-**Status:** In progress (Tasks 1, 1B, 2 and 3 done)
+**Status:** In progress (Tasks 1–4 done)
 **Scope:** [`docs/plans/2026-11-14-engine-first.md`](../plans/2026-11-14-engine-first.md)
 **Date:** 2026-11-14
 
@@ -21,6 +21,10 @@
 - Task 1B: engine made art-independent. Resting animation is each pack's `fallbackAnimation`; manifests can mark animations as `routine` or `onTap`; the scene is the first scene folder or `-scene <folder>`; pack lists are filtered by the scene's `perspective`. A synthetic fixture scene (320×240, other animation names) runs the engine in tests.
 - Task 2: one-shot animations and safe exits. `ActorTimeline` (pure timing), `TimerScheduling` / `LiveTimers` (injectable timers, reused by later tasks), `PackSpriteNode.play(_:then:)` and `requestExit(then:)`. A one-shot stays on its last frame until the caller shows something else. Note: `requestExit` and `show` cancel a pending `play` completion, so whoever interrupts must restart the routine chain (handled in Task 3).
 - Task 3: routine and pet scheduling. `RoutineScheduler` (weighted pick, cooldowns, delay range), `ActorDirector` (one per actor: routine chain, swap and tap wait for a safe exit only while a one-shot plays, at most one timer, none when inactive or when the pack has no routines), `SceneCoordinator.setActive` / `petTapped`, launch argument `-routineSpeed`. Pacing lives in code: characters 90–240 s, pets 60–180 s; weights and cooldowns come from manifests. A pack swap resets cooldowns.
+- Task 4: stand-in art and scene visuals.
+  - Art (`Tools/build_art.py`, no PixelLab generations): character `drink`, `stretch`, `rest`; cat `idle` and `react`; 6-frame rain; day frames for both cities; four room images (`night-on`, `night-off`, `day-on`, `day-off`); hotspots for pet, lamp, window, computer. All marked as stand-ins in `provenance` / `standIns`.
+  - Engine: scene manifest gains optional `rooms`, `rain`, `hotspots`; scenery packs gain optional `phases`. `LoFiSKScene.apply(_:reduceMotion:)` swaps the room texture, shows or hides rain (half speed under Reduce Motion) and picks the scenery picture for the phase, without adding nodes. The coordinator applies the environment at start and on every clock tick. Debug launch arguments `-time`, `-weather`, `-lamp`.
+  - Change from the plan: day/night and lamp are four baked room images, not overlay sprites (no extra nodes, and new art can supply its own four).
 - Working method from Task 1B on: the lead writes each task's brief and acceptance tests, a Sonnet subagent implements, the lead reviews, runs the tests and commits.
 
 ## Build / test results
@@ -30,13 +34,17 @@
 - After Task 1B: `Executed 25 tests, with 0 failures` / `** TEST SUCCEEDED **` on the iPad. Source search for art names outside `RoomStateStore.swift`: none.
 - After Task 2: `Executed 35 tests, with 0 failures` / `** TEST SUCCEEDED **` on the iPad (run by the subagent and again by the lead).
 - After Task 3: `Executed 46 tests, with 0 failures` / `** TEST SUCCEEDED **` on the iPad (subagent and lead).
+- After Task 4: `Executed 56 tests, with 0 failures` / `** TEST SUCCEEDED **` on the iPad (subagent and lead). Device screenshots checked for night/rain/lamp-off, day/clear/lamp-on and night/clear/lamp-on: rain shows only inside the window.
 
 ## Open issues
 
 - Tests hang if the iPad locks; set Auto-Lock to Never while testing.
 - `testFixtureRoutinesUseOnlyDeclaredNames` uses the system random generator, so it could fail by chance (about 1 in 100,000 runs).
-- The bundled art has no routines or tap reaction yet, so nothing visible changes until Task 4 adds stand-ins.
+- Stand-in quality (all to be replaced in the art pass): the day room is a pale wash and the character looks too dark against it, with ragged edge pixels; lamp-off still shows a faint cone; the drink mug is 4×5 px and easy to miss; the cat's idle twitch is 1 px; rain is faint.
+- Characters and pets have no day variant.
+- A Reduce Motion change is only picked up on the next clock tick (up to a minute).
+- Automatic time shows the stand-in day room during daylight until the settings panel exists; use `-time night` to force night.
 
 ## Next step
 
-Task 4 (stand-in art and scene visuals).
+Task 5 (hotspots and taps).
