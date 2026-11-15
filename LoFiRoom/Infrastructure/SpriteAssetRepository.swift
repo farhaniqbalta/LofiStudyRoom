@@ -20,9 +20,24 @@ final class SpriteAssetRepository {
     let scene: ScenePack
     private let sceneFolder: URL
 
-    init(root: URL = Bundle.main.resourceURL!.appendingPathComponent("Assets"), sceneName: String? = nil) throws {
+    /// `art-sets.json` beside the packs: which art sets exist (A, B, ...) and which one is active.
+    private struct ArtSets: Decodable {
+        struct Entry: Decodable { var scene: String }
+        var active: String
+        var sets: [String: Entry]
+    }
+
+    /// The scene is, in order: `sceneName`; the scene of `artSet`; the scene of the registry's active set;
+    /// the first scene folder (roots without a registry, such as test fixtures).
+    init(root: URL = Bundle.main.resourceURL!.appendingPathComponent("Assets"), sceneName: String? = nil, artSet: String? = nil) throws {
         self.root = root
-        let sceneName = try sceneName ?? FileManager.default
+        let registry = (try? Data(contentsOf: root.appendingPathComponent("art-sets.json"))).flatMap { try? JSONDecoder().decode(ArtSets.self, from: $0) }
+        var registered: String?
+        if let key = artSet ?? registry?.active {
+            guard let entry = registry?.sets[key] else { throw PackError("art-sets.json has no art set '\(key)'") }
+            registered = entry.scene
+        }
+        let sceneName = try sceneName ?? registered ?? FileManager.default
             .contentsOfDirectory(at: root.appendingPathComponent("Scenes"), includingPropertiesForKeys: nil)
             .filter(\.hasDirectoryPath).map(\.lastPathComponent).min() ?? { throw PackError("Scenes: no scene folder found") }()
         sceneFolder = root.appendingPathComponent("Scenes/\(sceneName)")

@@ -1,0 +1,13 @@
+{
+  "active": "A",
+  "sets": {
+    "A": {
+      "name": "Lo-fi room (three-quarter view from behind)",
+      "scene": "StudyRoom01"
+    },
+    "B": {
+      "name": "Cyberpunk side desk (experimental)",
+      "scene": "CyberDesk01"
+    }
+  }
+}

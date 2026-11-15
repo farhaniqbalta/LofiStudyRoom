@@ -58,5 +58,5 @@
   },
   "fallbackAnimation": "sleep",
   "provenance": "Art-direction spike: the existing orange cat (see ArtLab/aseprite/OrangeCatAse.pack.json) reused unchanged under the new scene's perspective tag.",
-  "source": "ArtLab/cyberdesk/CyberCat.aseprite"
+  "source": "ArtLab/type-b-cyberdesk/CyberCat.aseprite"
 }

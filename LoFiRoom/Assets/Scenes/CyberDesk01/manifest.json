@@ -1,6 +1,7 @@
 {
-  "id": "studyroomcyber01",
+  "id": "cyberdesk01",
   "type": "scene",
+  "artSet": "B",
   "packVersion": 1,
   "perspective": "cyber-desk-side-v1",
   "canvas": {
@@ -86,6 +87,6 @@
       "h": 75
     }
   },
-  "provenance": "Art-direction spike, not production art. PixelLab create_image_pixen job 6a15ba72-3d76-4db9-bbbc-d08f2fe3a58f; glass keyed out and chair-front layer traced by ArtLab/cyberdesk/cut_layers.py; layers held in ArtLab/cyberdesk/StudyRoomCyber01.aseprite.",
-  "source": "ArtLab/cyberdesk/StudyRoomCyber01.aseprite"
+  "provenance": "Art set B, experimental, not production art. PixelLab create_image_pixen job 6a15ba72-3d76-4db9-bbbc-d08f2fe3a58f; glass keyed out and chair-front layer traced by ArtLab/type-b-cyberdesk/cut_layers.py; layers held in ArtLab/type-b-cyberdesk/CyberDesk01.aseprite.",
+  "source": "ArtLab/type-b-cyberdesk/CyberDesk01.aseprite"
 }

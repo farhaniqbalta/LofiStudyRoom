@@ -3,7 +3,7 @@ import Foundation
 extension SceneCoordinator {
     /// Builds the running room from the bundle and launch arguments.
     /// Launch arguments: `-fps 12`, `-paused YES`, `-debugAnchors YES` (anchor overlay + FPS counter), and
-    /// `-scene <folder>` (default: first scene folder), `-character Girl01`, `-pet BlackCat`, `-scenery NeonCity02` to choose packs (the choice is saved),
+    /// `-artSet <A|B|...>` or `-scene <folder>` (default: the active set in `Assets/art-sets.json`), `-character Girl01`, `-pet BlackCat`, `-scenery NeonCity02` to choose packs (the choice is saved),
     /// `-time auto|day|night`, `-weather auto|clear|rain`, `-lamp on|off` (saved too; unknown values are ignored),
     /// `-cityName <text> -cityLat <number> -cityLon <number>` (all three) set the weather city,
     /// `-showPanel YES` opens the settings panel at launch,
@@ -11,7 +11,7 @@ extension SceneCoordinator {
     static func live() -> SceneCoordinator {
         let defaults = UserDefaults.standard
         do {
-            let repository = try SpriteAssetRepository(sceneName: defaults.string(forKey: "scene"))
+            let repository = try SpriteAssetRepository(sceneName: defaults.string(forKey: "scene"), artSet: defaults.string(forKey: "artSet"))
             let scene = try LoFiSKScene(repository: repository, showAnchors: defaults.bool(forKey: "debugAnchors"))
             let speed = defaults.double(forKey: "routineSpeed")
             let coordinator = SceneCoordinator(repository: repository, store: RoomStateStore(), scene: scene,

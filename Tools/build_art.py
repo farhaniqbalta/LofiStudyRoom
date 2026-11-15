@@ -257,7 +257,7 @@ pngio.write(os.path.join(scene_dir, "chair_front.png"), pngio.crop(front, fx, fy
 anchors = {"window-rect": rect(*WINDOW), "window-mask": rect(*WINDOW), "desk-seat": seat, "pet-spot": pet,
            "clock-slot": rect(CLOCK[0], CLOCK[1], 23, 15)}
 anchors.update({k: dict(x=x, y=H - top) for k, (x, top) in POINTS.items()})
-write_manifest(scene_dir, id="studyroom01", type="scene", packVersion=1, perspective=PERSPECTIVE,
+write_manifest(scene_dir, id="studyroom01", type="scene", artSet="A", packVersion=1, perspective=PERSPECTIVE,
                canvas=dict(w=W, h=H), safe=SAFE, anchors=anchors, room="room.png",
                foreground=[dict(image="chair_front.png", anchor="desk-seat")],
                provenance="PixelLab create_image_pixen job 0c085c34-7866-4ce7-813f-002ac93c9d1b; glass keyed out and "

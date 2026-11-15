@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""Art-direction spike: cuts the raw PixelLab images into layer PNGs that are then imported into the
-.aseprite sources (stdlib only). Run from the repo root: python3 ArtLab/cyberdesk/cut_layers.py
+"""Art set B (cyberpunk side desk): cuts the raw PixelLab images into layer PNGs that are then imported into the
+.aseprite sources (stdlib only). Run from the repo root: python3 ArtLab/type-b-cyberdesk/cut_layers.py
 Coordinates are room pixels, top-left based, read off Aseprite's ruler view."""
 import os, sys
 HERE = os.path.dirname(os.path.abspath(__file__))

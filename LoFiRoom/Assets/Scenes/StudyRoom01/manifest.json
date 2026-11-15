@@ -1,6 +1,7 @@
 {
   "id": "studyroom01",
   "type": "scene",
+  "artSet": "A",
   "packVersion": 1,
   "perspective": "study-room-back-3q-v1",
   "canvas": {

@@ -37,6 +37,16 @@ Use them for composition, palette (warm amber lamp vs cyan/violet city) and anch
 - The always-visible Spotify and weather HUD panels are mock-ups; in the app they are hidden by default/compact (spec §1.1, §1.3).
 - The "15–30 FPS" label is a hypothesis, not a target (see review D1).
 
+## Art sets
+
+The room can be drawn in several complete looks, lettered A, B, C. **`docs/ART_SETS.md` is the registry**: what each set contains, where its sources are, how to build, switch, add or remove one.
+
+- **A** — lo-fi room, the active set (`StudyRoom01`, built by `Tools/build_art.py`).
+- **B** — cyberpunk side desk, an experimental spike saved for later (`CyberDesk01`, sources in `ArtLab/type-b-cyberdesk/`).
+- The default is `"active"` in `LoFiRoom/Assets/art-sets.json` (the one hand-edited file there). For one launch use `-artSet B`.
+- A set is a scene plus packs sharing its `perspective` tag; sets never mix. Pack folder names are unique across sets.
+- A new set is a new `ArtLab/type-<letter>-<name>/` folder, a new scene, a registry row and a log `docs/logs/art-<letter>-<name>.md`. No Swift changes.
+
 ## Art workflow
 
 **PixelLab (optional draft) → Aseprite (edit, animate, clean up) → `Tools/aseprite_export.py` → sprite pack.** Full steps: `docs/ASEPRITE_WORKFLOW.md`.
@@ -73,14 +83,14 @@ xcrun devicectl device process launch --terminate-existing --device $IPAD com.lo
 xcrun devicectl device capture screenshot --device $IPAD --destination build/shots/shot.png
 ```
 
-Launch switches: `-fps N`, `-paused YES`, `-debugAnchors YES` (anchor overlay + FPS counter), `-scene <folder>`, `-character <folder>`, `-pet <folder>`, `-scenery <folder>`, `-time auto|day|night`, `-weather auto|clear|rain`, `-lamp on|off` (choices are saved), `-routineSpeed N` (shortens routine delays for watching). The tests hang if the iPad is locked: check `xcrun devicectl device info lockState` first.
+Launch switches: `-fps N`, `-paused YES`, `-debugAnchors YES` (anchor overlay + FPS counter), `-artSet <A|B>`, `-scene <folder>`, `-character <folder>`, `-pet <folder>`, `-scenery <folder>`, `-time auto|day|night`, `-weather auto|clear|rain`, `-lamp on|off` (choices are saved), `-routineSpeed N` (shortens routine delays for watching). The tests hang if the iPad is locked: check `xcrun devicectl device info lockState` first.
 
 ## Code layout (as of the engine-first phase)
 
 - **Flow:** `LoFiRoomApp` → `RoomView` (SwiftUI root: `SceneContainer` for the `SKView`, `HotspotOverlay`, gear, `CustomizationSheet`) → `SceneCoordinator` (`ObservableObject`, built by `SceneCoordinator.live()`). The coordinator is the only thing that pushes state into `LoFiSKScene`; it owns the `SpriteAssetRepository`, `RoomStateStore` (one saved `RoomConfig` in `UserDefaults`), `ClockDriver`, two `ActorDirector`s and the `EnvironmentController`.
 - **Packs:** `LoFiRoom/Assets/<Category>/<Folder>/{manifest.json, sheet.png}` is a folder reference, so adding a pack is adding a folder. A sheet is one row of equal frames. `SpritePack.problems()` validates a pack against the scene; a bad pack is rejected with a readable message and the scene keeps what it had. Pack lists are filtered to the active scene's `perspective`.
 - **Manifests drive behaviour:** `fallbackAnimation` is the resting animation; an animation with `routine {weight, cooldown}` can be scheduled; `onTap` marks the tap reaction; `loop: false` makes a one-shot; `safeExits` lists frames where it may be interrupted (empty: only at its end); scenery `phases` maps day/night to animations.
-- **Scene pack:** `Scenes/<Folder>/manifest.json` holds the canvas, safe rectangle, anchors, foreground pieces and optional `rooms` (four images keyed `<phase>-<on|off>`), `rain`, `hotspots`. Coordinates are logical pixels, origin bottom-left; every pack sprite sits with its bottom-left corner on its anchor. Anchors and hotspots must be inside the safe rectangle. The scene is the first folder in `Scenes/` or `-scene <folder>`.
+- **Scene pack:** `Scenes/<Folder>/manifest.json` holds the canvas, safe rectangle, anchors, foreground pieces and optional `rooms` (four images keyed `<phase>-<on|off>`), `rain`, `hotspots`. Coordinates are logical pixels, origin bottom-left; every pack sprite sits with its bottom-left corner on its anchor. Anchors and hotspots must be inside the safe rectangle. The scene is chosen by `-scene <folder>`, else `-artSet <letter>`, else the active set in `art-sets.json`, else the first folder in `Scenes/`.
 - **Scaling:** `ScalePolicy` picks the largest integer scale at which the safe rectangle fits; the rest letterboxes.
 - **Time-based logic:** everything uses injected one-shot timers (`TimerScheduling`) and clocks, never per-frame code. `ActorTimeline` is pure timing; `RoutineScheduler` picks routines; `ActorDirector` runs the chain for one actor and waits for a safe exit only while a one-shot plays. Tests drive time with `FakeTimers`.
 - **Clock:** `ClockTime` → `ClockDriver` (one timer per minute boundary plus system notifications) → `PixelClockNode`. Each tick also re-applies the environment.
@@ -164,7 +174,7 @@ What exists: routine and pet scheduling, tap hotspots, the customization panel, 
 What comes next, in order (spec §9 allows reordering):
 
 1. Spotify: a one-day App Remote spike, then M3b. Needs separate approval. Until then the computer hotspot shows a "Music coming soon" card.
-2. Art-direction pass (experimental, on a branch): the reference board is side-profile, half-body characters hidden below a detailed desk, and a dense cyberpunk city. It is done as a new scene with its own `perspective` tag, characters, pets and art build script, chosen with `-scene <folder>`. Stand-ins (marked `"stand-in"` in `provenance` / `standIns`) are replaced then, through the Aseprite workflow (proof of concept done, see `docs/ASEPRITE_WORKFLOW.md`).
+2. Art-direction pass: the reference board is side-profile, half-body characters hidden below a detailed desk, and a dense cyberpunk city. Art set B is a first, saved attempt (see `docs/logs/art-B-cyberdesk.md`); further attempts are new sets (C, ...) per `docs/ART_SETS.md`. Stand-ins (marked `"stand-in"` in `provenance` / `standIns`) are replaced then, through the Aseprite workflow (proof of concept done, see `docs/ASEPRITE_WORKFLOW.md`).
 3. M4: power tuning and polish. M0's energy baseline is still unmeasured.
 
 Working method: the lead writes each task's brief and acceptance tests, a subagent implements, the lead reviews, re-runs the tests on the iPad and commits.

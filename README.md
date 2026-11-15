@@ -41,7 +41,8 @@ In the app: tap the cat, lamp, window or monitor; tap empty room to reveal the s
 | `LoFiRoom/` | App source: `Domain`, `Application`, `Infrastructure`, `Rendering`, `Presentation` |
 | `LoFiRoom/Assets/` | Generated sprite packs (do not edit by hand) |
 | `LoFiRoomTests/` | Unit tests |
-| `ArtSource/` | Raw generated images the packs are built from |
+| `ArtSource/` | Raw generated images art set A is built from |
+| `ArtLab/` | Aseprite sources: the pipeline proof of concept and art set B |
 | `ArtLab/aseprite/` | Editable `.aseprite` sources and their exported packs (pipeline proof of concept, see `docs/ASEPRITE_WORKFLOW.md`) |
 | `Tools/` | `build_art.py` builds the packs; `preview.py` composites the layers without a device |
 | `docs/spec/` | The locked MVP specification, design brief and review report |
@@ -52,6 +53,10 @@ In the app: tap the cat, lamp, window or monitor; tap empty room to reveal the s
 ## How the scene is put together
 
 The room is a stack of independent sprite layers: scenery behind the window, the room itself (its window glass is transparent), the character and pet, foreground furniture that hides part of the character, then in-world objects such as the clock. Each character, pet, city view and clock skin is a folder with a `manifest.json` and a sprite sheet, so adding or replacing one needs no code change.
+
+## Art sets
+
+The room has more than one look. Set A (lo-fi room) is the default; set B (cyberpunk side desk) is an experiment you can see with the launch option `-artSet B`. The registry is in [`docs/ART_SETS.md`](docs/ART_SETS.md).
 
 ## Art credits
 

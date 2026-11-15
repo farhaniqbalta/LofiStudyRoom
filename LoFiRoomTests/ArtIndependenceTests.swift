@@ -54,6 +54,34 @@ final class ArtIndependenceTests: XCTestCase {
         }
     }
 
+    func testArtSetsAreChosenByTheRegistry() throws {
+        // The bundle holds two art sets; B's scene folder sorts first, so only the registry keeps A the default.
+        XCTAssertEqual(try SpriteAssetRepository().scene.id, "studyroom01")
+        XCTAssertEqual(try SpriteAssetRepository(artSet: "A").scene.id, "studyroom01")
+        let b = try SpriteAssetRepository(artSet: "B")
+        XCTAssertEqual(b.scene.id, "cyberdesk01")
+        XCTAssertEqual(b.folders(in: "Characters"), ["CyberBoy"])
+        XCTAssertEqual(b.folders(in: "Pets"), ["CyberCat"])
+        XCTAssertEqual(b.folders(in: "Scenery"), ["CyberCity01"])
+        XCTAssertEqual(b.folders(in: "Clocks"), ["CyberClock"])
+        XCTAssertThrowsError(try SpriteAssetRepository(artSet: "Z")) {
+            XCTAssertEqual($0.localizedDescription, "art-sets.json has no art set 'Z'")
+        }
+        // An explicit scene name still wins over the registry.
+        XCTAssertEqual(try SpriteAssetRepository(sceneName: "CyberDesk01", artSet: "A").scene.id, "cyberdesk01")
+    }
+
+    func testArtSetBRunsTheEngineUnchanged() throws {
+        let repository = try SpriteAssetRepository(artSet: "B")
+        let scene = try LoFiSKScene(repository: repository, showAnchors: false)
+        let coordinator = SceneCoordinator(repository: repository, store: RoomStateStore(defaults: defaults), scene: scene)
+        coordinator.start(clockDriver: ClockDriver { scene.clock.show($0) })
+        XCTAssertEqual(scene.character.pack?.manifest.id, "cyberboy")
+        XCTAssertEqual(scene.pet.pack?.manifest.id, "cybercat")
+        XCTAssertEqual(scene.clock.text.count, 5)
+        XCTAssertEqual(coordinator.config.character, "CyberBoy", "the saved Type A name falls back to Type B's character")
+    }
+
     func testRestingAnimationComesFromTheManifest() throws {
         let repository = try SpriteAssetRepository()
         let scene = try LoFiSKScene(repository: repository, showAnchors: false)

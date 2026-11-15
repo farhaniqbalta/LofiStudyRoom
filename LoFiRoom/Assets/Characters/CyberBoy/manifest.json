@@ -19,6 +19,6 @@
     }
   },
   "fallbackAnimation": "study",
-  "provenance": "Art-direction spike, not production art. PixelLab edit_image_pixen job 40ff89ad-6abf-4557-985c-de824150f3ae on a crop of the room; cut out by ArtLab/cyberdesk/cut_layers.py (body behind the chair is flat fill); head-bob frame made in Aseprite through aseprite-mcp.",
-  "source": "ArtLab/cyberdesk/CyberBoy.aseprite"
+  "provenance": "Art-direction spike, not production art. PixelLab edit_image_pixen job 40ff89ad-6abf-4557-985c-de824150f3ae on a crop of the room; cut out by ArtLab/type-b-cyberdesk/cut_layers.py (body behind the chair is flat fill); head-bob frame made in Aseprite through aseprite-mcp.",
+  "source": "ArtLab/type-b-cyberdesk/CyberBoy.aseprite"
 }

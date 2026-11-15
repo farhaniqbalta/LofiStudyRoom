@@ -72,5 +72,5 @@ The script fails with a readable message, before writing a manifest, on the same
 1. Keep one `.aseprite` per pack with the body on its own layer and each moving part (ear, tail, arm, cup) on a separate layer; that is what makes later edits cheap.
 2. Use PixelLab only for a first draft of a pose, then import it as a layer and finish in Aseprite. Record the job and settings in the sidecar `provenance`.
 3. When a pack is approved, export it with `LoFiRoom/Assets` as the out root under a new folder name, and remove the matching block from `build_art.py`. Do not have two pipelines write the same folder.
-4. Scene art (room images, foreground cut-outs, rain) is not covered by the exporter. Add that only when the new scene is started; the room's layered export will need Aseprite's per-layer export, not a sheet.
+4. Scene art (room images, foreground cut-outs, rain) is not covered by `Tools/aseprite_export.py`. Art set B shows one way: `ArtLab/type-b-cyberdesk/export.py` exports named layers of the room's `.aseprite` file with the Aseprite command line (`--layer`, `--crop`) and writes the scene manifest itself.
 5. For the art-direction pass, move sources to `ArtSource/aseprite/` (or keep `ArtLab/`) and change the test resource path in `project.yml` to match.
