@@ -18,21 +18,6 @@ final class StubURLProtocol: URLProtocol {
     override func stopLoading() {}
 }
 
-final class FakeWeather: WeatherProviding, @unchecked Sendable {
-    private let lock = NSLock()
-    private var _calls = 0
-    var result: Result<WeatherSnapshot, Error>
-    var gate: (@Sendable () async -> Void)?
-    init(_ result: Result<WeatherSnapshot, Error>) { self.result = result }
-    var calls: Int { lock.withLock { _calls } }
-    func snapshot(for city: City, now: Date) async throws -> WeatherSnapshot {
-        lock.withLock { _calls += 1 }
-        await gate?()
-        return try result.get()
-    }
-    func searchCities(_ name: String) async throws -> [City] { [] }
-}
-
 private struct Offline: Error {}
 
 final class WeatherProviderTests: XCTestCase {

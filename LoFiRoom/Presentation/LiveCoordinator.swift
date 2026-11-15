@@ -6,6 +6,7 @@ extension SceneCoordinator {
     /// `-scene <folder>` (default: first scene folder), `-character Girl01`, `-pet BlackCat`, `-scenery NeonCity02` to choose packs (the choice is saved),
     /// `-time auto|day|night`, `-weather auto|clear|rain`, `-lamp on|off` (saved too; unknown values are ignored),
     /// `-cityName <text> -cityLat <number> -cityLon <number>` (all three) set the weather city,
+    /// `-showPanel YES` opens the settings panel at launch,
     /// and `-routineSpeed 20` to run routine delays that many times faster (testing).
     static func live() -> SceneCoordinator {
         let defaults = UserDefaults.standard
@@ -41,6 +42,7 @@ extension SceneCoordinator {
             for (category, argument) in [("Characters", "character"), ("Pets", "pet"), ("Scenery", "scenery")] {
                 if let folder = defaults.string(forKey: argument) { coordinator.select(folder, in: category) }
             }
+            coordinator.panelVisible = defaults.bool(forKey: "showPanel")
             return coordinator
         } catch {
             // The room itself ships in the bundle; if it cannot load, the build is broken.

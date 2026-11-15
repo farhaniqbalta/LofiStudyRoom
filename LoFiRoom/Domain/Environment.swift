@@ -4,10 +4,10 @@ enum DayPhase: String, Codable { case day, night }
 enum Sky: String, Codable { case clear, rain }
 
 /// Time and weather are independent, each automatic or manual (spec §1.4).
-enum TimeSetting: Codable, Equatable { case automatic, manual(DayPhase) }
-enum WeatherSetting: Codable, Equatable { case automatic, manual(Sky) }
+enum TimeSetting: Codable, Hashable { case automatic, manual(DayPhase) }
+enum WeatherSetting: Codable, Hashable { case automatic, manual(Sky) }
 
-struct City: Codable, Equatable {
+struct City: Codable, Hashable {
     var name: String
     var latitude: Double
     var longitude: Double

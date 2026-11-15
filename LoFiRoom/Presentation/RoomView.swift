@@ -6,6 +6,9 @@ struct RoomView: View {
     var body: some View {
         ZStack(alignment: .topLeading) {
             SceneContainer(coordinator: coordinator)
+            Color.clear.contentShape(Rectangle())
+                .onTapGesture { coordinator.revealControls() }
+                .accessibilityHidden(true)
             HotspotOverlay(coordinator: coordinator)
             if UserDefaults.standard.bool(forKey: "debugAnchors") {
                 TimelineView(.periodic(from: .now, by: 1)) { _ in
@@ -30,7 +33,20 @@ struct RoomView: View {
                 .accessibilityLabel("Music coming soon")
                 .padding(24)
             }
+            Button { coordinator.panelVisible = true } label: {
+                Image(systemName: "gearshape.fill")
+                    .foregroundStyle(.white.opacity(0.7))
+                    .frame(width: 44, height: 44)
+                    .opacity(coordinator.controlsVisible ? 1 : 0)
+                    .animation(.easeInOut(duration: 0.3), value: coordinator.controlsVisible)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Room settings")
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
+            .padding(8)
         }
+        .sheet(isPresented: $coordinator.panelVisible) { CustomizationSheet(coordinator: coordinator) }
         .ignoresSafeArea()
         .statusBarHidden()
         .persistentSystemOverlays(.hidden)

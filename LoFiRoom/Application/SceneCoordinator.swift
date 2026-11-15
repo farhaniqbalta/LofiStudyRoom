@@ -13,6 +13,12 @@ final class SceneCoordinator: ObservableObject {
     @Published private(set) var hotspotFrames: [String: CGRect] = [:]
     @Published var musicPanelVisible = false
     @Published private(set) var weatherStatus: WeatherStatus = .off
+    @Published var panelVisible = false
+    @Published private(set) var controlsVisible = false
+    @Published private(set) var citySearchMessage: String?
+    private let timers: TimerScheduling
+    private let weather: WeatherProviding
+    private var hideControls: Cancellable?
     private var environment: EnvironmentController!
     private var reloading: Task<Void, Never>?
     private var clockDriver: ClockDriver?
@@ -31,6 +37,8 @@ final class SceneCoordinator: ObservableObject {
          routineSpeed: Double = 1, now: @escaping () -> Date = Date.init,
          weather: WeatherProviding = OpenMeteoProvider(), weatherCacheURL: URL = SceneCoordinator.defaultWeatherCacheURL()) {
         self.now = now
+        self.timers = timers
+        self.weather = weather
         self.repository = repository
         self.store = store
         self.scene = scene
@@ -51,6 +59,64 @@ final class SceneCoordinator: ObservableObject {
             }
             if frames != hotspotFrames { hotspotFrames = frames }
         }
+    }
+
+    var config: RoomConfig { store.config }
+
+    /// The only place the config is written, so observers always hear about it.
+    private func update(_ change: (inout RoomConfig) -> Void) {
+        objectWillChange.send()
+        change(&store.config)
+    }
+
+    func packNames(in category: String) -> [String] { repository.folders(in: category) }
+
+    func setTime(_ setting: TimeSetting) { update { $0.time = setting }; environmentSettingsChanged() }
+    func setWeather(_ setting: WeatherSetting) { update { $0.weather = setting }; environmentSettingsChanged() }
+    func setCity(_ city: City) { update { $0.city = city }; environmentSettingsChanged() }
+    func setKeepAwake(_ on: Bool) { update { $0.keepAwake = on } }
+
+    /// Shows the settings gear for 4 seconds; calling again restarts the 4 seconds.
+    func revealControls() {
+        controlsVisible = true
+        hideControls?.cancel()
+        hideControls = timers.schedule(after: 4) { [weak self] in self?.controlsVisible = false }
+    }
+
+    /// Never changes the saved city; the caller picks one of the results.
+    func searchCities(_ text: String) async -> [City] {
+        let name = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !name.isEmpty else { citySearchMessage = nil; return [] }
+        do {
+            let cities = try await weather.searchCities(name)
+            citySearchMessage = cities.isEmpty ? "No cities found." : nil
+            return cities
+        } catch {
+            citySearchMessage = "Couldn't search. Check your connection."
+            return []
+        }
+    }
+
+    static func weatherStatusText(_ status: WeatherStatus, hasCity: Bool, fetched: Date?, calendar: Calendar) -> String {
+        guard hasCity else { return "Choose a city for automatic weather" }
+        switch status {
+        case .off: return "Weather is off (time and weather are manual)"
+        case .loading: return "Updating…"
+        case .current:
+            guard let fetched else { return "Updated" }
+            let format = DateFormatter()
+            format.locale = Locale(identifier: "en_US_POSIX")
+            format.calendar = calendar
+            format.timeZone = calendar.timeZone
+            format.dateFormat = "HH:mm"
+            return "Updated \(format.string(from: fetched))"
+        case .stale: return "Weather may be out of date"
+        case .unavailable: return "Weather unavailable"
+        }
+    }
+
+    var weatherStatusLine: String {
+        Self.weatherStatusText(weatherStatus, hasCity: config.city != nil, fetched: environment.snapshot?.fetched, calendar: .autoupdatingCurrent)
     }
 
     static func defaultWeatherCacheURL() -> URL {
@@ -105,7 +171,7 @@ final class SceneCoordinator: ObservableObject {
     }
 
     func lampTapped() {
-        store.config.lampOn.toggle()
+        update { $0.lampOn.toggle() }
         applyEnvironment()
     }
 
@@ -154,7 +220,7 @@ final class SceneCoordinator: ObservableObject {
             case "Pets": petDirector.show(pack)
             default: scene.show(pack)
             }
-            store.config[keyPath: key] = folder
+            update { $0[keyPath: key] = folder }
             return true
         } catch {
             log.error("\(error.localizedDescription, privacy: .public)")
