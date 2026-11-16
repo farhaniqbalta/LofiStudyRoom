@@ -51,6 +51,41 @@ final class MusicSkinTests: XCTestCase {
         ])
     }
 
+    func testBadSkinGeometryIsReported() throws {
+        var scene = try SpriteAssetRepository().scene
+        scene.music?.icons.frame.w = 0
+        scene.music?.notes?.frame.w = 0
+        scene.music?.notes?.fps = 0
+        XCTAssertEqual(scene.problems(), [
+            "music icons frame needs a positive width and height",
+            "music notes frame needs a positive width and height",
+            "music notes need a positive fps",
+        ])
+    }
+
+    func testTransportNeedsAConnectedTrack() throws {
+        let scene = try LoFiSKScene(repository: try SpriteAssetRepository(artSet: "A"), showAnchors: false)
+        scene.applyMusic(panelVisible: true, state: state(.connected, nil), reduceMotion: false)
+        XCTAssertFalse(scene.musicTransportIsShown)
+        scene.applyMusic(panelVisible: true, state: state(.connected, playing), reduceMotion: false)
+        XCTAssertTrue(scene.musicTransportIsShown)
+    }
+
+    func testCoordinatorLoadsCoverThroughTheRemote() async throws {
+        let repository = try SpriteAssetRepository(artSet: "A")
+        let remote = FakeMusicRemote()
+        let image = UIGraphicsImageRenderer(size: CGSize(width: 2, height: 2)).image { _ in }
+        remote.artworkImage = image
+        func make(_ music: MusicRemote?) throws -> SceneCoordinator {
+            SceneCoordinator(repository: repository, store: RoomStateStore(defaults: defaults),
+                             scene: try LoFiSKScene(repository: repository, showAnchors: false), music: music)
+        }
+        let loaded = await (try make(remote)).loadArtwork(for: playing, size: CGSize(width: 8, height: 8))
+        XCTAssertTrue(loaded === image)
+        let none = await (try make(nil)).loadArtwork(for: playing, size: CGSize(width: 8, height: 8))
+        XCTAssertNil(none)
+    }
+
     func testSceneWithoutSkinFallsBack() throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         _ = try FixtureScene.make(in: root)

@@ -68,6 +68,11 @@ struct ScenePack: Codable, Equatable {
                 }
             }
             problems += MusicSkin.requiredIcons.filter { !music.icons.names.contains($0) }.map { "music is missing icon '\($0)'" }
+            if music.icons.frame.w <= 0 || music.icons.frame.h <= 0 { problems.append("music icons frame needs a positive width and height") }
+            if let notes = music.notes {
+                if notes.frame.w <= 0 || notes.frame.h <= 0 { problems.append("music notes frame needs a positive width and height") }
+                if notes.fps <= 0 { problems.append("music notes need a positive fps") }
+            }
             if let notes = music.notes, anchors[notes.anchor] == nil { problems.append("music notes use unknown anchor '\(notes.anchor)'") }
         }
         problems += foreground.filter { anchors[$0.anchor] == nil }.map { "foreground '\($0.image)' uses unknown anchor '\($0.anchor)'" }

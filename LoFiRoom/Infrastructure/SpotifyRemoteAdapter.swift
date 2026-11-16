@@ -25,7 +25,12 @@ final class SpotifyRemoteAdapter: NSObject, MusicRemote, @preconcurrency SPTAppR
     var isInstalled: Bool { UIApplication.shared.canOpenURL(URL(string: "spotify:")!) }
     var hasToken: Bool { remote?.connectionParameters.accessToken != nil }
 
-    func authorizeAndPlay() { remote?.authorizeAndPlayURI("") { _ in } }
+    func authorizeAndPlay() {
+        remote?.authorizeAndPlayURI("") { [weak self] success in
+            // The SDK may call back off the main thread; false means Spotify could not be opened.
+            if !success { Task { @MainActor in self?.onEvent?(.authorizeFailed) } }
+        }
+    }
     func connect() { remote?.connect() }
     func disconnect() { remote?.disconnect() }
 
@@ -39,8 +44,11 @@ final class SpotifyRemoteAdapter: NSObject, MusicRemote, @preconcurrency SPTAppR
     func next() { remote?.playerAPI?.skip(toNext: nil) }
     func previous() { remote?.playerAPI?.skip(toPrevious: nil) }
 
+    /// Only our own redirect is a Spotify reply.
+    nonisolated static func isCallback(_ url: URL) -> Bool { url.scheme == "lofiroom" && url.host == "spotify-callback" }
+
     func handleCallback(_ url: URL) -> Bool {
-        guard let remote, url.scheme == "lofiroom" else { return false }
+        guard let remote, Self.isCallback(url) else { return false }
         if let token = remote.authorizationParameters(from: url)?[SPTAppRemoteAccessTokenKey] {
             KeychainToken.save(token)
             remote.connectionParameters.accessToken = token

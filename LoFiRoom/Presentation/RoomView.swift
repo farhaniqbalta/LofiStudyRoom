@@ -14,7 +14,7 @@ struct RoomView: View {
             if UserDefaults.standard.bool(forKey: "debugAnchors") {
                 TimelineView(.periodic(from: .now, by: 1)) { _ in
                     let a = coordinator.scene.applied
-                    Text("weather: \(String(describing: coordinator.weatherStatus)) · \(a?.phase.rawValue ?? "-") · \(a?.sky.rawValue ?? "-") · lamp \(a?.lampOn == true ? "on" : "off") · music: \(String(describing: coordinator.musicState.connection)) · cover: \((coordinator.musicRemote as? SpotifyRemoteAdapter)?.lastArtworkError ?? "ok or not asked")")
+                    Text("weather: \(String(describing: coordinator.weatherStatus)) · \(a?.phase.rawValue ?? "-") · \(a?.sky.rawValue ?? "-") · lamp \(a?.lampOn == true ? "on" : "off") · music: \(String(describing: coordinator.musicState.connection)) · cover: \(coordinator.artworkStatus ?? "ok or not asked")")
                         .font(.caption.monospaced()).foregroundStyle(.white)
                         .padding(4).background(.black.opacity(0.6))
                 }

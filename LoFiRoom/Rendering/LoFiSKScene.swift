@@ -94,7 +94,11 @@ final class LoFiSKScene: SKScene {
         groups[.objects]!.addChild(panel)
         musicPanel = panel
         let sheet = try repository.sceneTexture(music.icons.sheet)
-        let frames = SpriteAssetRepository.frames(of: sheet, count: Int(sheet.size().width) / music.icons.frame.w)
+        let iconW = Int(sheet.size().width)
+        guard music.icons.frame.w > 0, iconW == music.icons.names.count * music.icons.frame.w else {
+            throw PackError("music icons sheet is \(iconW) px wide, expected \(music.icons.names.count) frames of \(music.icons.frame.w)")
+        }
+        let frames = SpriteAssetRepository.frames(of: sheet, count: music.icons.names.count)
         for (name, texture) in zip(music.icons.names, frames) { iconTextures[name] = texture }
         for name in ["previous", "toggle", "next", "close"] {
             let slot = music.slots[name]!
@@ -108,7 +112,11 @@ final class LoFiSKScene: SKScene {
         }
         if let notes = music.notes {
             let sheet = try repository.sceneTexture(notes.sheet)
-            notesFrames = SpriteAssetRepository.frames(of: sheet, count: Int(sheet.size().width) / notes.frame.w)
+            let notesW = Int(sheet.size().width)
+            guard notes.frame.w > 0, notesW >= notes.frame.w, notesW % notes.frame.w == 0 else {
+                throw PackError("music notes sheet is \(notesW) px wide, expected whole frames of \(notes.frame.w)")
+            }
+            notesFrames = SpriteAssetRepository.frames(of: sheet, count: notesW / notes.frame.w)
             let node = SKSpriteNode(texture: notesFrames.first, size: CGSize(width: notes.frame.w, height: notes.frame.h))
             node.anchorPoint = .zero
             node.position = point(notes.anchor)
@@ -135,7 +143,7 @@ final class LoFiSKScene: SKScene {
         let playing = connected && state.track?.isPaused == false
         musicPanel?.isHidden = !panelVisible
         musicIcons["close"]?.isHidden = !panelVisible
-        for name in ["previous", "toggle", "next"] { musicIcons[name]?.isHidden = !(panelVisible && connected) }
+        for name in ["previous", "toggle", "next"] { musicIcons[name]?.isHidden = !(panelVisible && connected && state.track != nil) }
         musicIcons["toggle"]?.texture = iconTextures[playing ? "pause" : "play"]
         guard let notes = notesSprite, let spec = music.notes else { return }
         notes.removeAllActions()

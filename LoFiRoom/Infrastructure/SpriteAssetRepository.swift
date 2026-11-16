@@ -31,7 +31,11 @@ final class SpriteAssetRepository {
     /// the first scene folder (roots without a registry, such as test fixtures).
     init(root: URL = Bundle.main.resourceURL!.appendingPathComponent("Assets"), sceneName: String? = nil, artSet: String? = nil) throws {
         self.root = root
-        let registry = (try? Data(contentsOf: root.appendingPathComponent("art-sets.json"))).flatMap { try? JSONDecoder().decode(ArtSets.self, from: $0) }
+        // A missing registry is allowed (test fixtures); one that exists but cannot be decoded is an error.
+        var registry: ArtSets?
+        if let data = try? Data(contentsOf: root.appendingPathComponent("art-sets.json")) {
+            do { registry = try JSONDecoder().decode(ArtSets.self, from: data) } catch { throw PackError("art-sets.json is invalid (\(error))") }
+        }
         var registered: String?
         if let key = artSet ?? registry?.active {
             guard let entry = registry?.sets[key] else { throw PackError("art-sets.json has no art set '\(key)'") }

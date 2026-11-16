@@ -23,6 +23,36 @@ final class MusicControllerTests: XCTestCase {
         return c
     }
 
+    func testAuthorizeFailedLeavesConnecting() {
+        let c = make()
+        c.primaryAction()
+        XCTAssertEqual(c.state.connection, .connecting)
+        remote.send(.authorizeFailed)
+        XCTAssertEqual(c.state.connection, .neverConnected)
+        c.primaryAction()
+        XCTAssertEqual(remote.count("authorizeAndPlay"), 2)
+        remote.isInstalled = false
+        remote.send(.authorizeFailed)
+        XCTAssertEqual(c.state.connection, .notInstalled)
+    }
+
+    func testAuthorizeFailedWithTokenDrops() {
+        let c = make(token: true)
+        c.primaryAction()
+        remote.send(.authorizeFailed)
+        XCTAssertEqual(c.state.connection, .dropped)
+    }
+
+    func testAuthorizationDeniedOnlyMattersWhileConnecting() {
+        let c = connected()
+        remote.send(.authorizationDenied)
+        XCTAssertEqual(c.state.connection, .connected)
+        let d = make()
+        d.primaryAction()
+        remote.send(.authorizationDenied)
+        XCTAssertEqual(d.state.connection, .needsReconnect)
+    }
+
     func testInitialStates() {
         remote.isConfigured = false
         XCTAssertEqual(make().state.connection, .notConfigured)
@@ -118,6 +148,19 @@ final class MusicControllerTests: XCTestCase {
         idle.resignedActive()
         idle.becameActive()
         XCTAssertEqual(remote.calls, ["disconnect"])
+    }
+
+    func testReturnFromAuthorizeDoesNotConnectTwice() {
+        remote.callbackResult = true
+        let c = make()
+        c.cardOpened()
+        c.primaryAction()
+        XCTAssertTrue(c.handleCallback(URL(string: "lofiroom://spotify-callback#access_token=x")!))
+        c.becameActive()
+        XCTAssertEqual(remote.count("connect"), 0)
+        XCTAssertEqual(c.state.connection, .connecting)
+        remote.send(.connected)
+        XCTAssertEqual(c.state.connection, .connected)
     }
 
     func testStaleConnectingIsResolvedOnReturn() {
