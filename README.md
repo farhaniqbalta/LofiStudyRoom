@@ -22,7 +22,7 @@ Built with SwiftUI and SpriteKit. No backend. The only third-party dependency is
 | M1 | Swappable sprite packs, layered scene, real pixel clock, saved setup | Done |
 | Engine-first (M2 + M3a) | Routines, taps, settings panel, time and weather, power policy | Done |
 | M3b | Spotify now-playing | Done |
-| Art set A | Real poses, cat reactions, lamp-off room | Mostly done; day rooms, day city views and rain art are still stand-ins |
+| Art set A | Real poses, cat reactions, lamp-off room | Mostly done; day rooms and day city views are still stand-ins |
 | M4 | Energy measurement, power tuning, polish | Not started |
 
 Progress notes are in [`docs/logs/worklog.md`](docs/logs/worklog.md).

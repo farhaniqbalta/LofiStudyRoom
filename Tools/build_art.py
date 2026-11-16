@@ -224,27 +224,47 @@ def lamp_off(img):
 def daylight(img):  # mild: actors are not tinted, so keep the dark chair pixels plausible
     return tint(img, lambda r, g, b: lerp((r, g, b), (245, 228, 200), 0.45))
 
-# ---------- rain: a looping one-row sheet; each streak falls RAIN_STEP px per frame and the pattern repeats every
-# RAIN_PERIOD rows, so frame 6 is frame 0
-RAIN_FRAMES, RAIN_STEP, RAIN_PERIOD, RAIN_COLOUR = 6, 8, 48, (170, 210, 255, 160)
+RAIN_FRAMES = 6
+# Two depths of rain plus a few beads stuck on the glass. Each layer falls `step` px per frame and repeats every
+# RAIN_FRAMES * step rows, so frame 6 is frame 0 again and the loop has no seam.
+RAIN_LAYERS = [  # spacing between columns, streak length, step per frame, colour
+    dict(spacing=3, length=2, step=6, colour=(150, 180, 230, 90)),     # far: short, faint, slow
+    dict(spacing=9, length=6, step=16, colour=(205, 228, 255, 175)),   # near: long, bright, fast
+]
+GLASS_BEADS = [(14, 22), (41, 70), (63, 35), (88, 98), (117, 18), (139, 61), (160, 104), (176, 40), (27, 112), (101, 52)]
+BEAD_C, BEAD_HI = (150, 180, 230, 120), (225, 240, 255, 200)
 def rain_sheet():
     rng = random.Random(7)
-    # One drop per 4 px column band, so the whole pane rains evenly (random columns left gaps).
-    drops = [(x + rng.randrange(3), rng.randrange(RAIN_PERIOD)) for x in range(2, ww - 2, 4)]
+    layers = []
+    for layer in RAIN_LAYERS:
+        period = RAIN_FRAMES * layer["step"]
+        drops = [(x + rng.randrange(layer["spacing"]), rng.randrange(period)) for x in range(2, ww - 2, layer["spacing"])]
+        layers.append((layer, period, drops))
     frames = []
     for f in range(RAIN_FRAMES):
         img = [[CLEAR] * ww for _ in range(wh)]
-        for x, y0 in drops:
-            for y in range(y0 + f * RAIN_STEP - RAIN_PERIOD, wh, RAIN_PERIOD):
-                for k in range(3):  # 1x3 diagonal streak
-                    if 0 <= y + k < wh:
-                        img[y + k][x - (k + 1) // 2] = RAIN_COLOUR
+        for layer, period, drops in layers:
+            for x, y0 in drops:
+                for y in range((y0 + f * layer["step"]) % period - period, wh, period):
+                    for k in range(layer["length"]):  # slanted streak: one px left every 3 rows
+                        if 0 <= y + k < wh and 0 <= x - k // 3 < ww:
+                            img[y + k][x - k // 3] = layer["colour"]
+        for x, y in GLASS_BEADS:  # still beads on the glass: a 2x2 drop with a bright corner
+            if x + 1 < ww and y + 1 < wh:
+                for dx, dy in ((0, 0), (1, 0), (0, 1), (1, 1)):
+                    img[y + dy][x + dx] = BEAD_C
+                img[y][x] = BEAD_HI
         frames.append(img)
     return frames
 
 # ---------- music skin: a wall-mounted pixel player (panel, icons, notes) for the Spotify now-playing display
 PANEL_AT, PANEL_SIZE = (58, 228), (176, 56)    # top-left on the room, size
-BODY_C, EDGE_C, HILITE_C, WELL_C, LED_C, ICON_C = (22, 18, 40, 255), (118, 92, 160, 255), (58, 46, 92, 255), (12, 10, 24, 255), (240, 170, 70, 255), (243, 233, 210, 255)
+# A small retro wall radio: bevelled plum casing, four screws, a recessed cover well and a dark LCD screen
+# that the title, artist, buttons and logo sit on.
+OUTLINE_C, BODY_C, LIGHT_C, SHADE_C = (10, 8, 20, 255), (34, 27, 58, 255), (84, 67, 128, 255), (20, 16, 36, 255)
+WELL_C, SCREEN_C, SCAN_C = (9, 8, 18, 255), (14, 17, 30, 255), (17, 21, 36, 255)
+SCREW_C, SCREW_HI, LED_C, LED_ON_C, ICON_C = (92, 84, 110, 255), (170, 160, 190, 255), (240, 170, 70, 255), (120, 220, 140, 255), (243, 233, 210, 255)
+ICON_SHADOW_C = (6, 5, 12, 255)
 CYAN_C = (120, 220, 235, 255)
 MUSIC_SLOTS = dict(artwork=(6, 6, 44, 44), title=(56, 6, 104, 13), artist=(56, 20, 104, 11), attribution=(128, 38, 42, 12),
                    previous=(58, 36, 16, 16), toggle=(80, 36, 16, 16), next=(102, 36, 16, 16), close=(164, 4, 8, 8),
@@ -253,24 +273,35 @@ MUSIC_SLOTS = dict(artwork=(6, 6, 44, 44), title=(56, 6, 104, 13), artist=(56, 2
 def panel_image():
     pw, ph = PANEL_SIZE
     img = [[BODY_C] * pw for _ in range(ph)]
-    def px(x, y, c): img[y][x] = c
-    for x in range(pw):
-        px(x, 0, EDGE_C); px(x, ph - 1, EDGE_C)
-    for y in range(ph):
-        px(0, y, EDGE_C); px(pw - 1, y, EDGE_C)
+    def fill(x0, y0, x1, y1, c):  # inclusive corners
+        for y in range(y0, y1 + 1):
+            for x in range(x0, x1 + 1):
+                img[y][x] = c
+    def bevel(x0, y0, x1, y1, raised):
+        """1 px light edge on top/left and shade on bottom/right (swapped for a recess)."""
+        top, bottom = (LIGHT_C, SHADE_C) if raised else (SHADE_C, LIGHT_C)
+        fill(x0, y0, x1, y0, top); fill(x0, y0, x0, y1, top)
+        fill(x0, y1, x1, y1, bottom); fill(x1, y0, x1, y1, bottom)
+    # casing: dark outline, raised bevel, transparent corners for a rounded look
+    fill(0, 0, pw - 1, ph - 1, OUTLINE_C)
+    fill(1, 1, pw - 2, ph - 2, BODY_C)
+    bevel(1, 1, pw - 2, ph - 2, raised=True)
     for x, y in ((0, 0), (pw - 1, 0), (0, ph - 1), (pw - 1, ph - 1)):
-        px(x, y, CLEAR)
-    for x in range(2, pw - 2):
-        px(x, 1, HILITE_C)
-    for i in range(46):  # recessed cover well
-        for x, y in ((5 + i, 5), (5 + i, 50), (5, 5 + i), (50, 5 + i)):
-            px(x, y, HILITE_C)
-    for y in range(6, 50):
-        for x in range(6, 50):
-            px(x, y, WELL_C)
-    for x in range(56, 170):  # divider under the text area
-        px(x, 33, HILITE_C)
-    px(166, 16, LED_C); px(169, 16, LED_C)
+        img[y][x] = CLEAR
+    # recessed cover well around the artwork slot (6, 6, 44, 44)
+    bevel(4, 4, 51, 51, raised=False)
+    fill(5, 5, 50, 50, WELL_C)
+    # recessed screen behind the text, buttons and logo, with faint scanlines
+    bevel(53, 3, 173, 52, raised=False)
+    fill(54, 4, 172, 51, SCREEN_C)
+    for y in range(5, 51, 2):
+        fill(54, y, 172, y, SCAN_C)
+    fill(56, 33, 170, 33, SHADE_C)  # divider between the track text and the controls
+    # screws in the four corners of the casing
+    for x, y in ((2, 2), (pw - 4, 2), (2, ph - 4), (pw - 4, ph - 4)):
+        fill(x, y, x + 1, y + 1, SCREW_C); img[y][x] = SCREW_HI
+    # power LEDs under the close button: green "on", amber "signal"
+    img[16][166] = LED_ON_C; img[16][169] = LED_C
     return img
 
 def bitmap(rows, colour=ICON_C):
@@ -291,6 +322,11 @@ def icon(*parts):
     canvas = [[CLEAR] * 16 for _ in range(16)]
     for rows, x, y in parts:
         paste(canvas, rows, x, y)
+    # 1 px drop shadow down-right, so the icons read as buttons on the screen
+    for y in range(15, 0, -1):
+        for x in range(15, 0, -1):
+            if canvas[y][x] == CLEAR and canvas[y - 1][x - 1] == ICON_C:
+                canvas[y][x] = ICON_SHADOW_C
     return canvas
 ICON_NEXT = icon((TRI_R, 3, 3), (TRI_R, 8, 3), (BAR, 13, 3))
 ICON_PREVIOUS = [row[::-1] for row in ICON_NEXT]

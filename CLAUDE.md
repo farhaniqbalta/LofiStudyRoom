@@ -173,7 +173,7 @@ Done and hand-tested: M0, M1, engine-first (M2 + M3a), Spotify now-playing (M3b)
 Also done: eight code-review fixes, app icon, Spotify logo, animation frequency setting, rain sound (`docs/logs/polish-and-audio.md`). Nothing is in progress.
 
 Open, in no fixed order; start one only with the user's go-ahead:
-- Art set A stand-ins still left: day rooms, day city views, rain art, the music player's first-pass frame (PixelLab generations needed for the day art). More cat animation (the user asked to keep it for later).
+- Art set A stand-ins still left: day rooms and day city views (PixelLab generations needed). More cat animation (the user asked to keep it for later).
 - M4: energy measurement on the iPad (never done; no power claims until it is), power tuning, polish.
 - Not tried on the device: Low Power Mode, VoiceOver, airplane-mode launch, Spotify signed out or not installed.
 - Art direction B/C (`docs/ART_SETS.md`).
