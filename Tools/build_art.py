@@ -258,49 +258,71 @@ def rain_sheet():
     return frames
 
 # ---------- music skin: a wall-mounted pixel player (panel, icons, notes) for the Spotify now-playing display
-PANEL_AT, PANEL_SIZE = (58, 228), (176, 56)    # top-left on the room, size
-# A small retro wall radio: bevelled plum casing, four screws, a recessed cover well and a dark LCD screen
-# that the title, artist, buttons and logo sit on.
-OUTLINE_C, BODY_C, LIGHT_C, SHADE_C = (10, 8, 20, 255), (34, 27, 58, 255), (84, 67, 128, 255), (20, 16, 36, 255)
-WELL_C, SCREEN_C, SCAN_C = (9, 8, 18, 255), (14, 17, 30, 255), (17, 21, 36, 255)
-SCREW_C, SCREW_HI, LED_C, LED_ON_C, ICON_C = (92, 84, 110, 255), (170, 160, 190, 255), (240, 170, 70, 255), (120, 220, 140, 255), (243, 233, 210, 255)
-ICON_SHADOW_C = (6, 5, 12, 255)
+PANEL_AT, CASING = (58, 228), (176, 56)        # top-left on the room, size of the radio itself
+SHADOW = 2                                     # px of cast shadow on the wall, below and right
+PANEL_SIZE = (CASING[0] + SHADOW, CASING[1] + SHADOW)  # the panel image and its frame include the shadow
+# A small walnut wall radio. Every colour is sampled from the room (desk, sill, lamp light), so the player looks
+# like furniture under the same lamp rather than an app overlay.
+OUTLINE_C, WOOD_DARK, WOOD_MID, WOOD_LIGHT, WOOD_HI = (10, 2, 0, 255), (34, 17, 13, 255), (61, 30, 25, 255), (89, 43, 35, 255), (121, 66, 61, 255)
+LAMP_RIM_C = (165, 90, 66, 255)                  # the side facing the desk lamp catches its warm light
+WELL_C, SCREEN_C, SCAN_C = (12, 5, 3, 255), (20, 11, 8, 255), (26, 15, 11, 255)   # a dim warm tuner glass
+SCREW_C, SCREW_HI = (121, 66, 61, 255), (238, 147, 85, 255)
+LED_C, LED_ON_C = (238, 147, 85, 255), (149, 250, 250, 255)   # amber like the lamp, cyan like the monitor
+ICON_C, ICON_SHADOW_C = (242, 226, 196, 255), (10, 2, 0, 255)
+SHADOW_C = (0, 0, 0, 90)
+TEXT_HEX, DIM_HEX = "#F2E2C4", "#C08A5E"           # warm cream title, amber artist and messages
 CYAN_C = (120, 220, 235, 255)
 MUSIC_SLOTS = dict(artwork=(6, 6, 44, 44), title=(56, 6, 104, 13), artist=(56, 20, 104, 11), attribution=(128, 38, 42, 12),
                    previous=(58, 36, 16, 16), toggle=(80, 36, 16, 16), next=(102, 36, 16, 16), close=(164, 4, 8, 8),
                    message=(56, 6, 114, 24), action=(56, 34, 114, 16))
 
 def panel_image():
+    cw, ch = CASING
     pw, ph = PANEL_SIZE
-    img = [[BODY_C] * pw for _ in range(ph)]
+    img = [[CLEAR] * pw for _ in range(ph)]
     def fill(x0, y0, x1, y1, c):  # inclusive corners
         for y in range(y0, y1 + 1):
             for x in range(x0, x1 + 1):
                 img[y][x] = c
     def bevel(x0, y0, x1, y1, raised):
         """1 px light edge on top/left and shade on bottom/right (swapped for a recess)."""
-        top, bottom = (LIGHT_C, SHADE_C) if raised else (SHADE_C, LIGHT_C)
+        top, bottom = (WOOD_HI, WOOD_DARK) if raised else (WOOD_DARK, WOOD_HI)
         fill(x0, y0, x1, y0, top); fill(x0, y0, x0, y1, top)
         fill(x0, y1, x1, y1, bottom); fill(x1, y0, x1, y1, bottom)
-    # casing: dark outline, raised bevel, transparent corners for a rounded look
-    fill(0, 0, pw - 1, ph - 1, OUTLINE_C)
-    fill(1, 1, pw - 2, ph - 2, BODY_C)
-    bevel(1, 1, pw - 2, ph - 2, raised=True)
-    for x, y in ((0, 0), (pw - 1, 0), (0, ph - 1), (pw - 1, ph - 1)):
+    # cast shadow on the wall, offset down-right; the casing covers most of it
+    fill(SHADOW, SHADOW, pw - 1, ph - 1, SHADOW_C)
+    # walnut casing: outline, mid wood with darker grain lines that break up at random, raised bevel
+    fill(0, 0, cw - 1, ch - 1, OUTLINE_C)
+    fill(1, 1, cw - 2, ch - 2, WOOD_MID)
+    rng = random.Random(3)
+    for y in range(3, ch - 3, 3):
+        x = 2
+        while x < cw - 2:
+            run = rng.randrange(6, 30)
+            for i in range(x, min(x + run, cw - 2)):
+                img[y][i] = WOOD_DARK
+            x += run + rng.randrange(3, 12)
+    for x in range(2, cw - 2, 2):  # dithered sheen along the top
+        img[2][x] = WOOD_LIGHT
+    bevel(1, 1, cw - 2, ch - 2, raised=True)
+    for y in range(2, ch - 2):     # warm rim on the side facing the lamp
+        img[y][cw - 2] = LAMP_RIM_C
+    for x, y in ((0, 0), (cw - 1, 0), (0, ch - 1), (cw - 1, ch - 1)):  # rounded corners
         img[y][x] = CLEAR
+    for x, y in ((3, 1), (cw - 9, ch - 2), (1, 30)):  # a few scuffs on the edge
+        img[y][x] = WOOD_LIGHT
     # recessed cover well around the artwork slot (6, 6, 44, 44)
     bevel(4, 4, 51, 51, raised=False)
     fill(5, 5, 50, 50, WELL_C)
-    # recessed screen behind the text, buttons and logo, with faint scanlines
+    # recessed tuner glass behind the text, buttons and logo, with faint scanlines
     bevel(53, 3, 173, 52, raised=False)
     fill(54, 4, 172, 51, SCREEN_C)
     for y in range(5, 51, 2):
         fill(54, y, 172, y, SCAN_C)
-    fill(56, 33, 170, 33, SHADE_C)  # divider between the track text and the controls
-    # screws in the four corners of the casing
-    for x, y in ((2, 2), (pw - 4, 2), (2, ph - 4), (pw - 4, ph - 4)):
+    fill(56, 33, 170, 33, WOOD_DARK)  # divider between the track text and the controls
+    # brass screws in the four corners
+    for x, y in ((2, 2), (cw - 4, 2), (2, ch - 4), (cw - 4, ch - 4)):
         fill(x, y, x + 1, y + 1, SCREW_C); img[y][x] = SCREW_HI
-    # power LEDs under the close button: green "on", amber "signal"
     img[16][166] = LED_ON_C; img[16][169] = LED_C
     return img
 
@@ -379,7 +401,7 @@ write_manifest(scene_dir, id="studyroom01", type="scene", artSet="A", packVersio
                music=dict(panel="music_panel.png", frame=rect(*PANEL_AT, *PANEL_SIZE),
                           icons=dict(sheet="music_icons.png", frame=dict(w=16, h=16), names=["previous", "play", "pause", "next", "close"]),
                           slots={name: panel_slot(name) for name in MUSIC_SLOTS},
-                          textColor="#F3E9D2", dimColor="#8B7FA8",
+                          textColor=TEXT_HEX, dimColor=DIM_HEX,
                           notes=dict(sheet="music_notes.png", frame=dict(w=20, h=24), fps=2, anchor="music-notes")),
                rain=dict(sheet="rain.png", frame=dict(w=ww, h=wh), fps=8, anchor="window-rect"),
                hotspots=dict(pet=pet, window=rect(*WINDOW), lamp=rect(*LAMP_BOX), computer=rect(*COMPUTER_BOX)))

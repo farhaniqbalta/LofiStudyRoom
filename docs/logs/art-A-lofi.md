@@ -50,7 +50,8 @@ Each pose is an edit of the character's existing rest picture (`ArtSource/<who>_
 ## Rain and music player redrawn (2026-11-17)
 
 - Rain: two depths instead of one row of tiny dashes. Far: short, faint, slow streaks every 3 px. Near: long, bright, fast streaks every 9 px. Ten still beads on the glass. Still a seamless 6-frame loop (each layer repeats every 6 × its step).
-- Music player: a small retro wall radio instead of a flat box: dark outline, raised bevel, four screws, a recessed cover well, a recessed dark screen with faint scanlines behind the text and controls, a green and an amber LED. Icons get a 1 px drop shadow. Slot positions and size are unchanged, so the skin manifest did not change.
+- Music player, first redraw: a bevelled retro radio in cool purples. Reviewed against the room: it still read as an app overlay (flat, a palette found nowhere else in the room, unlit by the lamp, no shadow).
+- Music player, re-skin: a walnut wall radio. Every colour is sampled from the room (desk wood, sill, lamp light); wood grain lines, a dithered sheen, a warm rim on the side facing the lamp, brass screws, a few scuffs, a dim warm tuner glass behind the text, and a 2 px shadow cast on the wall. Title text is warm cream, artist and messages amber. The panel image grew by the 2 px shadow; slot positions are unchanged.
 - Checked on the iPad: rain at night over the city; the player showing "Spotify is paused" / "Resume in Spotify".
 
 ## Still stand-ins
@@ -58,6 +59,10 @@ Each pose is an edit of the character's existing rest picture (`ArtSource/<who>_
 - Day rooms (`room_day.png`, `room_day_off.png`): a pale wash; characters look too dark against them.
 - Day city views: brightened copies of the night pictures.
 - Music skin notes: first-pass, drawn by the script.
+
+## Idea for later: music in a room object (not built)
+
+Instead of a panel on the wall, the music lives in something already in the room, for example a small cassette deck or radio on the window sill or the shelf. Closed, it is just furniture (maybe a tiny lit display or turning reels while playing). Tapped, it opens the readable player. This fits "a living room, no HUD" best. It needs two designs (the closed object and the open player), a hotspot on the object instead of the monitor, and room in the sill or shelf art. The skin manifest would gain an "object" sprite with closed/playing animations; the engine pieces (slots, overlay, controller) stay as they are.
 
 ## Known problems
 

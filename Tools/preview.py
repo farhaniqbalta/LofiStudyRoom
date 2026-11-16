@@ -38,7 +38,7 @@ def main():
             for i, p in enumerate(row):
                 if p[3] and 0 <= top + j < H and 0 <= x + i < W:
                     q = canvas[top + j][x + i]
-                    canvas[top + j][x + i] = p if p[3] == 255 else tuple((a * p[3] + b * (255 - p[3])) // 255 for a, b in zip(p, q))
+                    canvas[top + j][x + i] = p if p[3] == 255 else (*((a * p[3] + b * (255 - p[3])) // 255 for a, b in zip(p[:3], q[:3])), q[3])
     def draw_frame(category, name, index):
         d, m = load(category, name)
         a = scene["anchors"][m["anchor"]]
@@ -82,8 +82,9 @@ def main():
             sl = skin["slots"][slot]
             blit([[colour] * (sl["w"] - shrink) for _ in range(sl["h"] - 2 * (sl["h"] // 4))], sl["x"], sl["y"] + sl["h"] // 4)
         flat("artwork", (90, 120, 150, 255)); blit([[(90, 120, 150, 255)] * 44 for _ in range(44)], skin["slots"]["artwork"]["x"], skin["slots"]["artwork"]["y"])
-        flat("title", (243, 233, 210, 255), 40); flat("artist", (139, 127, 168, 255), 60)
-        flat("attribution", (139, 127, 168, 255), 4)
+        hexc = lambda h: (int(h[1:3], 16), int(h[3:5], 16), int(h[5:7], 16), 255)
+        flat("title", hexc(skin["textColor"]), 40); flat("artist", hexc(skin["dimColor"]), 60)
+        flat("attribution", (242, 242, 242, 255), 4)   # stands in for the white Spotify logo
         centre("previous", "previous"); centre("toggle", "pause" if state == "playing" else "play")
         centre("next", "next"); centre("close", "close")
         if state == "playing" and skin.get("notes"):
