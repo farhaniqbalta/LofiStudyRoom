@@ -51,9 +51,19 @@ final class SpotifyRemoteAdapter: NSObject, MusicRemote, @preconcurrency SPTAppR
         return true
     }
 
+    /// Why the last cover request gave no image; shown in the debug status line.
+    private(set) var lastArtworkError: String?
+
     func artwork(for track: NowPlaying, size: CGSize, completion: @escaping (UIImage?) -> Void) {
-        guard let remote, let item = lastTrack, item.imageIdentifier == track.imageID else { return completion(nil) }
-        remote.imageAPI?.fetchImage(forItem: item, with: size) { image, _ in completion(image as? UIImage) }
+        // Every path must call `completion`: the caller awaits it.
+        guard let remote, let item = lastTrack, item.imageIdentifier == track.imageID, let api = remote.imageAPI else {
+            lastArtworkError = remote?.imageAPI == nil ? "no image API (not connected)" : "track changed"
+            return completion(nil)
+        }
+        api.fetchImage(forItem: item, with: size) { [weak self] image, error in
+            self?.lastArtworkError = image is UIImage ? nil : "fetch failed: \(error.map { "\($0)" } ?? "result was \(type(of: image))")"
+            completion(image as? UIImage)
+        }
     }
 
     // MARK: SPTAppRemoteDelegate

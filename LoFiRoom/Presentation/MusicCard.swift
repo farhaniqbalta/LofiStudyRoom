@@ -110,7 +110,7 @@ struct MusicArtwork: View {
             }
         }
         .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
-        .task(id: track.imageID) { await load() }
+        .task(id: "\(track.imageID ?? "")|\(coordinator.musicState.connection == .connected)") { await load() }
     }
 
     private func load() async {
