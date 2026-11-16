@@ -11,3 +11,4 @@ One line per checkpoint. Detail lives in the linked file.
 | Art set B — cyberpunk side desk | Experimental spike, saved; run with `-artSet B` | [art-B-cyberdesk.md](art-B-cyberdesk.md) |
 | Spotify App Remote spike | Done; connection drops about 30 s after a pause, app-switch resume works | [spotify-spike.md](spotify-spike.md) |
 | Spotify now-playing (M3b) | Built, 112 tests; plain card hand-tested, in-room skin awaiting a hand test with music playing | [spotify-now-playing.md](spotify-now-playing.md) |
+| Art set A — sprite pass | Character poses, cat reactions and lamp-off room replaced; day rooms, day cities and rain still stand-ins | [art-A-lofi.md](art-A-lofi.md) |

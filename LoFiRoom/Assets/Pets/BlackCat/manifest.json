@@ -19,12 +19,11 @@
     },
     "idle": {
       "frames": [
-        2,
-        0,
-        2,
-        0
+        5,
+        6,
+        5
       ],
-      "fps": 2,
+      "fps": 4,
       "loop": false,
       "routine": {
         "weight": 1,
@@ -33,9 +32,9 @@
     },
     "react": {
       "frames": [
-        3,
-        4,
-        3,
+        7,
+        8,
+        7,
         0
       ],
       "fps": 4,
@@ -44,5 +43,6 @@
     }
   },
   "fallbackAnimation": "sleep",
-  "provenance": "PixelLab create_image_pixen job 23ddd82d-29af-4643-8629-8d9adee3e747; breathing frame and recolour by Tools/build_art.py. Stand-in frames: idle, react."
+  "provenance": "PixelLab create_image_pixen job 23ddd82d-29af-4643-8629-8d9adee3e747 (sleeping cat) with a breathing frame; ear-twitch frames (idle) and eyes-open frames (tap reaction) drawn in Aseprite through aseprite-mcp. Recoloured from OrangeCat in Aseprite. Frames 3-5 are unused leftovers of the stand-in tail twitch and hop.",
+  "source": "ArtLab/type-a-lofi/BlackCat.aseprite"
 }

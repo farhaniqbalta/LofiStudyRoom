@@ -3,7 +3,7 @@
 Run: python3 Tools/build_art.py
 All positions here are top-left based image pixels on the 480x352 room; manifests are written in SpriteKit
 coordinates (origin bottom-left). Every pack sprite is placed with its bottom-left corner on its anchor."""
-import json, math, os, random, shutil
+import collections, json, math, os, random, shutil
 import pngio
 from cutout import figure, polygon
 
@@ -44,9 +44,6 @@ def tint(img, f):
 def lerp(c, target, t):
     return tuple(round(a + (b - a) * t) for a, b in zip(c, target))
 
-def disc(cx, cy, r, n=20):
-    return polygon([(round(cx + r * math.cos(i * math.tau / n)), round(cy + r * math.sin(i * math.tau / n))) for i in range(n)])
-
 def bbox(images):
     pts = [(x, y) for img in images for y, row in enumerate(img) for x, p in enumerate(row) if p[3]]
     xs, ys = [p[0] for p in pts], [p[1] for p in pts]
@@ -81,98 +78,80 @@ CHAIR_FRONT = [  # room pixels, top-left based
 chair = {(x - sx, y - sy) for pts in CHAIR_FRONT for x, y in polygon(pts)}
 before = pngio.crop(pngio.read(os.path.join(SRC, "room_raw.png")), sx, sy, sw, sh)
 
-PAD = 4  # spare rows above every character frame so the stretch frames have headroom
-BACK_TOP = 69 + PAD  # chair-back top row (crop 69) in padded frames
-STRETCH_CUT = BACK_TOP + 14  # cut below the hands so they travel with the arms instead of tearing
-def pad(img):
-    return [[CLEAR] * len(img[0]) for _ in range(PAD)] + img
-
 def bob(img, neck):
     """Rows above the neck drop one pixel; reads as a small nod over the keyboard."""
     return [[CLEAR] * len(img[0])] + img[:neck] + img[neck + 1:]
-
-# Stand-in routine frames: crude edits of the rest frame, to be replaced by real art.
-def stretch(img, n):
-    """Upper body (rows above the chair back and hands) moves up n px; the gap repeats the cut row."""
-    return img[n:STRETCH_CUT] + [img[STRETCH_CUT]] * n + img[STRETCH_CUT:]
-
-def head_left(img, neck, n=2):
-    return [row[n:] + [CLEAR] * n for row in img[:neck]] + img[neck:]
-
-MUG = ["LLL.", "LLLH", "LLLH", "DDD.", "DDD."]
-MUG_COLOURS = {"L": (143, 120, 138, 255), "H": (143, 120, 138, 255), "D": (78, 61, 95, 255)}
-def with_mug(img, x, y):
-    img = [row[:] for row in img]
-    for j, line in enumerate(MUG):
-        for i, c in enumerate(line):
-            if c in MUG_COLOURS:
-                img[y + PAD + j][x + i] = MUG_COLOURS[c]
-    return img
 
 # Loose outline both seated characters fit inside (crop pixels). It also bounds what a character pack may paint.
 ENVELOPE = polygon([(50, 18), (60, 10), (80, 9), (93, 14), (97, 28), (97, 44), (101, 56), (101, 72), (93, 77), (91, 123),
                     (52, 125), (50, 146), (64, 150), (64, 166), (14, 166), (14, 148), (23, 144), (21, 100), (29, 96),
                     (26, 84), (29, 77), (17, 75), (17, 62), (40, 59), (50, 52)])
-front = pad([[before[y][x] if (x, y) in chair else CLEAR for x in range(sw)] for y in range(sh)])
+# Routine poses reach further (raised mug, elbows out), so they get a wider outline for the upper body.
+POSE_ENVELOPE = ENVELOPE | polygon([(8, 4), (122, 4), (122, 82), (101, 82), (93, 77), (40, 59), (17, 62), (17, 75), (8, 75)])
+front = [[before[y][x] if (x, y) in chair else CLEAR for x in range(sw)] for y in range(sh)]
+
+def differs(p, q, threshold=8):
+    return max(abs(p[i] - q[i]) for i in range(3)) > threshold
+
+def cut(after, shape):
+    """The figure as a sprite with no chair in it: hidden pixels behind the chair take the nearest body colour."""
+    body = [[after[y][x] if (x, y) in shape else CLEAR for x in range(sw)] for y in range(sh)]
+    visible = shape - chair
+    for x, y in chair:
+        near = [(abs(d), body[y + dy * d][x + dx * d]) for dx, dy in ((1, 0), (0, 1)) for d in range(-40, 41)
+                if (x + dx * d, y + dy * d) in visible]
+        if near:
+            body[y][x] = min(near, key=lambda n: n[0])[1]
+    return body
+
+def pose_shape(rest_after, rest_shape, pose_after):
+    """A pose is an edit of the rest picture: keep what was body or what the edit changed, then drop pixels
+    that went back to showing the room (an arm that left the keyboard)."""
+    return {(x, y) for x, y in POSE_ENVELOPE
+            if ((x, y) in rest_shape or differs(pose_after[y][x], rest_after[y][x]))
+            and differs(pose_after[y][x], before[y][x], 12)}
 
 def one_shot(fps, frames, weight, cooldown):
     return dict(frames=frames, fps=fps, loop=False, safeExits=[], routine=dict(weight=weight, cooldown=cooldown))
 
+POSES = {  # PixelLab edit_image_pixen jobs, each an edit of the character's rest picture
+    "Boy01": dict(drink="eb6bf14f-d1cd-4fc3-a1d9-5847c0592368", stretch="9e28eaa2-60bd-438d-b318-c512197fcfb3",
+                  rest="d37d0deb-8676-49d8-b917-7b0288e5f67a"),
+    "Girl01": dict(drink="d677a003-6fb9-455e-a034-b6af5e07a8c2", stretch="5f911362-7571-4162-872d-7a0cce043704",
+                   rest="f1ff52c5-c21b-4be9-9dfe-2a8203d840cf"),
+}
 characters = {}
 for name, neck, job in (("Boy01", 52, "01c93df1-0248-4bb4-8ed1-0d1bba639e6c"),
                         ("Girl01", 56, "7ba1e19c-e5fc-45b6-a5b4-4d05c9dbe17a")):
-    after = pngio.read(os.path.join(SRC, f"{name[:-2].lower()}_edit_raw.png"))
+    who = name[:-2].lower()
+    after = pngio.read(os.path.join(SRC, f"{who}_edit_raw.png"))
     shape = figure(before, after, ENVELOPE)
-    body = [[after[y][x] if (x, y) in shape else CLEAR for x in range(sw)] for y in range(sh)]
-    # Continue the body behind the chair: each hidden pixel takes the colour of the nearest body pixel in its row or column.
-    for x, y in chair:
-        near = [(abs(d), body[y + dy * d][x + dx * d]) for dx, dy in ((1, 0), (0, 1)) for d in range(-40, 41)
-                if (x + dx * d, y + dy * d) in shape - chair]
-        if near:
-            body[y][x] = min(near, key=lambda n: n[0])[1]
-    body = pad(body)
-    lift, sip = with_mug(body, 38, 58), with_mug(body, 52, 40)
-    frames = [body, bob(body, neck + PAD), lift, sip, stretch(body, 2), stretch(body, 4), head_left(body, neck + PAD)]
+    body = cut(after, shape)
+    frames = [body, bob(body, neck)]
+    for pose in ("drink", "stretch", "rest"):
+        pose_after = pngio.read(os.path.join(SRC, f"{who}_{pose}_raw.png"))
+        frames.append(cut(pose_after, pose_shape(after, shape, pose_after)))
     characters[name] = (frames, job)
 
 fx, fy, fw, fh = bbox([f for frames, _ in characters.values() for f in frames] + [front])
-seat = rect(sx + fx, sy + fy - PAD, fw, fh)
+seat = rect(sx + fx, sy + fy, fw, fh)
 for name, (frames, job) in characters.items():
     sprite_pack("Characters", name, "character", "desk-seat", [pngio.crop(f, fx, fy, fw, fh) for f in frames],
                 {"study": dict(frames=[0, 1], fps=1),
-                 "drink": one_shot(1.5, [2, 3, 3, 2], 3, 300),
-                 "stretch": one_shot(1, [4, 5, 5, 4], 1, 900),
-                 "rest": one_shot(0.125, [6], 2, 600)},
-                f"PixelLab edit_image_pixen job {job} on a crop of the room; cut out, body continued behind the chair "
-                "and bob frame added by Tools/build_art.py. Stand-in frames: drink, stretch, rest.")
+                 # one held pose each: 2.5 s, 3 s and 8 s
+                 "drink": one_shot(0.4, [2], 3, 300),
+                 "stretch": one_shot(1 / 3, [3], 1, 900),
+                 "rest": one_shot(0.125, [4], 2, 600)},
+                f"PixelLab edit_image_pixen job {job} on a crop of the room (rest), and jobs "
+                + ", ".join(f"{POSES[name][k]} ({k})" for k in ("drink", "stretch", "rest"))
+                + " as edits of the rest picture; cut out, body continued behind the chair and bob frame added by Tools/build_art.py.")
 
-# ---------- pets: trim, add a breathing frame, recolour for the black cat
+# ---------- pets: the anchor matches the cat sprite (37x28 with spare rows on top)
 cat = pngio.read(os.path.join(SRC, "cat_orange_raw.png"))
 cx, cy, cw, ch = bbox([cat])
 CAT_PAD = 2  # spare rows on top for the inhale and the startle hop
 cat = [[CLEAR] * cw for _ in range(CAT_PAD - 1)] + pngio.crop(cat, cx, cy - 1, cw, ch + 1)
-mid = len(cat) // 2
-inhale = cat[1:mid + 1] + [cat[mid]] + cat[mid + 1:]   # body one pixel taller
-def hop(img, n):
-    return img[n:] + [[CLEAR] * cw for _ in range(n)]
-def twitch(img):
-    """Tail cluster (right-most columns) moves up 1 px."""
-    cols = range(cw - 9, cw)
-    out = [row[:] for row in img]
-    for x in cols:
-        for y in range(len(img)):
-            out[y][x] = img[y + 1][x] if y + 1 < len(img) else CLEAR
-    return out
-def black(p):
-    lum = (p[0] * 3 + p[1] * 6 + p[2]) // 10
-    return (10 + lum * 22 // 100, 10 + lum * 22 // 100, 16 + lum * 27 // 100, p[3]) if p[3] else p
-for name, recolour in (("OrangeCat", lambda p: p), ("BlackCat", black)):
-    sprite_pack("Pets", name, "pet", "pet-spot", [[[recolour(p) for p in row] for row in f] for f in (cat, inhale, twitch(cat), hop(cat, 1), hop(cat, 2))],
-                {"sleep": dict(frames=[0, 1], fps=0.5),
-                 "idle": dict(frames=[2, 0, 2, 0], fps=2, loop=False, routine=dict(weight=1, cooldown=120)),
-                 "react": dict(frames=[3, 4, 3, 0], fps=4, loop=False, onTap=True)},
-                "PixelLab create_image_pixen job 23ddd82d-29af-4643-8629-8d9adee3e747; breathing frame"
-                + ("" if name == "OrangeCat" else " and recolour") + " by Tools/build_art.py. Stand-in frames: idle, react.")
+# The cat packs themselves come from ArtLab/type-a-lofi/*.aseprite (exported at the end); this only sizes the pet anchor.
 pet = rect(CAT_FEET[0], CAT_FEET[1] - len(cat), cw, len(cat))
 
 # ---------- scenery: full-bleed window views; mirror over any border the generator painted
@@ -208,21 +187,38 @@ write_manifest(clock_dir, id="retrodigital01", type="clock", packVersion=1, pers
                slots=[dict(x=x, y=5) for x in (3, 7, 10, 13, 17)],
                provenance="Hand-drawn by Tools/build_art.py")
 
-# ---------- stand-in room variants: lamp-off and daylight (crude recolours, replaced by real art later)
-# Hand-traced: the lamp's light cone on wall and desk, plus a disc of bulb glow around the shade.
-LAMP_CONE = polygon([(284, 182), (312, 182), (330, 232), (264, 297), (108, 297), (240, 214)]) | disc(293, 177, 24)
-SHADE_UNDERSIDE = polygon([(284, 178), (312, 178), (310, 192), (286, 192)])  # the glowing underside of the shade
-
+# ---------- room variants: lamp-off is a PixelLab edit of the lamp area; daylight is still a crude stand-in recolour
+LAMP_CROP = (136, 150)  # where the 256x160 crop sent to PixelLab sits in the room
+GLOW_ABOVE = (226, 112, 404)  # x0, top, x1: wall under the shelf that the lamp also lit, above that crop
 def lamp_off(img):
+    """Patches the PixelLab lamp-off picture into the room, only where the original was lit, and shifts its colours
+    so the patch meets the untouched wall without a seam (the edit re-tinted the whole crop a little)."""
+    original = pngio.read(os.path.join(SRC, "room_raw.png"))
+    edit = pngio.read(os.path.join(SRC, "lamp_off_raw.png"))
+    lx, ly = LAMP_CROP
+    lit, shift, count = set(), [0, 0, 0], 0
+    for j, row in enumerate(edit):
+        for i, p in enumerate(row):
+            o = original[ly + j][lx + i]
+            if sum(o[:3]) - sum(p[:3]) > 45:   # clearly darker in the edit: this was lamp light
+                lit.add((i, j))
+            elif not differs(o, p, 60):         # ordinary unlit surface: measure the edit's colour drift
+                shift = [shift[c] + o[c] - p[c] for c in range(3)]
+                count += 1
+    shift = [round(v / max(count, 1)) for v in shift]
     out = [row[:] for row in img]
-    for x, y in LAMP_CONE:
-        r, g, b, a = out[y][x]
-        if a:  # remove the warm tint and darken toward the unlit wall
-            out[y][x] = (round(r * .5), round(g * .56), round(b * .78), a)
-    for x, y in SHADE_UNDERSIDE:
-        r, g, b, a = out[y][x]
-        if a:
-            out[y][x] = (round(r * .35), round(g * .3), round(b * .35), a)
+    remap = {}  # lit colour -> its unlit colour, learned from the patched area
+    for i, j in lit:
+        if out[ly + j][lx + i][3]:
+            unlit = (*[max(0, min(255, edit[j][i][c] + shift[c])) for c in range(3)], 255)
+            out[ly + j][lx + i] = unlit
+            remap.setdefault(original[ly + j][lx + i], collections.Counter())[unlit] += 1
+    # The lamp's glow also reaches the wall above the crop sent to PixelLab. Recolour it with the same
+    # lit -> unlit mapping, so the edge of the patch does not show.
+    for y in range(GLOW_ABOVE[1], ly):
+        for x in range(GLOW_ABOVE[0], GLOW_ABOVE[2]):
+            if original[y][x] in remap and out[y][x][3]:
+                out[y][x] = remap[original[y][x]].most_common(1)[0][0]
     return out
 
 def daylight(img):  # mild: actors are not tinted, so keep the dark chair pixels plausible
@@ -233,7 +229,8 @@ def daylight(img):  # mild: actors are not tinted, so keep the dark chair pixels
 RAIN_FRAMES, RAIN_STEP, RAIN_PERIOD, RAIN_COLOUR = 6, 8, 48, (170, 210, 255, 160)
 def rain_sheet():
     rng = random.Random(7)
-    drops = [(rng.randrange(2, ww), rng.randrange(RAIN_PERIOD)) for _ in range(34)]
+    # One drop per 4 px column band, so the whole pane rains evenly (random columns left gaps).
+    drops = [(x + rng.randrange(3), rng.randrange(RAIN_PERIOD)) for x in range(2, ww - 2, 4)]
     frames = []
     for f in range(RAIN_FRAMES):
         img = [[CLEAR] * ww for _ in range(wh)]
@@ -334,14 +331,14 @@ def panel_slot(name):
     x, y, w, h = MUSIC_SLOTS[name]
     return rect(PANEL_AT[0] + x, PANEL_AT[1] + y, w, h)
 # Notes frame: 2 px above the higher of the two rest-pose heads, centred on them (top-left room pixels).
-seat_top = sy + fy - PAD
+seat_top = sy + fy
 head_top = seat_top + min(next(j for j, row in enumerate(pngio.crop(f[0], fx, fy, fw, fh)) if any(p[3] for p in row)) for f, _ in characters.values())
 anchors["music-notes"] = dict(x=sx + fx + 57 - 2, y=H - (head_top - 2))
 write_manifest(scene_dir, id="studyroom01", type="scene", artSet="A", packVersion=1, perspective=PERSPECTIVE,
                canvas=dict(w=W, h=H), safe=SAFE, anchors=anchors, room="room.png",
                foreground=[dict(image="chair_front.png", anchor="desk-seat")],
                provenance="PixelLab create_image_pixen job 0c085c34-7866-4ce7-813f-002ac93c9d1b; glass keyed out and "
-                          "chair-front occluder traced by Tools/build_art.py. Stand-in frames: room variants, rain.",
+                          "chair-front occluder traced by Tools/build_art.py. Lamp-off room: PixelLab edit_image_pixen job 1caa32ca-cc50-4c08-95f8-89f9b91583ea on a crop around the lamp, patched in. Stand-in frames: day rooms, rain.",
                rooms=files, standIns=["rooms", "rain", "music"],
                music=dict(panel="music_panel.png", frame=rect(*PANEL_AT, *PANEL_SIZE),
                           icons=dict(sheet="music_icons.png", frame=dict(w=16, h=16), names=["previous", "play", "pause", "next", "close"]),
@@ -352,3 +349,8 @@ write_manifest(scene_dir, id="studyroom01", type="scene", artSet="A", packVersio
                hotspots=dict(pet=pet, window=rect(*WINDOW), lamp=rect(*LAMP_BOX), computer=rect(*COMPUTER_BOX)))
 print("built packs in", os.path.normpath(OUT))
 print("anchors", json.dumps(anchors))
+
+# ---------- Aseprite-made packs of art set A (the cats): exported last, so the scene manifest they are checked against exists
+import glob, aseprite_export
+for source in sorted(glob.glob(os.path.join(ROOT, "ArtLab", "type-a-lofi", "*.aseprite"))):
+    aseprite_export.export(source, OUT)

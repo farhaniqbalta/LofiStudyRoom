@@ -6,8 +6,8 @@
   "anchor": "desk-seat",
   "sheet": "sheet.png",
   "frame": {
-    "w": 85,
-    "h": 159
+    "w": 114,
+    "h": 162
   },
   "animations": {
     "study": {
@@ -19,12 +19,9 @@
     },
     "drink": {
       "frames": [
-        2,
-        3,
-        3,
         2
       ],
-      "fps": 1.5,
+      "fps": 0.4,
       "loop": false,
       "safeExits": [],
       "routine": {
@@ -34,12 +31,9 @@
     },
     "stretch": {
       "frames": [
-        4,
-        5,
-        5,
-        4
+        3
       ],
-      "fps": 1,
+      "fps": 0.3333333333333333,
       "loop": false,
       "safeExits": [],
       "routine": {
@@ -49,7 +43,7 @@
     },
     "rest": {
       "frames": [
-        6
+        4
       ],
       "fps": 0.125,
       "loop": false,
@@ -61,5 +55,5 @@
     }
   },
   "fallbackAnimation": "study",
-  "provenance": "PixelLab edit_image_pixen job 01c93df1-0248-4bb4-8ed1-0d1bba639e6c on a crop of the room; cut out, body continued behind the chair and bob frame added by Tools/build_art.py. Stand-in frames: drink, stretch, rest."
+  "provenance": "PixelLab edit_image_pixen job 01c93df1-0248-4bb4-8ed1-0d1bba639e6c on a crop of the room (rest), and jobs eb6bf14f-d1cd-4fc3-a1d9-5847c0592368 (drink), 9e28eaa2-60bd-438d-b318-c512197fcfb3 (stretch), d37d0deb-8676-49d8-b917-7b0288e5f67a (rest) as edits of the rest picture; cut out, body continued behind the chair and bob frame added by Tools/build_art.py."
 }

@@ -28,10 +28,10 @@
       "h": 128
     },
     "desk-seat": {
-      "x": 336,
-      "y": 27,
-      "w": 85,
-      "h": 159
+      "x": 328,
+      "y": 26,
+      "w": 114,
+      "h": 162
     },
     "pet-spot": {
       "x": 86,
@@ -54,7 +54,7 @@
       "y": 160
     },
     "music-notes": {
-      "x": 391,
+      "x": 383,
       "y": 184
     }
   },
@@ -65,7 +65,7 @@
       "anchor": "desk-seat"
     }
   ],
-  "provenance": "PixelLab create_image_pixen job 0c085c34-7866-4ce7-813f-002ac93c9d1b; glass keyed out and chair-front occluder traced by Tools/build_art.py. Stand-in frames: room variants, rain.",
+  "provenance": "PixelLab create_image_pixen job 0c085c34-7866-4ce7-813f-002ac93c9d1b; glass keyed out and chair-front occluder traced by Tools/build_art.py. Lamp-off room: PixelLab edit_image_pixen job 1caa32ca-cc50-4c08-95f8-89f9b91583ea on a crop around the lamp, patched in. Stand-in frames: day rooms, rain.",
   "rooms": {
     "night-on": "room.png",
     "night-off": "room_night_off.png",
