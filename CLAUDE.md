@@ -85,7 +85,7 @@ xcrun devicectl device capture screenshot --device $IPAD --destination build/sho
 
 Launch switches: `-fps N`, `-paused YES`, `-debugAnchors YES` (anchor overlay + FPS counter), `-artSet <A|B>`, `-scene <folder>`, `-character <folder>`, `-pet <folder>`, `-scenery <folder>`, `-time auto|day|night`, `-weather auto|clear|rain`, `-lamp on|off` (choices are saved), `-routineSpeed N` (shortens routine delays for watching), `-showPanel YES`, `-showMusic YES`. The tests hang if the iPad is locked: check `xcrun devicectl device info lockState` first.
 
-## Code layout (as of the engine-first phase)
+## Code layout
 
 - **Flow:** `LoFiRoomApp` → `RoomView` (SwiftUI root: `SceneContainer` for the `SKView`, `HotspotOverlay`, gear, `CustomizationSheet`) → `SceneCoordinator` (`ObservableObject`, built by `SceneCoordinator.live()`). The coordinator is the only thing that pushes state into `LoFiSKScene`; it owns the `SpriteAssetRepository`, `RoomStateStore` (one saved `RoomConfig` in `UserDefaults`), `ClockDriver`, two `ActorDirector`s and the `EnvironmentController`.
 - **Packs:** `LoFiRoom/Assets/<Category>/<Folder>/{manifest.json, sheet.png}` is a folder reference, so adding a pack is adding a folder. A sheet is one row of equal frames. `SpritePack.problems()` validates a pack against the scene; a bad pack is rejected with a readable message and the scene keeps what it had. Pack lists are filtered to the active scene's `perspective`.
@@ -166,19 +166,21 @@ Performance claims require measurements.
 7. Do not claim tests passed without executing them.
 8. Do not modify locked requirements without explicit approval.
 
-## Current milestone
+## Current status
 
-**Engine-first (M2 + M3a) is done:** built, tested (87 tests on the iPad) and hand-tested by the user. See `docs/logs/M2-engine.md` for what was verified and what was not. No next phase is active; do not start one without the user's go-ahead.
+Done and hand-tested: M0, M1, engine-first (M2 + M3a), Spotify now-playing (M3b) with the in-room player, art set A's poses, cat reactions and lamp-off room. Per-phase detail is in `docs/logs/` (index: `docs/logs/worklog.md`).
 
-What exists: routine and pet scheduling, tap hotspots, the customization panel, hybrid time and weather (Open-Meteo, city search, cache), and the power policy, all on script-made stand-in art.
+In progress: app icon, Spotify logo, animation frequency setting, rain sound, docs cleanup (`docs/logs/polish-and-audio.md`).
 
-What comes next, in order (spec §9 allows reordering):
+Open, in no fixed order; start one only with the user's go-ahead:
+- Art set A stand-ins still left: day rooms, day city views, rain art, the music player's first-pass frame (PixelLab generations needed for the day art). More cat animation (the user asked to keep it for later).
+- M4: energy measurement on the iPad (never done; no power claims until it is), power tuning, polish.
+- Not tried on the device: Low Power Mode, VoiceOver, airplane-mode launch, Spotify signed out or not installed.
+- Art direction B/C (`docs/ART_SETS.md`).
 
-1. Spotify now-playing (M3b) is built and hand-tested (`docs/logs/spotify-now-playing.md`); the in-room music skin for art set A is built and awaits a hand test with music playing. Building needs `SPOTIFY_CLIENT_ID` in the environment before `xcodegen generate`, like `DEVELOPMENT_TEAM`; without it the card says Spotify is not set up.
-2. Art-direction pass: the reference board is side-profile, half-body characters hidden below a detailed desk, and a dense cyberpunk city. Art set B is a first, saved attempt (see `docs/logs/art-B-cyberdesk.md`); further attempts are new sets (C, ...) per `docs/ART_SETS.md`. Stand-ins (marked `"stand-in"` in `provenance` / `standIns`) are replaced then, through the Aseprite workflow (proof of concept done, see `docs/ASEPRITE_WORKFLOW.md`).
-3. M4: power tuning and polish. M0's energy baseline is still unmeasured.
+Building needs `DEVELOPMENT_TEAM` and `SPOTIFY_CLIENT_ID` in the environment before `xcodegen generate` (values in `CLAUDE.local.md`), and the rain loop at `LoFiRoom/LocalAudio/rain.mp3` for the Sound settings (`docs/AUDIO.md`). All three are optional for a build: without them signing fails / the music card says Spotify is not set up / the Sound settings are hidden.
 
-Working method: the lead writes each task's brief and acceptance tests, a subagent implements, the lead reviews, re-runs the tests on the iPad and commits.
+Working method: the lead writes each task's brief and acceptance tests, a subagent implements, the lead reviews, re-runs the tests on the iPad and commits. Changes go to a branch and a pull request.
 
 ## Reusable engine vs art
 
@@ -191,7 +193,7 @@ The engine must run unchanged with any art direction. The full table is in the p
 
 ## Public repository
 
-This repo is public at https://github.com/farhaniqbalta/LofiStudyRoom. Never commit device IDs, Apple team IDs, API keys, personal email addresses or absolute home paths; they belong in the git-ignored `CLAUDE.local.md`. The concept images in `docs/reference/` stay local. Push after each task's commit.
+This repo is public at https://github.com/farhaniqbalta/LofiStudyRoom. Never commit device IDs, Apple team IDs, API keys, the Spotify client ID, personal email addresses or absolute home paths; they belong in the git-ignored `CLAUDE.local.md`. The concept images in `docs/reference/` and the rain sound (`docs/sound/`, `LoFiRoom/LocalAudio/`) stay local. Push after each task's commit.
 
 ## Completion requirements
 

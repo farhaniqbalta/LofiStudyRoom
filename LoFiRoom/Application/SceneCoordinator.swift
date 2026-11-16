@@ -39,13 +39,16 @@ final class SceneCoordinator: ObservableObject {
     let musicRemote: MusicRemote?
     private let characterDirector: ActorDirector
     private let petDirector: ActorDirector
+    private let ambient: AmbientAudio?
+    var hasRainSound: Bool { ambient != nil }
 
     init(repository: SpriteAssetRepository, store: RoomStateStore, scene: LoFiSKScene,
          timers: TimerScheduling = LiveTimers(), clock: @escaping () -> TimeInterval = CACurrentMediaTime,
-         routineSpeed: Double = 1, now: @escaping () -> Date = Date.init,
+         routineSpeed: Double? = nil, now: @escaping () -> Date = Date.init,
          weather: WeatherProviding = OpenMeteoProvider(), weatherCacheURL: URL = SceneCoordinator.defaultWeatherCacheURL(),
-         music: MusicRemote? = nil) {
+         music: MusicRemote? = nil, ambient: AmbientPlayer? = nil) {
         musicRemote = music
+        self.ambient = ambient.map { AmbientAudio(player: $0, timers: timers) }
         self.now = now
         self.timers = timers
         self.weather = weather
@@ -53,9 +56,9 @@ final class SceneCoordinator: ObservableObject {
         self.store = store
         self.scene = scene
         characterDirector = ActorDirector(node: scene.character, delay: RoutineConfig.characterDelay, timers: timers,
-                                          clock: clock, speed: routineSpeed) { [scene] in scene.show($0) }
+                                          clock: clock, speed: routineSpeed ?? store.config.routineFrequency) { [scene] in scene.show($0) }
         petDirector = ActorDirector(node: scene.pet, delay: RoutineConfig.petDelay, timers: timers,
-                                    clock: clock, speed: routineSpeed) { [scene] in scene.show($0) }
+                                    clock: clock, speed: routineSpeed ?? store.config.routineFrequency) { [scene] in scene.show($0) }
         environment = EnvironmentController(provider: weather, timers: timers, cacheURL: weatherCacheURL, now: now) { [weak self] in
             guard let self else { return }
             applyEnvironment()
@@ -97,6 +100,14 @@ final class SceneCoordinator: ObservableObject {
     func setWeather(_ setting: WeatherSetting) { update { $0.weather = setting }; environmentSettingsChanged() }
     func setCity(_ city: City) { update { $0.city = city }; environmentSettingsChanged() }
     func setKeepAwake(_ on: Bool) { update { $0.keepAwake = on } }
+    func setRainSound(_ mode: RainSoundMode) { update { $0.rainSound = mode }; applyAmbient() }
+    func setRainVolume(_ volume: Double) { update { $0.rainVolume = volume }; applyAmbient() }
+
+    func setRoutineFrequency(_ value: Double) {
+        update { $0.routineFrequency = value }
+        characterDirector.setSpeed(config.routineFrequency)
+        petDirector.setSpeed(config.routineFrequency)
+    }
 
     /// Shows the settings gear for 4 seconds; calling again restarts the 4 seconds.
     func revealControls() {
@@ -178,6 +189,7 @@ final class SceneCoordinator: ObservableObject {
         if active { Task { await environment.refreshIfStale() } } else { environment.stop() }
         characterDirector.setActive(active)
         petDirector.setActive(active)
+        applyAmbient()
         if active { music?.becameActive() } else { music?.resignedActive() }
     }
 
@@ -262,6 +274,12 @@ final class SceneCoordinator: ObservableObject {
         applyMusic()
         scene.apply(EnvironmentRules.resolve(config: store.config, snapshot: environment.snapshot, now: now(), calendar: .autoupdatingCurrent),
                     reduceMotion: UIAccessibility.isReduceMotionEnabled)
+        applyAmbient()
+    }
+
+    private func applyAmbient() {
+        ambient?.update(play: AmbientSound.shouldPlay(mode: config.rainSound, sky: scene.applied?.sky ?? .clear, active: isActive),
+                        volume: config.rainVolume)
     }
 
     /// Swaps one pack and saves the choice. Returns false, leaving the scene as it was, if the pack is unusable.

@@ -8,3 +8,5 @@ docs/reference/
 CLAUDE.local.md
 __pycache__/
 ArtLab/*/layers/
+docs/sound/
+LoFiRoom/LocalAudio/

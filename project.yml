@@ -21,13 +21,19 @@ targets:
     platform: iOS
     sources:
       - path: LoFiRoom
-        excludes: [Assets]
+        excludes: [Assets, LocalAudio]
       # Folder reference: packs keep their directory layout in the bundle, so adding a pack is adding a folder.
       - path: LoFiRoom/Assets
         type: folder
         buildPhase: resources
+      # Locally licensed audio (not in the public repo, see docs/AUDIO.md). Missing in a fresh clone: the app hides the option.
+      - path: LoFiRoom/LocalAudio
+        type: folder
+        buildPhase: resources
+        optional: true
     settings:
       base:
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         PRODUCT_BUNDLE_IDENTIFIER: com.lofiroom.app
         SPOTIFY_CLIENT_ID: ${SPOTIFY_CLIENT_ID}  # from the environment; empty means the card says Spotify is not set up
     info:

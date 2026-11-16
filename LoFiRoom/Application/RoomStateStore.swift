@@ -12,6 +12,14 @@ struct RoomConfig: Codable, Equatable {
     var weather = WeatherSetting.automatic
     var city: City?
     var keepAwake = false
+    var routineFrequency = 1.0 { didSet { routineFrequency = Self.clamp(routineFrequency, Self.routineFrequencyRange) } }
+    var rainSound = RainSoundMode.whenRaining
+    var rainVolume = 0.4 { didSet { rainVolume = Self.clamp(rainVolume, 0...1) } }
+
+    /// How many times as often routines run; 1 is the manifest pacing.
+    static let routineFrequencyRange: ClosedRange<Double> = 0.5...20
+
+    private static func clamp(_ x: Double, _ r: ClosedRange<Double>) -> Double { min(max(x, r.lowerBound), r.upperBound) }
 
     init() {}
 
@@ -29,6 +37,9 @@ struct RoomConfig: Codable, Equatable {
         weather = try c.decodeIfPresent(WeatherSetting.self, forKey: .weather) ?? d.weather
         city = try c.decodeIfPresent(City.self, forKey: .city)
         keepAwake = try c.decodeIfPresent(Bool.self, forKey: .keepAwake) ?? d.keepAwake
+        routineFrequency = Self.clamp(try c.decodeIfPresent(Double.self, forKey: .routineFrequency) ?? d.routineFrequency, Self.routineFrequencyRange)
+        rainSound = try c.decodeIfPresent(RainSoundMode.self, forKey: .rainSound) ?? d.rainSound
+        rainVolume = Self.clamp(try c.decodeIfPresent(Double.self, forKey: .rainVolume) ?? d.rainVolume, 0...1)
     }
 }
 

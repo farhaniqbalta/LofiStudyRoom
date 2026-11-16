@@ -12,7 +12,7 @@ final class ActorDirector {
     private let delay: ClosedRange<TimeInterval>
     private let timers: TimerScheduling
     private let clock: () -> TimeInterval
-    private let speed: Double
+    private var speed: Double
     private var random: AnyRandom
     private let present: (LoadedPack) -> Void
     private var pack: LoadedPack?
@@ -38,6 +38,15 @@ final class ActorDirector {
     func setActive(_ active: Bool) {
         isActive = active
         if active { scheduleNext() } else { cancelTimer() }
+    }
+
+    /// Takes effect on the next wait; a playing one-shot is not interrupted.
+    func setSpeed(_ speed: Double) {
+        self.speed = speed
+        // Cooldowns are measured on `clock() * speed`; a new speed moves that clock, so start them afresh
+        // (otherwise slowing down after a long fast run leaves every routine "cooling down" for hours).
+        if let pack { scheduler = RoutineScheduler(config: .from(pack.manifest, delay: delay)) }
+        scheduleNext()
     }
 
     func show(_ pack: LoadedPack) {
