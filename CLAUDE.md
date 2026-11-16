@@ -170,7 +170,7 @@ Performance claims require measurements.
 
 Done and hand-tested: M0, M1, engine-first (M2 + M3a), Spotify now-playing (M3b) with the in-room player, art set A's poses, cat reactions and lamp-off room. Per-phase detail is in `docs/logs/` (index: `docs/logs/worklog.md`).
 
-In progress: app icon, Spotify logo, animation frequency setting, rain sound, docs cleanup (`docs/logs/polish-and-audio.md`).
+Also done: eight code-review fixes, app icon, Spotify logo, animation frequency setting, rain sound (`docs/logs/polish-and-audio.md`). Nothing is in progress.
 
 Open, in no fixed order; start one only with the user's go-ahead:
 - Art set A stand-ins still left: day rooms, day city views, rain art, the music player's first-pass frame (PixelLab generations needed for the day art). More cat animation (the user asked to keep it for later).
