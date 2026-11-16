@@ -56,7 +56,7 @@ The room can be drawn in several complete looks, lettered A, B, C. **`docs/ART_S
 - **Export:** `python3 Tools/aseprite_export.py <source>`. PNG and manifest are generated output: never hand-edit them, re-export.
 - **Validate:** `AsepritePipelineTests` on the iPad.
 
-Keep every asset on one logical pixel grid, one camera angle and shared anchors; record the prompt/settings and licence for each pack in the sidecar `provenance`. Generated output still needs a consistency pass before it counts as production art. The shipped stand-in packs still come from `Tools/build_art.py`; a pack moves to the Aseprite pipeline when it is redrawn, and two pipelines never write the same folder.
+Keep every asset on one logical pixel grid, one camera angle and shared anchors; record the prompt/settings and licence for each pack in the sidecar `provenance`. Generated output still needs a consistency pass before it counts as production art. Art set A is built by `Tools/build_art.py`, which also exports set A's Aseprite sources (`ArtLab/type-a-lofi/`, the cats) at its end; a pack moves to the Aseprite pipeline when it is redrawn, and two pipelines never write the same folder.
 
 ## Commands
 

@@ -6,7 +6,7 @@ An **art set** is one complete look for the room: a scene plus the characters, p
 
 | Set | Name | Status | Scene folder | Perspective tag | Sources | Build command | Log |
 |---|---|---|---|---|---|---|---|
-| **A** | Lo-fi room (three-quarter view from behind) | **Active.** First-pass PixelLab art plus stand-ins | `StudyRoom01` | `study-room-back-3q-v1` | `ArtSource/` | `python3 Tools/build_art.py` | [M1](logs/M1.md), [engine-first](logs/M2-engine.md) |
+| **A** | Lo-fi room (three-quarter view from behind) | **Active.** PixelLab art with drawn poses; day rooms, day cities and rain still stand-ins | `StudyRoom01` | `study-room-back-3q-v1` | `ArtSource/`, `ArtLab/type-a-lofi/` (cats) | `python3 Tools/build_art.py` (needs Aseprite) | [M1](logs/M1.md), [engine-first](logs/M2-engine.md), [sprite pass](logs/art-A-lofi.md) |
 | **B** | Cyberpunk side desk | Experimental spike, saved. Closer to the reference board; not cleaned up | `CyberDesk01` | `cyber-desk-side-v1` | `ArtLab/type-b-cyberdesk/` | `python3 ArtLab/type-b-cyberdesk/export.py` | [art-B](logs/art-B-cyberdesk.md) |
 
 What each set contains (folders under `LoFiRoom/Assets/`):
