@@ -1,7 +1,7 @@
-import Foundation
+import UIKit
 
 enum MusicRemoteEvent: Equatable {
-    case connected, connectFailed(authorization: Bool), disconnected, playing(NowPlaying), authorizationDenied
+    case connected, connectFailed(authorization: Bool), disconnected, playing(NowPlaying), authorizationDenied, authorizeFailed
 }
 
 @MainActor
@@ -19,6 +19,8 @@ protocol MusicRemote: AnyObject {
     func next()
     func previous()
     func handleCallback(_ url: URL) -> Bool
+    func artwork(for track: NowPlaying, size: CGSize, completion: @escaping (UIImage?) -> Void)
+    var lastArtworkError: String? { get }
 }
 
 /// All music state logic. No timers, no polling; the only app switch is `primaryAction()`.
@@ -29,6 +31,8 @@ final class MusicController {
     private var cardIsOpen = false
     private var started = false
     private var wasConnectedWhenLeft = false
+    /// A callback delivered a token and the adapter already started connecting.
+    private var connectInFlight = false
     private(set) var state: MusicState {
         didSet { if started, state != oldValue { onChange() } }
     }
@@ -47,6 +51,7 @@ final class MusicController {
     func becameActive() {
         let wasConnected = wasConnectedWhenLeft
         wasConnectedWhenLeft = false
+        if connectInFlight { return }
         // An authorize that produced no callback leaves `connecting` behind.
         if state.connection == .connecting { state.connection = remote.hasToken ? .dropped : .neverConnected }
         if wasConnected || cardIsOpen { silentConnect() } else { recheck() }
@@ -55,6 +60,7 @@ final class MusicController {
     func resignedActive() {
         let connection = state.connection
         wasConnectedWhenLeft = connection == .connected
+        connectInFlight = false
         remote.disconnect()
         if connection == .connected || (connection == .connecting && remote.hasToken) { state.connection = .dropped }
     }
@@ -77,7 +83,11 @@ final class MusicController {
 
     func next() { if state.connection == .connected { remote.next() } }
     func previous() { if state.connection == .connected { remote.previous() } }
-    func handleCallback(_ url: URL) -> Bool { remote.handleCallback(url) }
+    func handleCallback(_ url: URL) -> Bool {
+        let handled = remote.handleCallback(url)
+        if handled && state.connection == .connecting { connectInFlight = true }
+        return handled
+    }
 
     /// The user may have installed Spotify, or configured the build, since the last look.
     private func recheck() {
@@ -97,6 +107,7 @@ final class MusicController {
     }
 
     private func handle(_ event: MusicRemoteEvent) {
+        if case .playing = event {} else { connectInFlight = false }
         switch event {
         case .connected: state.connection = .connected
         case .playing(let track): state.track = track
@@ -104,7 +115,10 @@ final class MusicController {
         case .connectFailed(authorization: true):
             remote.forgetToken()
             state = MusicState(connection: .needsReconnect, track: nil)
-        case .authorizationDenied: state.connection = .needsReconnect
+        case .authorizationDenied: if state.connection == .connecting { state.connection = .needsReconnect }
+        case .authorizeFailed:
+            recheck()
+            if state.connection == .connecting { state.connection = remote.hasToken ? .dropped : .neverConnected }
         }
     }
 }

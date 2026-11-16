@@ -37,3 +37,18 @@ The user asked for the artwork to fit the room's ambience and for the look to be
 - The "sign-in expired" case is detected from the wording of Spotify's error and has not been seen on a device.
 - Not tried: Spotify not installed, signed out, offline.
 - Spotify Development Mode: personal use, Premium owner, at most 5 users.
+
+## Code review fixes (2026-11-16)
+
+A whole-app code review found ten issues; eight were fixed (PR "Fix eight code-review findings"), each with a test seen to fail first. `Executed 122 tests, with 0 failures` on the iPad.
+
+1. A late cover for the previous track could replace the current one after a quick skip: the result is now applied only if the request was not cancelled and the track is unchanged.
+2. Transport icons were drawn when connected with nothing playing, with no tap targets under them: icons now need a track, like their buttons.
+3. "Connecting…" stuck when Spotify could not be opened: the adapter reports the failure (`authorizeFailed`) and the card goes back to Connect / Resume / Get Spotify.
+4. Any `lofiroom://` link was taken as Spotify's reply: only `lofiroom://spotify-callback` is accepted, and a reply without a token is ignored unless a connection is being made.
+5. A broken `art-sets.json` was ignored and the app fell back to art set B: an unreadable file now fails with "art-sets.json is invalid (…)". A missing file is still allowed.
+6. Connect could run twice on return from Spotify: after the reply delivers a token, returning to the app no longer starts a second connect.
+7. A bad music skin could crash at launch (zero-sized frames, zero fps, sheet width not matching the frames): now reported as pack problems or a readable load error.
+8. Presentation code reached past the `MusicRemote` protocol to load covers: cover loading and its debug status now go through the protocol and the coordinator.
+
+Not fixed (cleanups): the rain and notes sprite setup is duplicated in `LoFiSKScene`; one unused state variable in `MusicCard`. Fixes 3, 4 and 6 are verified with fakes only, not against the real Spotify app.

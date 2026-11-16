@@ -217,6 +217,15 @@ final class SceneCoordinator: ObservableObject {
         if musicPanelVisible { music?.cardOpened() } else { music?.cardClosed() }
     }
 
+    /// The cover for a track through the music protocol; nil when there is no remote or no image.
+    func loadArtwork(for track: NowPlaying, size: CGSize) async -> UIImage? {
+        guard let remote = musicRemote else { return nil }
+        return await withCheckedContinuation { continuation in
+            remote.artwork(for: track, size: size) { continuation.resume(returning: $0) }
+        }
+    }
+    var artworkStatus: String? { musicRemote?.lastArtworkError }
+
     func musicPrimaryAction() { music?.primaryAction() }
     func musicTogglePlayPause() { music?.togglePlayPause() }
     func musicNext() { music?.next() }

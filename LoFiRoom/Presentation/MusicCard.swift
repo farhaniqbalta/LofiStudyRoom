@@ -113,11 +113,12 @@ struct MusicArtwork: View {
         .task(id: "\(track.imageID ?? "")|\(coordinator.musicState.connection == .connected)") { await load() }
     }
 
+    /// A cover may land only if its load was not cancelled and its track is still the current one.
+    static func shouldApply(requested: String?, current: String?, cancelled: Bool) -> Bool { !cancelled && requested == current }
+
     private func load() async {
         image = nil
-        guard let adapter = coordinator.musicRemote as? SpotifyRemoteAdapter else { return }
-        image = await withCheckedContinuation { continuation in
-            adapter.artwork(for: track, size: CGSize(width: 192, height: 192)) { continuation.resume(returning: $0) }
-        }
+        let loaded = await coordinator.loadArtwork(for: track, size: CGSize(width: 192, height: 192))
+        if Self.shouldApply(requested: track.imageID, current: coordinator.musicState.track?.imageID, cancelled: Task.isCancelled) { image = loaded }
     }
 }

@@ -54,6 +54,14 @@ final class ArtIndependenceTests: XCTestCase {
         }
     }
 
+    func testBrokenArtSetsFileThrowsAndMissingFileLoads() throws {
+        XCTAssertEqual(try SpriteAssetRepository(root: root).scene.id.isEmpty, false)
+        try Data("{\"active\": \"A\", \"sets\": {".utf8).write(to: root.appendingPathComponent("art-sets.json"))
+        XCTAssertThrowsError(try SpriteAssetRepository(root: root)) {
+            XCTAssertTrue($0.localizedDescription.hasPrefix("art-sets.json is invalid"), $0.localizedDescription)
+        }
+    }
+
     func testArtSetsAreChosenByTheRegistry() throws {
         // The bundle holds two art sets; B's scene folder sorts first, so only the registry keeps A the default.
         XCTAssertEqual(try SpriteAssetRepository().scene.id, "studyroom01")

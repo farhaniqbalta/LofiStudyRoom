@@ -1,4 +1,4 @@
-import Foundation
+import UIKit
 @testable import LoFiRoom
 
 @MainActor
@@ -19,5 +19,9 @@ final class FakeMusicRemote: MusicRemote {
     func resume() { calls.append("resume") }
     func next() { calls.append("next") }
     func previous() { calls.append("previous") }
-    func handleCallback(_ url: URL) -> Bool { calls.append("handleCallback"); return url.scheme == "lofiroom" }
+    var callbackResult: Bool?
+    var artworkImage: UIImage?
+    var lastArtworkError: String?
+    func handleCallback(_ url: URL) -> Bool { calls.append("handleCallback"); return callbackResult ?? (url.scheme == "lofiroom") }
+    func artwork(for track: NowPlaying, size: CGSize, completion: @escaping (UIImage?) -> Void) { completion(artworkImage) }
 }
