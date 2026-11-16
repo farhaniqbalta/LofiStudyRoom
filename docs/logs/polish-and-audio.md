@@ -1,8 +1,8 @@
 # Polish and audio
 
-**Status:** Built and tested on the iPad (132 tests). Awaiting the user's hand check (sound, sliders, logo with a track playing).
+**Status:** Done, merged to `main` (PR #4). 132 tests on the iPad.
 **Date:** 2026-11-16
-**Branch:** `feature/polish-and-audio` (built on top of `fix/review-findings`, PR #3)
+**Branch:** `feature/polish-and-audio`, merged
 
 ## Done
 
