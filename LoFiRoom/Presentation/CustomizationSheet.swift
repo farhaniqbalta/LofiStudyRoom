@@ -50,6 +50,30 @@ struct CustomizationSheet: View {
                     if let message = coordinator.citySearchMessage { Text(message) }
                     Text(coordinator.weatherStatusLine).foregroundStyle(.secondary)
                 }
+                Section("Animation") {
+                    Slider(value: Binding(get: { Self.slider(forFrequency: coordinator.config.routineFrequency) },
+                                          set: { coordinator.setRoutineFrequency(Self.frequency(atSlider: $0)) }), in: 0...1) {
+                        Text("Animation frequency")
+                    } minimumValueLabel: { Text("Rare") } maximumValueLabel: { Text("Often") }
+                    .accessibilityValue("\(Self.frequencyText(coordinator.config.routineFrequency)) times as often")
+                    Text(Self.frequencyText(coordinator.config.routineFrequency) + "×").foregroundStyle(.secondary)
+                }
+                if coordinator.hasRainSound {
+                    Section {
+                        Picker("Rain sound", selection: Binding(get: { coordinator.config.rainSound }, set: { coordinator.setRainSound($0) })) {
+                            Text("Off").tag(RainSoundMode.off)
+                            Text("When raining").tag(RainSoundMode.whenRaining)
+                            Text("Always").tag(RainSoundMode.always)
+                        }.pickerStyle(.segmented)
+                        HStack {
+                            Image(systemName: "speaker.wave.2.fill").accessibilityHidden(true)
+                            Slider(value: Binding(get: { coordinator.config.rainVolume }, set: { coordinator.setRainVolume($0) }), in: 0...1) {
+                                Text("Rain volume")
+                            }
+                        }
+                        .disabled(coordinator.config.rainSound == .off)
+                    } header: { Text("Sound") } footer: { Text("Plays on top of Spotify.") }
+                }
                 Section("Display") {
                     Toggle("Keep screen awake (uses more battery)", isOn: Binding(get: { coordinator.config.keepAwake }, set: { coordinator.setKeepAwake($0) }))
                 }
@@ -61,6 +85,20 @@ struct CustomizationSheet: View {
             .toolbar { Button("Done") { coordinator.panelVisible = false } }
         }
     }
+
+    /// Slider 0...1 to frequency, logarithmic: 0.5 * 40^t.
+    static func frequency(atSlider t: Double) -> Double {
+        let range = RoomConfig.routineFrequencyRange
+        return range.lowerBound * pow(range.upperBound / range.lowerBound, t)
+    }
+
+    static func slider(forFrequency f: Double) -> Double {
+        let range = RoomConfig.routineFrequencyRange
+        return log(f / range.lowerBound) / log(range.upperBound / range.lowerBound)
+    }
+
+    /// One decimal below 10, none above (without the multiplication sign).
+    static func frequencyText(_ f: Double) -> String { f < 10 ? String(format: "%.1f", f).replacingOccurrences(of: ".0", with: "") : String(Int(f.rounded())) }
 
     private func runSearch() {
         searching = true

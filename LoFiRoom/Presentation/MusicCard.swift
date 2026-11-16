@@ -48,6 +48,7 @@ struct MusicCard: View {
         VStack(alignment: .leading, spacing: 2) {
             Text(track.title).font(.headline).lineLimit(1)
             Text(track.artist).font(.subheadline).opacity(0.7).lineLimit(1)
+            Image("SpotifyLogo").resizable().scaledToFit().frame(height: 20).padding(.top, 2).accessibilityLabel("Spotify")
         }
     }
 

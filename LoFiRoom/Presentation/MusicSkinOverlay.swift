@@ -1,9 +1,15 @@
 import SwiftUI
+import os
 
 /// SwiftUI content over the slots of the scene's pixel-art music player. The pixel art itself is drawn by SpriteKit.
 /// Same coordinate space as `HotspotOverlay`. Nothing animates; the cover is never altered or covered.
 struct MusicSkinOverlay: View {
     @ObservedObject var coordinator: SceneCoordinator
+    @Environment(\.displayScale) private var displayScale
+    private static var warned = false
+
+    /// Spotify's guideline: the logo is never narrower than 70 px.
+    static func logoMeetsMinimumWidth(slotWidthPoints: CGFloat, displayScale: CGFloat) -> Bool { slotWidthPoints * displayScale >= 70 }
 
     private var state: MusicState { coordinator.musicState }
 
@@ -16,7 +22,10 @@ struct MusicSkinOverlay: View {
                     slot("artwork") { MusicArtwork(coordinator: coordinator, track: track, cornerRadius: 4) }.opacity(faded)
                     slot("title") { line(track.title, "title", text) }.opacity(faded)
                     slot("artist") { line(track.artist, "artist", dim) }.opacity(faded)
-                    slot("attribution") { line("Spotify", "attribution", dim) }
+                    slot("attribution") {
+                        Image("SpotifyLogo").resizable().scaledToFit().accessibilityLabel("Spotify")
+                            .onAppear { checkLogoWidth() }
+                    }
                     if state.connection == .connected {
                         tap("previous", "Previous track") { coordinator.musicPrevious() }
                         tap("toggle", track.isPaused ? "Play" : "Pause") { coordinator.musicTogglePlayPause() }
@@ -44,6 +53,13 @@ struct MusicSkinOverlay: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
             .ignoresSafeArea()
         }
+    }
+
+    private func checkLogoWidth() {
+        let width = coordinator.musicSlotFrames["attribution"]?.width ?? 0
+        guard !Self.logoMeetsMinimumWidth(slotWidthPoints: width, displayScale: displayScale), !Self.warned else { return }
+        Self.warned = true
+        Logger(subsystem: "com.lofiroom.app", category: "music").warning("Spotify logo is \(width * displayScale, privacy: .public) px wide, below the 70 px minimum")
     }
 
     private func height(_ name: String) -> CGFloat { coordinator.musicSlotFrames[name]?.height ?? 0 }

@@ -15,7 +15,8 @@ extension SceneCoordinator {
             let scene = try LoFiSKScene(repository: repository, showAnchors: defaults.bool(forKey: "debugAnchors"))
             let speed = defaults.double(forKey: "routineSpeed")
             let coordinator = SceneCoordinator(repository: repository, store: RoomStateStore(), scene: scene,
-                                           routineSpeed: speed > 0 ? speed : 1, music: SpotifyRemoteAdapter())
+                                           routineSpeed: speed > 0 ? speed : nil, music: SpotifyRemoteAdapter(),
+                                           ambient: RainSoundPlayer.make())
             let store = coordinator.store
             switch defaults.string(forKey: "time") {
             case "auto": store.config.time = .automatic

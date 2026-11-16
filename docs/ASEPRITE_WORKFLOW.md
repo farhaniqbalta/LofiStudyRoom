@@ -2,7 +2,7 @@
 
 **PixelLab (optional draft) → Aseprite (edit, animate, clean up) → `Tools/aseprite_export.py` → sprite pack.**
 
-Status: proof of concept, validated on 2026-11-15 with one demonstration pack. The shipped packs in `LoFiRoom/Assets` still come from `Tools/build_art.py`; nothing there was changed.
+Status: in use. Validated on 2026-11-15 with one demonstration pack (`ArtLab/aseprite/`); since then art set A's cats (`ArtLab/type-a-lofi/`, exported by `Tools/build_art.py`) and art set B (`ArtLab/type-b-cyberdesk/`) are built this way. The rest of art set A still comes from `Tools/build_art.py`.
 
 ## Setup (once per machine)
 
@@ -73,4 +73,4 @@ The script fails with a readable message, before writing a manifest, on the same
 2. Use PixelLab only for a first draft of a pose, then import it as a layer and finish in Aseprite. Record the job and settings in the sidecar `provenance`.
 3. When a pack is approved, export it with `LoFiRoom/Assets` as the out root under a new folder name, and remove the matching block from `build_art.py`. Do not have two pipelines write the same folder.
 4. Scene art (room images, foreground cut-outs, rain) is not covered by `Tools/aseprite_export.py`. Art set B shows one way: `ArtLab/type-b-cyberdesk/export.py` exports named layers of the room's `.aseprite` file with the Aseprite command line (`--layer`, `--crop`) and writes the scene manifest itself.
-5. For the art-direction pass, move sources to `ArtSource/aseprite/` (or keep `ArtLab/`) and change the test resource path in `project.yml` to match.
+5. Sources live in `ArtLab/type-<letter>-<name>/`, one folder per art set (see `docs/ART_SETS.md`).
