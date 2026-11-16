@@ -41,14 +41,22 @@ Each pose is an edit of the character's existing rest picture (`ArtSource/<who>_
 - `Executed 112 tests, with 0 failures` / `** TEST SUCCEEDED **` on the iPad.
 - Device run with `-routineSpeed 20`: of eight screenshots 3 s apart, two showed the rest pose (looking out of the window) correctly placed in the chair.
 
+## Fixes after the user's review (2026-11-16)
+
+- Lamp off: glow was left on the wall above the lamp, outside the crop sent to PixelLab. The wall under the shelf is now recoloured with the lit→unlit colour mapping learned from the patched area (`GLOW_ABOVE` in `Tools/build_art.py`).
+- Rain: drops were placed in random columns and left the left pane nearly empty. Now one drop per 4 px column band, so the whole window rains evenly.
+- Checked on the iPad at night with rain and the lamp off.
+
 ## Still stand-ins
 
 - Day rooms (`room_day.png`, `room_day_off.png`): a pale wash; characters look too dark against them.
 - Day city views: brightened copies of the night pictures.
-- Rain: faint streaks.
+- Rain: even coverage now, but still thin, faint streaks.
 - Music skin: first-pass pixel panel and notes drawn by the script.
 
 ## Known problems
+
+- The cat's tap reaction (startle with eyes opening) is too plain; the user wants more cat animation later.
 
 - Moving between rest and a pose is a cut, not an animation (one frame per pose).
 - On the iPad (routines sped up 20×) the rest pose was seen in place with nothing clipped; drink and stretch were not caught in the screenshots.

@@ -3,7 +3,7 @@
 Run: python3 Tools/build_art.py
 All positions here are top-left based image pixels on the 480x352 room; manifests are written in SpriteKit
 coordinates (origin bottom-left). Every pack sprite is placed with its bottom-left corner on its anchor."""
-import json, math, os, random, shutil
+import collections, json, math, os, random, shutil
 import pngio
 from cutout import figure, polygon
 
@@ -189,6 +189,7 @@ write_manifest(clock_dir, id="retrodigital01", type="clock", packVersion=1, pers
 
 # ---------- room variants: lamp-off is a PixelLab edit of the lamp area; daylight is still a crude stand-in recolour
 LAMP_CROP = (136, 150)  # where the 256x160 crop sent to PixelLab sits in the room
+GLOW_ABOVE = (226, 112, 404)  # x0, top, x1: wall under the shelf that the lamp also lit, above that crop
 def lamp_off(img):
     """Patches the PixelLab lamp-off picture into the room, only where the original was lit, and shifts its colours
     so the patch meets the untouched wall without a seam (the edit re-tinted the whole crop a little)."""
@@ -206,9 +207,18 @@ def lamp_off(img):
                 count += 1
     shift = [round(v / max(count, 1)) for v in shift]
     out = [row[:] for row in img]
+    remap = {}  # lit colour -> its unlit colour, learned from the patched area
     for i, j in lit:
         if out[ly + j][lx + i][3]:
-            out[ly + j][lx + i] = (*[max(0, min(255, edit[j][i][c] + shift[c])) for c in range(3)], 255)
+            unlit = (*[max(0, min(255, edit[j][i][c] + shift[c])) for c in range(3)], 255)
+            out[ly + j][lx + i] = unlit
+            remap.setdefault(original[ly + j][lx + i], collections.Counter())[unlit] += 1
+    # The lamp's glow also reaches the wall above the crop sent to PixelLab. Recolour it with the same
+    # lit -> unlit mapping, so the edge of the patch does not show.
+    for y in range(GLOW_ABOVE[1], ly):
+        for x in range(GLOW_ABOVE[0], GLOW_ABOVE[2]):
+            if original[y][x] in remap and out[y][x][3]:
+                out[y][x] = remap[original[y][x]].most_common(1)[0][0]
     return out
 
 def daylight(img):  # mild: actors are not tinted, so keep the dark chair pixels plausible
@@ -219,7 +229,8 @@ def daylight(img):  # mild: actors are not tinted, so keep the dark chair pixels
 RAIN_FRAMES, RAIN_STEP, RAIN_PERIOD, RAIN_COLOUR = 6, 8, 48, (170, 210, 255, 160)
 def rain_sheet():
     rng = random.Random(7)
-    drops = [(rng.randrange(2, ww), rng.randrange(RAIN_PERIOD)) for _ in range(34)]
+    # One drop per 4 px column band, so the whole pane rains evenly (random columns left gaps).
+    drops = [(x + rng.randrange(3), rng.randrange(RAIN_PERIOD)) for x in range(2, ww - 2, 4)]
     frames = []
     for f in range(RAIN_FRAMES):
         img = [[CLEAR] * ww for _ in range(wh)]
