@@ -1,6 +1,6 @@
 # Art set D — room exploration
 
-**Status:** Exploring rooms. No room chosen yet; nothing is in the app.
+**Status:** Room 3 chosen. Waiting for the user's edit (room without chair, chair as its own image). Nothing is in the app yet.
 **Plan:** [`docs/plans/2026-11-17-art-set-d.md`](../plans/2026-11-17-art-set-d.md)
 **Sources:** `ArtLab/type-d-violetdesk/raw/room-1.png` … `room-5.png`; prompts and job ids in `ArtLab/type-d-violetdesk/prompts.md`.
 
@@ -8,7 +8,7 @@
 
 - Direction: cozy cyberpunk lo-fi. The reference board is a guide, not a strict target, and it doesn't have to be violet.
 - Character: generate the full seated body and cut it ourselves.
-- **Room 3 is the current favourite.** Spend more generations on room options before moving on to characters.
+- **Room 3 chosen.** The user edits out the chair by hand instead of spending generations on more rooms.
 - The names `VioletDesk01` / `violet-*` are placeholders until a room is chosen.
 
 ## Room options (5 generations, 2026-11-17)
@@ -32,4 +32,10 @@ Room 1 came from the first plan prompt. Rooms 2 and 4 follow the board; rooms 3 
 
 ## Next
 
-More room generations, starting with variations on room 3. A useful one to try: room 3's layout and palette with the chair seen side-on, so a profile character works. The alternative is to keep room 3 and draw the character from behind, as in set A. Then pick one room and continue with plan Task 2.
+**Decided (user, 2026-11-17): room 3, edited by the user.** No more room generations. The user removes the chair from room 3 by hand and supplies it as a separate asset. Handoff format:
+
+- `ArtLab/type-d-violetdesk/raw/room-3-nochair.png`: the 480×352 room with the chair painted out (wall, desk legs and floor filled in behind it).
+- `ArtLab/type-d-violetdesk/raw/chair.png`: the chair alone on transparency, in the same 480×352 canvas and the same position, so it lines up with no offsets. Side-on if possible, so a profile character works.
+- Optional: glass glare and moon painted out, or left in; the window is keyed by polygon either way.
+
+With a separate chair the layering is chosen per pose: the chair back sits behind the body (room layer), and any part in front of it (near armrest, seat edge) becomes a foreground piece cut from `chair.png`. After that comes plan Task 2: character rest pose, city, lamp off. The names are renamed from `Violet*` at that point.
