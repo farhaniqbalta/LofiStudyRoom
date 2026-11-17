@@ -81,9 +81,9 @@
     "panel": "music_panel.png",
     "frame": {
       "x": 58,
-      "y": 68,
-      "w": 176,
-      "h": 56
+      "y": 66,
+      "w": 178,
+      "h": 58
     },
     "icons": {
       "sheet": "music_icons.png",
@@ -161,8 +161,8 @@
         "h": 16
       }
     },
-    "textColor": "#F3E9D2",
-    "dimColor": "#8B7FA8",
+    "textColor": "#F2E2C4",
+    "dimColor": "#C08A5E",
     "notes": {
       "sheet": "music_notes.png",
       "frame": {

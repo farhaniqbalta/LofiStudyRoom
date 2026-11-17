@@ -224,53 +224,106 @@ def lamp_off(img):
 def daylight(img):  # mild: actors are not tinted, so keep the dark chair pixels plausible
     return tint(img, lambda r, g, b: lerp((r, g, b), (245, 228, 200), 0.45))
 
-# ---------- rain: a looping one-row sheet; each streak falls RAIN_STEP px per frame and the pattern repeats every
-# RAIN_PERIOD rows, so frame 6 is frame 0
-RAIN_FRAMES, RAIN_STEP, RAIN_PERIOD, RAIN_COLOUR = 6, 8, 48, (170, 210, 255, 160)
+RAIN_FRAMES = 6
+# Two depths of rain plus a few beads stuck on the glass. Each layer falls `step` px per frame and repeats every
+# RAIN_FRAMES * step rows, so frame 6 is frame 0 again and the loop has no seam.
+RAIN_LAYERS = [  # spacing between columns, streak length, step per frame, colour
+    dict(spacing=3, length=2, step=6, colour=(150, 180, 230, 90)),     # far: short, faint, slow
+    dict(spacing=9, length=6, step=16, colour=(205, 228, 255, 175)),   # near: long, bright, fast
+]
+GLASS_BEADS = [(14, 22), (41, 70), (63, 35), (88, 98), (117, 18), (139, 61), (160, 104), (176, 40), (27, 112), (101, 52)]
+BEAD_C, BEAD_HI = (150, 180, 230, 120), (225, 240, 255, 200)
 def rain_sheet():
     rng = random.Random(7)
-    # One drop per 4 px column band, so the whole pane rains evenly (random columns left gaps).
-    drops = [(x + rng.randrange(3), rng.randrange(RAIN_PERIOD)) for x in range(2, ww - 2, 4)]
+    layers = []
+    for layer in RAIN_LAYERS:
+        period = RAIN_FRAMES * layer["step"]
+        drops = [(x + rng.randrange(layer["spacing"]), rng.randrange(period)) for x in range(2, ww - 2, layer["spacing"])]
+        layers.append((layer, period, drops))
     frames = []
     for f in range(RAIN_FRAMES):
         img = [[CLEAR] * ww for _ in range(wh)]
-        for x, y0 in drops:
-            for y in range(y0 + f * RAIN_STEP - RAIN_PERIOD, wh, RAIN_PERIOD):
-                for k in range(3):  # 1x3 diagonal streak
-                    if 0 <= y + k < wh:
-                        img[y + k][x - (k + 1) // 2] = RAIN_COLOUR
+        for layer, period, drops in layers:
+            for x, y0 in drops:
+                for y in range((y0 + f * layer["step"]) % period - period, wh, period):
+                    for k in range(layer["length"]):  # slanted streak: one px left every 3 rows
+                        if 0 <= y + k < wh and 0 <= x - k // 3 < ww:
+                            img[y + k][x - k // 3] = layer["colour"]
+        for x, y in GLASS_BEADS:  # still beads on the glass: a 2x2 drop with a bright corner
+            if x + 1 < ww and y + 1 < wh:
+                for dx, dy in ((0, 0), (1, 0), (0, 1), (1, 1)):
+                    img[y + dy][x + dx] = BEAD_C
+                img[y][x] = BEAD_HI
         frames.append(img)
     return frames
 
 # ---------- music skin: a wall-mounted pixel player (panel, icons, notes) for the Spotify now-playing display
-PANEL_AT, PANEL_SIZE = (58, 228), (176, 56)    # top-left on the room, size
-BODY_C, EDGE_C, HILITE_C, WELL_C, LED_C, ICON_C = (22, 18, 40, 255), (118, 92, 160, 255), (58, 46, 92, 255), (12, 10, 24, 255), (240, 170, 70, 255), (243, 233, 210, 255)
+PANEL_AT, CASING = (58, 228), (176, 56)        # top-left on the room, size of the radio itself
+SHADOW = 2                                     # px of cast shadow on the wall, below and right
+PANEL_SIZE = (CASING[0] + SHADOW, CASING[1] + SHADOW)  # the panel image and its frame include the shadow
+# A small walnut wall radio. Every colour is sampled from the room (desk, sill, lamp light), so the player looks
+# like furniture under the same lamp rather than an app overlay.
+OUTLINE_C, WOOD_DARK, WOOD_MID, WOOD_LIGHT, WOOD_HI = (10, 2, 0, 255), (34, 17, 13, 255), (61, 30, 25, 255), (89, 43, 35, 255), (121, 66, 61, 255)
+LAMP_RIM_C = (165, 90, 66, 255)                  # the side facing the desk lamp catches its warm light
+WELL_C, SCREEN_C, SCAN_C = (12, 5, 3, 255), (20, 11, 8, 255), (26, 15, 11, 255)   # a dim warm tuner glass
+SCREW_C, SCREW_HI = (121, 66, 61, 255), (238, 147, 85, 255)
+LED_C, LED_ON_C = (238, 147, 85, 255), (149, 250, 250, 255)   # amber like the lamp, cyan like the monitor
+ICON_C, ICON_SHADOW_C = (242, 226, 196, 255), (10, 2, 0, 255)
+SHADOW_C = (0, 0, 0, 90)
+TEXT_HEX, DIM_HEX = "#F2E2C4", "#C08A5E"           # warm cream title, amber artist and messages
 CYAN_C = (120, 220, 235, 255)
 MUSIC_SLOTS = dict(artwork=(6, 6, 44, 44), title=(56, 6, 104, 13), artist=(56, 20, 104, 11), attribution=(128, 38, 42, 12),
                    previous=(58, 36, 16, 16), toggle=(80, 36, 16, 16), next=(102, 36, 16, 16), close=(164, 4, 8, 8),
                    message=(56, 6, 114, 24), action=(56, 34, 114, 16))
 
 def panel_image():
+    cw, ch = CASING
     pw, ph = PANEL_SIZE
-    img = [[BODY_C] * pw for _ in range(ph)]
-    def px(x, y, c): img[y][x] = c
-    for x in range(pw):
-        px(x, 0, EDGE_C); px(x, ph - 1, EDGE_C)
-    for y in range(ph):
-        px(0, y, EDGE_C); px(pw - 1, y, EDGE_C)
-    for x, y in ((0, 0), (pw - 1, 0), (0, ph - 1), (pw - 1, ph - 1)):
-        px(x, y, CLEAR)
-    for x in range(2, pw - 2):
-        px(x, 1, HILITE_C)
-    for i in range(46):  # recessed cover well
-        for x, y in ((5 + i, 5), (5 + i, 50), (5, 5 + i), (50, 5 + i)):
-            px(x, y, HILITE_C)
-    for y in range(6, 50):
-        for x in range(6, 50):
-            px(x, y, WELL_C)
-    for x in range(56, 170):  # divider under the text area
-        px(x, 33, HILITE_C)
-    px(166, 16, LED_C); px(169, 16, LED_C)
+    img = [[CLEAR] * pw for _ in range(ph)]
+    def fill(x0, y0, x1, y1, c):  # inclusive corners
+        for y in range(y0, y1 + 1):
+            for x in range(x0, x1 + 1):
+                img[y][x] = c
+    def bevel(x0, y0, x1, y1, raised):
+        """1 px light edge on top/left and shade on bottom/right (swapped for a recess)."""
+        top, bottom = (WOOD_HI, WOOD_DARK) if raised else (WOOD_DARK, WOOD_HI)
+        fill(x0, y0, x1, y0, top); fill(x0, y0, x0, y1, top)
+        fill(x0, y1, x1, y1, bottom); fill(x1, y0, x1, y1, bottom)
+    # cast shadow on the wall, offset down-right; the casing covers most of it
+    fill(SHADOW, SHADOW, pw - 1, ph - 1, SHADOW_C)
+    # walnut casing: outline, mid wood with darker grain lines that break up at random, raised bevel
+    fill(0, 0, cw - 1, ch - 1, OUTLINE_C)
+    fill(1, 1, cw - 2, ch - 2, WOOD_MID)
+    rng = random.Random(3)
+    for y in range(3, ch - 3, 3):
+        x = 2
+        while x < cw - 2:
+            run = rng.randrange(6, 30)
+            for i in range(x, min(x + run, cw - 2)):
+                img[y][i] = WOOD_DARK
+            x += run + rng.randrange(3, 12)
+    for x in range(2, cw - 2, 2):  # dithered sheen along the top
+        img[2][x] = WOOD_LIGHT
+    bevel(1, 1, cw - 2, ch - 2, raised=True)
+    for y in range(2, ch - 2):     # warm rim on the side facing the lamp
+        img[y][cw - 2] = LAMP_RIM_C
+    for x, y in ((0, 0), (cw - 1, 0), (0, ch - 1), (cw - 1, ch - 1)):  # rounded corners
+        img[y][x] = CLEAR
+    for x, y in ((3, 1), (cw - 9, ch - 2), (1, 30)):  # a few scuffs on the edge
+        img[y][x] = WOOD_LIGHT
+    # recessed cover well around the artwork slot (6, 6, 44, 44)
+    bevel(4, 4, 51, 51, raised=False)
+    fill(5, 5, 50, 50, WELL_C)
+    # recessed tuner glass behind the text, buttons and logo, with faint scanlines
+    bevel(53, 3, 173, 52, raised=False)
+    fill(54, 4, 172, 51, SCREEN_C)
+    for y in range(5, 51, 2):
+        fill(54, y, 172, y, SCAN_C)
+    fill(56, 33, 170, 33, WOOD_DARK)  # divider between the track text and the controls
+    # brass screws in the four corners
+    for x, y in ((2, 2), (cw - 4, 2), (2, ch - 4), (cw - 4, ch - 4)):
+        fill(x, y, x + 1, y + 1, SCREW_C); img[y][x] = SCREW_HI
+    img[16][166] = LED_ON_C; img[16][169] = LED_C
     return img
 
 def bitmap(rows, colour=ICON_C):
@@ -291,6 +344,11 @@ def icon(*parts):
     canvas = [[CLEAR] * 16 for _ in range(16)]
     for rows, x, y in parts:
         paste(canvas, rows, x, y)
+    # 1 px drop shadow down-right, so the icons read as buttons on the screen
+    for y in range(15, 0, -1):
+        for x in range(15, 0, -1):
+            if canvas[y][x] == CLEAR and canvas[y - 1][x - 1] == ICON_C:
+                canvas[y][x] = ICON_SHADOW_C
     return canvas
 ICON_NEXT = icon((TRI_R, 3, 3), (TRI_R, 8, 3), (BAR, 13, 3))
 ICON_PREVIOUS = [row[::-1] for row in ICON_NEXT]
@@ -343,7 +401,7 @@ write_manifest(scene_dir, id="studyroom01", type="scene", artSet="A", packVersio
                music=dict(panel="music_panel.png", frame=rect(*PANEL_AT, *PANEL_SIZE),
                           icons=dict(sheet="music_icons.png", frame=dict(w=16, h=16), names=["previous", "play", "pause", "next", "close"]),
                           slots={name: panel_slot(name) for name in MUSIC_SLOTS},
-                          textColor="#F3E9D2", dimColor="#8B7FA8",
+                          textColor=TEXT_HEX, dimColor=DIM_HEX,
                           notes=dict(sheet="music_notes.png", frame=dict(w=20, h=24), fps=2, anchor="music-notes")),
                rain=dict(sheet="rain.png", frame=dict(w=ww, h=wh), fps=8, anchor="window-rect"),
                hotspots=dict(pet=pet, window=rect(*WINDOW), lamp=rect(*LAMP_BOX), computer=rect(*COMPUTER_BOX)))
