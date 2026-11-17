@@ -2,7 +2,7 @@
 
 Usage is under PixelLab's Terms of Service.
 
-## Room — `raw/room.png` (480×352)
+## Room 1, violet board room — `raw/room-1.png` (480×352)
 
 - Tool: `create_image_pixen`, `view: side`, `detail: highly detailed`. Cost 1 generation.
 - Job: `49949c84-08e5-4adc-b820-7eac2556b651` (2026-11-17)
