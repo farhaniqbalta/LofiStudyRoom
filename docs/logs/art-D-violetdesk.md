@@ -30,6 +30,18 @@ Room 1 came from the first plan prompt. Rooms 2 and 4 follow the board; rooms 3 
 - The window is keyed inside a polygon, not by colour, because the glass colour also shows up as light on the walls and in string lights.
 - "Chair seen exactly from the side in profile" worked in room 4. Room 3's prompt didn't say it, and its chair came out from behind.
 
+## Room 3 variants (3 generations, 2026-11-20)
+
+The user asked for three variations of room 3, with the chair turned side-on and clean glass. Prompt and job ids are in `prompts.md`.
+
+| Variant | Chair | Glass | Notes |
+|---|---|---|---|
+| 3a | Three-quarter, turned toward the desk; not a true profile | Skyline drawn in the glass, plus glare streaks | Closest to room 3's capsule feel; long desk under a three-panel window; lantern and teal tube kept |
+| 3b | Three-quarter from behind, at the desk's end | Moon, glare and faint shapes drawn in | Warmest; window over the desk with the lamp in front; daybed on the right |
+| 3c | Seen from behind, centred at the desk | Skyline and glare | Most symmetrical and readable: centred window with curtains, desk across it, lamps both sides, bed right; the clock shows stray text |
+
+What we learned: pixen ignores "seen exactly from the side" in this layout and still draws a city in the glass. The city is replaced anyway (the glass is cut by its outline), so the drawn skyline doesn't matter. A side-on chair will have to come from the user's edit, as already planned.
+
 ## Next
 
 **Decided (user, 2026-11-17): room 3, edited by the user.** No more room generations. The user removes the chair from room 3 by hand and supplies it as a separate asset. Handoff format:
