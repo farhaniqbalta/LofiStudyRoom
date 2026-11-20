@@ -1,6 +1,6 @@
 # Art set D — room exploration
 
-**Status:** Room 3 chosen. Waiting for the user's edit (room without chair, chair as its own image). Nothing is in the app yet.
+**Status:** Room 3a chosen (2026-11-20). Waiting for the user's edit (3a without chair, chair as its own image). Nothing is in the app yet.
 **Plan:** [`docs/plans/2026-11-17-art-set-d.md`](../plans/2026-11-17-art-set-d.md)
 **Sources:** `ArtLab/type-d-violetdesk/raw/room-1.png` … `room-5.png`; prompts and job ids in `ArtLab/type-d-violetdesk/prompts.md`.
 
@@ -8,7 +8,8 @@
 
 - Direction: cozy cyberpunk lo-fi. The reference board is a guide, not a strict target, and it doesn't have to be violet.
 - Character: generate the full seated body and cut it ourselves.
-- **Room 3 chosen.** The user edits out the chair by hand instead of spending generations on more rooms.
+- **Room 3 chosen**, then **variant 3a** (2026-11-20). The user edits out the chair by hand instead of spending generations on more rooms.
+- **Keep every generated room** (`room-1` … `room-5`, `room-3a/b/c`) in `raw/`; none are deleted.
 - The names `VioletDesk01` / `violet-*` are placeholders until a room is chosen.
 
 ## Room options (5 generations, 2026-11-17)
@@ -44,9 +45,9 @@ What we learned: pixen ignores "seen exactly from the side" in this layout and s
 
 ## Next
 
-**Decided (user, 2026-11-17): room 3, edited by the user.** No more room generations. The user removes the chair from room 3 by hand and supplies it as a separate asset. Handoff format:
+**Decided (user): room 3 (2026-11-17), then variant 3a (2026-11-20), edited by the user.** No more room generations. The user removes the chair from room 3 by hand and supplies it as a separate asset. Handoff format:
 
-- `ArtLab/type-d-violetdesk/raw/room-3-nochair.png`: the 480×352 room with the chair painted out (wall, desk legs and floor filled in behind it).
+- `ArtLab/type-d-violetdesk/raw/room-3a-nochair.png`: room 3a (480×352) with the chair painted out (wall, desk legs and floor filled in behind it).
 - `ArtLab/type-d-violetdesk/raw/chair.png`: the chair alone on transparency, in the same 480×352 canvas and the same position, so it lines up with no offsets. Side-on if possible, so a profile character works.
 - Optional: glass glare and moon painted out, or left in; the window is keyed by polygon either way.
 
