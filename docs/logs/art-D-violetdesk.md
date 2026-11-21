@@ -1,6 +1,6 @@
 # Art set D — room exploration
 
-**Status:** Room 3a chosen (2026-11-20). Waiting for the user's edit (3a without chair, chair as its own image). Nothing is in the app yet.
+**Status:** Room 3a chosen; the user's chair-free edit and separate chair are in and cut into layers (2026-11-21). Next: character rest pose, city, lamp off. Nothing is in the app yet.
 **Plan:** [`docs/plans/2026-11-17-art-set-d.md`](../plans/2026-11-17-art-set-d.md)
 **Sources:** `ArtLab/type-d-violetdesk/raw/room-1.png` … `room-5.png`; prompts and job ids in `ArtLab/type-d-violetdesk/prompts.md`.
 
@@ -52,3 +52,13 @@ What we learned: pixen ignores "seen exactly from the side" in this layout and s
 - Optional: glass glare and moon painted out, or left in; the window is keyed by polygon either way.
 
 With a separate chair the layering is chosen per pose: the chair back sits behind the body (room layer), and any part in front of it (near armrest, seat edge) becomes a foreground piece cut from `chair.png`. After that comes plan Task 2: character rest pose, city, lamp off. The names are renamed from `Violet*` at that point.
+
+## The user's edit (2026-11-21)
+
+`raw/room-3a-nochair.png` and `raw/chair.png`, both 480×352. The editor re-rendered the whole picture (71 colours became about 50,000, slightly soft), so `python3 ArtLab/type-d-violetdesk/cut_layers.py` builds clean layers in `layers/` (git-ignored) and leaves the user's files untouched:
+
+- `layers/room.png`: the original PixelLab pixels everywhere, except the area the user painted (chair, its floor shadow, relit floor), which takes the user's fill snapped to the original 71-colour palette. The area is the connected patch of real changes touching the chair.
+- `layers/chair.png`: the original pixels under the user's chair mask, hard alpha.
+- The script asserts that pixels outside the painted area are unchanged and that every colour is from the original palette.
+
+The chair is drawn three-quarter, turned toward the desk. In the scene it is room art behind the character; its near armrest and seat front will become foreground pieces once the character exists. With the chair layered over the clean room it has no floor shadow; one can be drawn later if it looks like it floats.
