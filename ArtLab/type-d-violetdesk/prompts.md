@@ -18,3 +18,11 @@ Room 3's prompt with two changes: the chair is "an empty office chair seen exact
 | `raw/room-3a.png` | 11 | `50537b9f-f1dc-4160-a134-397bc933d340` |
 | `raw/room-3b.png` | 22 | `a2a9b761-3843-4386-8259-c9ab10751b77` |
 | `raw/room-3c.png` | 33 | `ea860569-e63d-487e-b238-5349f920a829` |
+
+## Character, city, lamp off — 2026-11-21 (3 generations)
+
+| File | Tool | Job | Prompt (short) |
+|---|---|---|---|
+| `raw/boy-rest.png` 128×176 | `create_image_pixen`, `no_background`, `view: side`, `direction: west` | `c40797cc-7e08-4f9d-8d08-a80de8054882` | teenage boy seated on an office chair seen from the side, facing left, full body, forearms raised typing, headphones, dark messy hair, navy hoodie with grey sleeve stripe, sneakers; "only the boy, no chair, no desk, no keyboard"; indigo/teal/amber |
+| `raw/city-night.png` 232×224 | `create_image_pixen`, `view: side` | `3e194c73-a2e5-447d-884f-1b2ae4d2a128` | full-bleed night skyline from a high-rise, no frame or interior; cyberpunk towers, amber and teal windows, pink and cyan neon, elevated train; indigo/teal/amber |
+| `raw/lamp-off-crop.png` 128×128 | `edit_image_pixen` on the room crop x 236–364, y 120–248 (top-left) | `65b3e775-34f4-429d-94d5-f31c6c97d965` | desk lamp off, no glow on wall or desk, same dim night tone, keep everything else |

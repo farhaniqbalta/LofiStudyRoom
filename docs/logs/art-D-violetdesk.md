@@ -66,3 +66,9 @@ The chair is drawn three-quarter, turned toward the desk. In the scene it is roo
 ## Window glass keyed out (2026-11-21)
 
 `cut_layers.py` also removes the drawn city from the three window panes of `layers/room.png`, so the scenery pack shows through (the room's glass is the mask for the scenery layer). Inside each pane polygon it clears the sky, building and window-light colours, then any leftover speck under 40 px that doesn't join the curtain, frame or a desk object. The laptop's box is kept whole. The frame, its teal highlight, curtains, cords, plant and laptop stay. About 33,000 px are transparent. Preview on magenta: `build/art/d-room-keyed-3x.png`.
+
+## Character, city, lamp off (3 generations, 2026-11-21)
+
+- **Boy** (`raw/boy-rest.png`): a good side-profile seated figure (headphones, hoodie, typing), but PixelLab drew a chair, desk, monitor, bottle and keyboard despite "only the boy". They are separate shapes, so they are removed by hand (the user's "removing is easier than generating"). His chair is side-on while the room's chair is three-quarter; fitting him to the room's chair is the next decision.
+- **City** (`raw/city-night.png`): fits the window very well at offset (2, 14): teal sky, amber windows, neon signs, train. Preview with the room: `build/art/d-room-city-3x.png`.
+- **Lamp off** (`raw/lamp-off-crop.png`): the lamp is off, but the edit also darkened the whole crop (plants, curtain, shelf), so pasting it as a block would leave a dark square. It is used only inside the lamp's glow area, blended at the edges.

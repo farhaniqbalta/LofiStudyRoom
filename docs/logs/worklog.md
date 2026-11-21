@@ -13,4 +13,4 @@ One line per checkpoint. Detail lives in the linked file.
 | Spotify now-playing (M3b) | Done; hand-tested with music playing; eight code-review fixes (PR #3) | [spotify-now-playing.md](spotify-now-playing.md) |
 | Art set A — sprite pass | Character poses, cat reactions and lamp-off room replaced; day rooms, day cities and rain still stand-ins | [art-A-lofi.md](art-A-lofi.md) |
 | Polish: app icon, Spotify logo, animation frequency, rain sound, docs | Done, merged (PR #4); 132 tests | [polish-and-audio.md](polish-and-audio.md) |
-| Art set D — room exploration | 8 rooms generated (all kept); room 3a chosen; user's chair edit cut into clean layers; next the character | [art-D-violetdesk.md](art-D-violetdesk.md) |
+| Art set D — room exploration | 8 rooms generated (all kept); room 3a chosen; window keyed; boy, city and lamp-off drafts generated | [art-D-violetdesk.md](art-D-violetdesk.md) |
