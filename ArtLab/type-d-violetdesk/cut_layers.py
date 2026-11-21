@@ -54,6 +54,50 @@ assert all(room[y][x] == orig[y][x] for y in range(H) for x in range(W) if not n
 assert {p[:3] for row in room for p in row} <= set(palette)
 assert {p[3] for row in chair for p in row} <= {0, 255}
 
+# Window glass: the drawn city is removed so the scenery pack shows through (layering rule: room glass is transparent).
+# Inside each pane polygon, sky, building and window-light colours go; then leftover specks (building outlines) that are
+# not part of a larger object (curtain, plant, cords) go too. The laptop's box is kept whole.
+PANES = [[(4, 15), (92, 33), (92, 238), (4, 238)],          # left, its left edge is the curtain (kept by colour)
+         [(104, 38), (186, 60), (186, 238), (104, 238)],    # middle
+         [(193, 62), (232, 70), (232, 206), (193, 206)]]    # right, its right edge is the curtain
+KEEP_BOX = (163, 196, 207, 238)                             # laptop: x0, top, x1, bottom
+SCENERY = {(107, 213, 211), (117, 218, 217), (134, 224, 227), (110, 234, 229), (97, 149, 160), (73, 170, 169), (60, 128, 131),
+           (91, 117, 137), (94, 123, 143), (80, 100, 122), (85, 107, 129), (73, 88, 113), (68, 79, 104), (61, 64, 90),
+           (48, 53, 75), (51, 47, 75), (233, 193, 136), (254, 249, 213), (251, 215, 121)}
+SPECK = 40   # a leftover patch smaller than this (in px) inside a pane is city detail, not an object
+
+def inside(x, y, poly):
+    hit = False
+    for (ax, ay), (bx, by) in zip(poly, poly[1:] + poly[:1]):
+        if (ay > y) != (by > y) and x < ax + (y - ay) * (bx - ax) / (by - ay):
+            hit = not hit
+    return hit
+
+kx0, ky0, kx1, ky1 = KEEP_BOX
+glass = [[any(inside(x + .5, y + .5, p) for p in PANES) and not (kx0 <= x < kx1 and ky0 <= y < ky1) for x in range(W)] for y in range(H)]
+for y in range(H):
+    for x in range(W):
+        if glass[y][x] and room[y][x][:3] in SCENERY:
+            room[y][x] = CLEAR
+done = set()
+for y in range(H):
+    for x in range(W):
+        if glass[y][x] and room[y][x][3] and (x, y) not in done:
+            patch, stack, edge = [], [(x, y)], False
+            while stack:
+                i, j = stack.pop()
+                if (i, j) in done or not room[j][i][3]:
+                    continue
+                if not glass[j][i]:
+                    edge = True   # joins something outside the glass: curtain, frame, desk object
+                    continue
+                done.add((i, j)); patch.append((i, j))
+                stack += [(i + 1, j), (i - 1, j), (i, j + 1), (i, j - 1)]
+            if not edge and len(patch) < SPECK:
+                for i, j in patch:
+                    room[j][i] = CLEAR
+assert sum(1 for row in room for p in row if not p[3]) > 20000, "the glass should be mostly transparent"
+
 os.makedirs(OUT, exist_ok=True)
 pngio.write(os.path.join(OUT, "room.png"), room)
 pngio.write(os.path.join(OUT, "chair.png"), chair)

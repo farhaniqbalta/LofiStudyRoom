@@ -62,3 +62,7 @@ With a separate chair the layering is chosen per pose: the chair back sits behin
 - The script asserts that pixels outside the painted area are unchanged and that every colour is from the original palette.
 
 The chair is drawn three-quarter, turned toward the desk. In the scene it is room art behind the character; its near armrest and seat front will become foreground pieces once the character exists. With the chair layered over the clean room it has no floor shadow; one can be drawn later if it looks like it floats.
+
+## Window glass keyed out (2026-11-21)
+
+`cut_layers.py` also removes the drawn city from the three window panes of `layers/room.png`, so the scenery pack shows through (the room's glass is the mask for the scenery layer). Inside each pane polygon it clears the sky, building and window-light colours, then any leftover speck under 40 px that doesn't join the curtain, frame or a desk object. The laptop's box is kept whole. The frame, its teal highlight, curtains, cords, plant and laptop stay. About 33,000 px are transparent. Preview on magenta: `build/art/d-room-keyed-3x.png`.
