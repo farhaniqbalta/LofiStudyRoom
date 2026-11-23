@@ -143,7 +143,10 @@ def chair_part(x, y):            # crop coordinates
     return back or seat_base or armrest(x, y)
 def armrest(x, y):
     return (66 <= x < 114 and 101 <= y < 111) or (89 <= x < 98 and 111 <= y < 127)
-cuts = {p: pngio.read(os.path.join(RAW, f"boy-{p}-cut.png")) for p in POSES}
+# Drink, rest and lean were regenerated from the sharp study crop; the soft first versions stay in raw/.
+CUT_FILES = {"study": "boy-study-cut.png", "drink": "boy-drink-cut-sharp.png", "rest": "boy-rest-cut-sharp.png",
+             "lean": "boy-lean-cut-sharp.png"}
+cuts = {p: pngio.read(os.path.join(RAW, CUT_FILES[p])) for p in POSES}
 # The study pose has a sharper source: the user's full-size image shrunk by majority colour per block
 # (raw/boy-study-crop-sharp.png, same 160x200 crop). Use its colours under the cut's shape.
 sharp = pngio.read(os.path.join(RAW, "boy-study-crop-sharp.png"))

@@ -55,3 +55,13 @@ Room 3's prompt with two changes: the chair is "an empty office chair seen exact
 | `raw/boy-lean-cut.png` | `remove_background`, complex | `80d48a35-6469-441f-ab7e-0bd49c277c24` | used |
 | `raw/boy-sharp-0..3.png` | `correct_pixelart`, strength 0.25, on the four boy frames | `bd24f30d-8c05-4d24-9984-3fa77350796c` | not used: barely changed, added ~3,000 near-duplicate colours |
 | `raw/boy-study-crop-sharp.png` | none (free): the user's full-size image shrunk by majority colour per block, snapped to room 3a's palette | — | used for the study frame and the chair |
+
+## Poses regenerated from the sharp crop — 2026-11-24 (6 generations)
+
+Same prompts as before, plus "Keep the crisp pixel art with dark outlines", on `raw/boy-study-crop-sharp.png`. The soft first versions stay in `raw/`.
+
+| Pose | Edit job | Drift (noise ≈ 20) | Cut-out job | Files |
+|---|---|---|---|---|
+| drink | `357a017f-7dd3-4373-b6c3-4dc14f7497ee` | 15.5 | `8b283029-b460-42b1-8c5c-37cac51eb1e0` | `boy-drink-crop-sharp.png`, `boy-drink-cut-sharp.png` |
+| rest | `8a3a2039-c051-41c9-b47c-d34d82cc6838` | 25.2 | `50134808-af72-4335-b88f-676307e3d02c` | `boy-rest-crop-sharp.png`, `boy-rest-cut-sharp.png` |
+| lean | `580cefd9-098d-402b-9600-9d491f7e0034` | 7.6 | `19d4044c-828d-4fff-b6c5-f99a309e1fbb` | `boy-lean-crop-sharp.png`, `boy-lean-cut-sharp.png` |

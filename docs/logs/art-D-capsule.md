@@ -118,3 +118,7 @@ An automatic cut by difference doesn't work: the user's image is a re-render, so
 - **Lean** replaces stretch: leaning back, head tilted up, hands on his lap. He stays in profile (drift 12). Routine weight 1, cooldown 900 s, 3 s long, like set A's stretch. The armrest (foreground) passes in front of his hand.
 - **Sharpness** (the user: "the boy is not that sharp"): the source image is high-resolution art that was scaled down with blending. PixelLab `correct_pixelart` barely helped. Shrinking the original by majority colour per 3×3 block instead gives dark outlines and clear eyes and hands, so the study frame and the chair now come from that (free). Drink, rest and lean were generated from the soft crop and stay softer; regenerating them from the sharp crop would cost about 6 generations (3 edits, 3 cut-outs).
 - `Executed 133 tests, with 0 failures` on the iPad.
+
+## All poses sharp (2026-11-24, 6 generations)
+
+Drink, rest and lean were regenerated from the sharp study crop and cut out again, so all four frames now have the same crisp outlines. They are still consistent with the study pose (drift 8–25). In the rest pose the lamp's light on the wall shows behind his lowered head; that is the room, not the sprite. `Executed 133 tests, with 0 failures` on the iPad. Preview: `build/art/d-poses-final.png`.
