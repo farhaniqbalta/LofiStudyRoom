@@ -80,3 +80,11 @@ The PixelLab boy (`raw/boy-rest.png`) was rejected. The user supplied `raw/boy-s
 Pose tests (`edit_image_pixen` from the study crop, 3 generations): **drink** and **rest** are consistent with the study pose; **stretch** is not (he turned to face the camera). Retry stretch later with "keep the exact side profile facing left, only the arms rise above the head", or swap it for a smaller routine.
 
 Next: cut the boy and his chair into separate layers (chair behind, near armrest as a foreground piece), clean the edges in Aseprite, build the scene for `-artSet D`.
+
+## Lamp-off room (2026-11-24, no generations)
+
+`cut_layers.py` now also writes `layers/room-off.png`. The PixelLab edit darkened its whole crop, so it is used only on pixels the lamp lights in the room (warm and bright: the wall cone, the desk top, the lamp). The desk left of the crop fades back to lit through a 16 px dither. The floor and bed are lit by the paper lantern and stay. Preview: `build/art/d-lampoff-check.png`. A touch-up in Aseprite can smooth the fade later.
+
+## Cutting out the boy: blocked
+
+An automatic cut by difference doesn't work: the user's image is a re-render, so its background differs from our room everywhere, and the dark trousers and chair match the dark floor. Hand-tracing each pose at 160×200 is unreliable. PixelLab `remove_background` (1 generation per image) was refused by the session's permission check. Options for the user: allow it, or cut the boy and his chair by hand as was done for the room chair.

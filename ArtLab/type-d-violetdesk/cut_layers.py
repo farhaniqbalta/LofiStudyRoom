@@ -98,7 +98,42 @@ for y in range(H):
                     room[j][i] = CLEAR
 assert sum(1 for row in room for p in row if not p[3]) > 20000, "the glass should be mostly transparent"
 
+# Lamp off: PixelLab's edit darkened its whole 128x128 crop (plants and curtain too), so it is used only where the
+# room is warm-lit by the lamp (warm and bright: the cone on the wall, the desk top, the lamp itself). Colours are
+# snapped to the room's palette; glass stays transparent.
+LAMP_CROP = (236, 120)   # top-left of the crop in the room
+def lamp_lit(p):
+    r, g, b = p[:3]
+    return p[3] and r > b + 25 and r + g + b > 240
+off_crop = pngio.read(os.path.join(RAW, "lamp-off-crop.png"))
+room_off = [list(row) for row in room]
+for j, row in enumerate(off_crop):
+    for i, p in enumerate(row):
+        x, y = LAMP_CROP[0] + i, LAMP_CROP[1] + j
+        if lamp_lit(room[y][x]):
+            room_off[y][x] = (*snap(p[:3]), 255)
+# The desk runs on left of the crop; fade the unlit desk into the lit one with a dither so there is no seam
+# (the floor and bed are lit by the paper lantern and stay as they are). Each lit colour gets the unlit colour it
+# most often got inside the crop.
+votes = {}
+for j in range(len(off_crop)):
+    for i in range(len(off_crop[0])):
+        x, y = LAMP_CROP[0] + i, LAMP_CROP[1] + j
+        if lamp_lit(room[y][x]):
+            v = votes.setdefault(room[y][x], {})
+            v[room_off[y][x]] = v.get(room_off[y][x], 0) + 1
+lit_to_off = {k: max(v, key=v.get) for k, v in votes.items()}
+FADE = 16   # px of desk left of the crop that fade from unlit to lit
+for y in range(LAMP_CROP[1], LAMP_CROP[1] + len(off_crop)):
+    for x in range(LAMP_CROP[0] - FADE, LAMP_CROP[0]):
+        d = LAMP_CROP[0] - x
+        if room[y][x] in lit_to_off and lamp_lit(room[y][x]) and (
+                (d <= FADE // 2 and (x + y) % 2 == 0) or (x % 2 == 0 and y % 2 == 0)):
+            room_off[y][x] = lit_to_off[room[y][x]]
+assert sum(a != b for ra, rb in zip(room, room_off) for a, b in zip(ra, rb)) > 3000, "the lamp area should change"
+
 os.makedirs(OUT, exist_ok=True)
+pngio.write(os.path.join(OUT, "room-off.png"), room_off)
 pngio.write(os.path.join(OUT, "room.png"), room)
 pngio.write(os.path.join(OUT, "chair.png"), chair)
 print("room.png and chair.png written to", OUT, "| filled px:", sum(map(sum, near)), "| chair px:", sum(map(sum, mask)))
