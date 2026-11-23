@@ -52,6 +52,10 @@
     "computer": {
       "x": 200,
       "y": 132
+    },
+    "music-notes": {
+      "x": 296,
+      "y": 192
     }
   },
   "room": "room.png",
@@ -65,6 +69,111 @@
       "anchor": "desk-seat"
     }
   ],
+  "rain": {
+    "sheet": "rain.png",
+    "frame": {
+      "w": 220,
+      "h": 224
+    },
+    "fps": 8,
+    "anchor": "window-rect"
+  },
+  "music": {
+    "panel": "music_panel.png",
+    "frame": {
+      "x": 346,
+      "y": 184,
+      "w": 120,
+      "h": 68
+    },
+    "icons": {
+      "sheet": "music_icons.png",
+      "frame": {
+        "w": 16,
+        "h": 16
+      },
+      "names": [
+        "previous",
+        "play",
+        "pause",
+        "next",
+        "close"
+      ]
+    },
+    "slots": {
+      "artwork": {
+        "x": 351,
+        "y": 203,
+        "w": 44,
+        "h": 44
+      },
+      "attribution": {
+        "x": 351,
+        "y": 189,
+        "w": 42,
+        "h": 12
+      },
+      "title": {
+        "x": 400,
+        "y": 235,
+        "w": 48,
+        "h": 12
+      },
+      "artist": {
+        "x": 400,
+        "y": 224,
+        "w": 58,
+        "h": 10
+      },
+      "previous": {
+        "x": 400,
+        "y": 203,
+        "w": 16,
+        "h": 16
+      },
+      "toggle": {
+        "x": 419,
+        "y": 203,
+        "w": 16,
+        "h": 16
+      },
+      "next": {
+        "x": 438,
+        "y": 203,
+        "w": 16,
+        "h": 16
+      },
+      "close": {
+        "x": 451,
+        "y": 240,
+        "w": 8,
+        "h": 8
+      },
+      "message": {
+        "x": 400,
+        "y": 221,
+        "w": 58,
+        "h": 26
+      },
+      "action": {
+        "x": 400,
+        "y": 203,
+        "w": 58,
+        "h": 16
+      }
+    },
+    "textColor": "#DCF6F4",
+    "dimColor": "#6BD5D3",
+    "notes": {
+      "sheet": "music_notes.png",
+      "frame": {
+        "w": 20,
+        "h": 24
+      },
+      "fps": 2,
+      "anchor": "music-notes"
+    }
+  },
   "hotspots": {
     "pet": {
       "x": 116,

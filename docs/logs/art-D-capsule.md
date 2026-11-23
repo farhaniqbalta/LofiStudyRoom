@@ -102,7 +102,7 @@ An automatic cut by difference doesn't work: the user's image is a re-render, so
 
 1. ~~Stretch~~: replaced by a lean-back routine (2026-11-24).
 2. ~~The cat is set A's~~: replaced by a cat drawn for this room (2026-11-24).
-3. No rain sheet, day room, day city or music skin yet (rain and skin can be drawn by script in the room's palette, free).
+3. Rain and music skin done (2026-11-24); day room and day city still missing.
 4. Study is one frame: a 1 px head-bob or typing frame would make it breathe.
 5. Lamp-off fade on the desk could be smoothed in Aseprite.
 6. Girl character: same method (supplied image or PixelLab), not started.
@@ -126,3 +126,10 @@ Drink, rest and lean were regenerated from the sharp study crop and cut out agai
 ## Art set switch in Settings (2026-11-24)
 
 The user asked for a way to swap the scene in the app and chose "applies on reopen" over a live swap (a live swap would need a teardown path for timers, clock, weather, rain audio and Spotify). Settings → Art set lists the registry's sets by name; the choice is saved as `RoomConfig.artSet` and used at the next launch; a launch argument still wins, and a saved set that no longer exists falls back to the active one. `SpriteAssetRepository` now exposes `artSets` (letter to name) and `artSet` (the running letter). Test: `testArtSetChoiceIsListedAndSavedForNextLaunch`. `Executed 134 tests, with 0 failures` on the iPad; the picker shows A, B and D on the device.
+
+## Rain and music player (2026-11-24, no generations)
+
+`ArtLab/type-d-capsule/skin.py` (adapted from set A's `build_art.py`, which runs on import and can't be shared) draws them in room 3a's colours; `export.py` writes them and the manifest fields.
+- **Rain:** two depths of streaks plus beads, teal-white, 6 frames at 8 fps over the 220×224 city frame.
+- **Music player:** a 118×66 indigo wall tablet with a teal neon strip, on the right wall over the blank poster (set A's 178 px radio would cover the boy's head here). Cover, title, artist, controls and Spotify logo slots; cream title `#DCF6F4`, teal secondary `#6BD5D3`. Floating notes (amber and teal) above the boy's head while music plays.
+- Checked on the iPad with `-artSet D -weather rain -showMusic YES`: rain in the window, the tablet shows "Spotify is paused". The action button text is cut to "Resume in Spoti…" because the tablet's screen is only 58 px wide. `Executed 134 tests, with 0 failures`.

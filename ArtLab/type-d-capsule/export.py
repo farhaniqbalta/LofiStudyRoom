@@ -7,13 +7,17 @@ import json, os, shutil, subprocess, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.join(HERE, "..", "..")
 sys.path.insert(0, os.path.join(ROOT, "Tools"))
-import aseprite_export
+import aseprite_export, pngio
+sys.path.insert(0, HERE)
+import skin
 
 ASSETS = os.path.join(ROOT, "LoFiRoom", "Assets")
 ART_SET, SCENE, PERSPECTIVE = "D", "CapsuleDesk01", "capsule-desk-side-v1"
 W, H = 480, 352
 SEAT = (206, 157, 141, 181)      # x, top, w, h: the boy's frame; must match cut_layers.py (layers/geometry.json)
 CITY = (14, 14, 220, 224)        # the city frame behind the glass; must match cut_layers.py
+PANEL_AT = (346, 100)            # the music tablet on the right wall, over the blank poster, clear of the boy's head
+NOTES_AT = (296, 136)            # top-left of the floating notes, just above the boy's head
 
 def rect(x, top, w, h):          # top-left image pixels -> manifest (origin bottom-left)
     return dict(x=x, y=H - top - h, w=w, h=h)
@@ -28,14 +32,27 @@ os.makedirs(scene_dir, exist_ok=True)
 frame("room", os.path.join(scene_dir, "room.png"))
 frame("room_off", os.path.join(scene_dir, "room_off.png"))
 frame("chair_front", os.path.join(scene_dir, "chair_front.png"), SEAT)
+pngio.write(os.path.join(scene_dir, "rain.png"), skin.sheet(skin.rain(CITY[2], CITY[3])))
+pngio.write(os.path.join(scene_dir, "music_panel.png"), skin.panel())
+pngio.write(os.path.join(scene_dir, "music_icons.png"), skin.sheet(skin.icons()))
+pngio.write(os.path.join(scene_dir, "music_notes.png"), skin.sheet(skin.notes()))
+def slot(name):
+    x, y, w, h = skin.SLOTS[name]
+    return rect(PANEL_AT[0] + x, PANEL_AT[1] + y, w, h)
 pet, window = rect(116, 258, 24, 20), rect(*CITY)
 anchors = {"window-rect": window, "window-mask": window, "desk-seat": rect(*SEAT), "pet-spot": pet,
-           "clock-slot": rect(216, 207, 23, 15), "lamp": dict(x=262, y=H - 185), "computer": dict(x=200, y=H - 220)}
+           "clock-slot": rect(216, 207, 23, 15), "lamp": dict(x=262, y=H - 185), "computer": dict(x=200, y=H - 220),
+           "music-notes": dict(x=NOTES_AT[0], y=H - NOTES_AT[1] - 24)}
 with open(os.path.join(scene_dir, "manifest.json"), "w") as f:
     json.dump(dict(id=SCENE.lower(), type="scene", artSet=ART_SET, packVersion=1, perspective=PERSPECTIVE,
                    canvas=dict(w=W, h=H), safe=dict(x=14, y=12, w=452, h=328), anchors=anchors, room="room.png",
                    rooms={"night-off": "room_off.png", "day-off": "room_off.png"},
                    foreground=[dict(image="chair_front.png", anchor="desk-seat")],
+                   rain=dict(sheet="rain.png", frame=dict(w=CITY[2], h=CITY[3]), fps=8, anchor="window-rect"),
+                   music=dict(panel="music_panel.png", frame=rect(*PANEL_AT, *skin.PANEL_SIZE),
+                              icons=dict(sheet="music_icons.png", frame=dict(w=16, h=16), names=["previous", "play", "pause", "next", "close"]),
+                              slots={name: slot(name) for name in skin.SLOTS}, textColor=skin.TEXT_HEX, dimColor=skin.DIM_HEX,
+                              notes=dict(sheet="music_notes.png", frame=dict(w=20, h=24), fps=2, anchor="music-notes")),
                    hotspots={"pet": pet, "window": window, "lamp": rect(238, 160, 48, 60), "computer": rect(163, 195, 75, 52)},
                    provenance="Art set D, first pass. Room: PixelLab create_image_pixen job 50537b9f-f1dc-4160-a134-397bc933d340 "
                               "(room 3a), chair painted out by the user, glass keyed out, the user's boy image's chair added and "
