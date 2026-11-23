@@ -20,6 +20,7 @@ What each set contains (folders under `LoFiRoom/Assets/`):
 
 ## How to switch
 
+- **In the app:** Settings → Art set. The choice is saved and applies the next time the app opens (the room is built once at launch).
 - **For one launch:** add the launch argument `-artSet B`, `-artSet D` (or `-artSet A`).
 - **As the default:** change `"active"` in `LoFiRoom/Assets/art-sets.json`, then rebuild. This is the only place the default is decided.
 - **To check which set a scene belongs to:** its `manifest.json` has `"artSet"`.

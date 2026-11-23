@@ -122,3 +122,7 @@ An automatic cut by difference doesn't work: the user's image is a re-render, so
 ## All poses sharp (2026-11-24, 6 generations)
 
 Drink, rest and lean were regenerated from the sharp study crop and cut out again, so all four frames now have the same crisp outlines. They are still consistent with the study pose (drift 8–25). In the rest pose the lamp's light on the wall shows behind his lowered head; that is the room, not the sprite. `Executed 133 tests, with 0 failures` on the iPad. Preview: `build/art/d-poses-final.png`.
+
+## Art set switch in Settings (2026-11-24)
+
+The user asked for a way to swap the scene in the app and chose "applies on reopen" over a live swap (a live swap would need a teardown path for timers, clock, weather, rain audio and Spotify). Settings → Art set lists the registry's sets by name; the choice is saved as `RoomConfig.artSet` and used at the next launch; a launch argument still wins, and a saved set that no longer exists falls back to the active one. `SpriteAssetRepository` now exposes `artSets` (letter to name) and `artSet` (the running letter). Test: `testArtSetChoiceIsListedAndSavedForNextLaunch`. `Executed 134 tests, with 0 failures` on the iPad; the picker shows A, B and D on the device.
