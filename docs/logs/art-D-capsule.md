@@ -102,7 +102,7 @@ An automatic cut by difference doesn't work: the user's image is a re-render, so
 
 1. ~~Stretch~~: replaced by a lean-back routine (2026-11-24).
 2. ~~The cat is set A's~~: replaced by a cat drawn for this room (2026-11-24).
-3. Rain and music skin done (2026-11-24); day room and day city still missing.
+3. Rain, music skin, day room and day city done (2026-11-24).
 4. Study is one frame: a 1 px head-bob or typing frame would make it breathe.
 5. Lamp-off fade on the desk could be smoothed in Aseprite.
 6. Girl character: same method (supplied image or PixelLab), not started.
@@ -133,3 +133,9 @@ The user asked for a way to swap the scene in the app and chose "applies on reop
 - **Rain:** two depths of streaks plus beads, teal-white, 6 frames at 8 fps over the 220×224 city frame.
 - **Music player:** a 118×66 indigo wall tablet with a teal neon strip, on the right wall over the blank poster (set A's 178 px radio would cover the boy's head here). Cover, title, artist, controls and Spotify logo slots; cream title `#DCF6F4`, teal secondary `#6BD5D3`. Floating notes (amber and teal) above the boy's head while music plays.
 - Checked on the iPad with `-artSet D -weather rain -showMusic YES`: rain in the window, the tablet shows "Spotify is paused". The action button text is cut to "Resume in Spoti…" because the tablet's screen is only 58 px wide. `Executed 134 tests, with 0 failures`.
+
+## Day room and day city (2026-11-24, 1 generation)
+
+- **Day city:** an edit of the night city into a golden late afternoon, same skyline. The scenery pack is renamed `CapsuleCity01` (it now holds both) with `phases` night → `night`, day → `day`. `Tools/aseprite_export.py` now passes a sidecar's `phases` through and checks that each names a real animation.
+- **Day rooms:** `cut_layers.py` tints room and lamp-off room with a mild warm light (22 %), as set A does with script-made day rooms. The chair is left untinted so it matches its armrest, which is a foreground piece shared by day and night (and the boy, who is never tinted). The scene now has all four rooms.
+- `Executed 134 tests, with 0 failures` on the iPad. Preview: `build/art/d-day.png`.

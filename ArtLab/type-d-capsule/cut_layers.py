@@ -172,6 +172,14 @@ assert all(sum(p[3] > 0 for row in b for p in row) > 3000 for b in boy.values())
 CITY = (14, 14, 220, 224)        # x, top, w, h in the room
 city_src = pngio.read(os.path.join(RAW, "city-night.png"))   # 232x224, drawn for the window from x 2
 city = [row[CITY[0] - 2:CITY[0] - 2 + CITY[2]] for row in city_src]
+city_day = [row[CITY[0] - 2:CITY[0] - 2 + CITY[2]] for row in pngio.read(os.path.join(RAW, "city-day.png"))]
+
+# Day rooms: a mild warm tint, as set A does. The actors and the armrest (a foreground piece shared by day and night)
+# are not tinted, so the chair is left untinted too and they stay matched. Glass stays clear.
+chair_room = {(ax + x, ay + y) for x, y in chair_px}
+def daylight(img):
+    return [[(*(round(c + (t - c) * 0.22) for c, t in zip(p[:3], (255, 226, 180))), 255) if p[3] and (x, y) not in chair_room else p
+             for x, p in enumerate(row)] for y, row in enumerate(img)]
 
 # The cat: PixelLab sleeping and awake sprites (32x32). Keep only the largest connected shape (drops stray specks),
 # crop both to one box, and add a breathing frame (the upper body one row higher).
@@ -212,6 +220,9 @@ pngio.write(os.path.join(OUT, "chair_front.png"),
             [[front[y - SEAT[1]][x - SEAT[0]] if SEAT[0] <= x < SEAT[0] + SEAT[2] and SEAT[1] <= y < SEAT[1] + SEAT[3] else CLEAR
               for x in range(W)] for y in range(H)])
 pngio.write(os.path.join(OUT, "city-night.png"), city)
+pngio.write(os.path.join(OUT, "city-day.png"), city_day)
+pngio.write(os.path.join(OUT, "room-day.png"), daylight(room))
+pngio.write(os.path.join(OUT, "room-day-off.png"), daylight(room_off))
 for p, b in boy.items():
     pngio.write(os.path.join(OUT, f"boy-{p}.png"), [row[bx0:bx1] for row in b[by0:by1]])
 with open(os.path.join(OUT, "geometry.json"), "w") as f:

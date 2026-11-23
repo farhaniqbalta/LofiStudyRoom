@@ -95,7 +95,7 @@ final class ArtIndependenceTests: XCTestCase {
         XCTAssertEqual(repository.scene.id, "capsuledesk01")
         XCTAssertEqual(repository.folders(in: "Characters"), ["CapsuleBoy"])
         XCTAssertEqual(repository.folders(in: "Pets"), ["CapsuleCat"])
-        XCTAssertEqual(repository.folders(in: "Scenery"), ["CapsuleCityNight"])
+        XCTAssertEqual(repository.folders(in: "Scenery"), ["CapsuleCity01"])
         XCTAssertEqual(repository.folders(in: "Clocks"), ["CapsuleClock"])
         let scene = try LoFiSKScene(repository: repository, showAnchors: false)
         let coordinator = SceneCoordinator(repository: repository, store: RoomStateStore(defaults: defaults), scene: scene)

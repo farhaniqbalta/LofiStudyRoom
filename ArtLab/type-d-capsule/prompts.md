@@ -65,3 +65,7 @@ Same prompts as before, plus "Keep the crisp pixel art with dark outlines", on `
 | drink | `357a017f-7dd3-4373-b6c3-4dc14f7497ee` | 15.5 | `8b283029-b460-42b1-8c5c-37cac51eb1e0` | `boy-drink-crop-sharp.png`, `boy-drink-cut-sharp.png` |
 | rest | `8a3a2039-c051-41c9-b47c-d34d82cc6838` | 25.2 | `50134808-af72-4335-b88f-676307e3d02c` | `boy-rest-crop-sharp.png`, `boy-rest-cut-sharp.png` |
 | lean | `580cefd9-098d-402b-9600-9d491f7e0034` | 7.6 | `19d4044c-828d-4fff-b6c5-f99a309e1fbb` | `boy-lean-crop-sharp.png`, `boy-lean-cut-sharp.png` |
+
+## Day city — 2026-11-24 (1 generation)
+
+- `raw/city-day.png` 232×224: `edit_image_pixen` on the night city (job `3e194c73-…`), seed 3: "Same city skyline, same buildings, same framing and size, but in late afternoon daylight: soft bright sky with pale clouds, warm golden sunlight on the building faces, window lights off, neon signs dim." Job `140d68af-e91f-4b7a-8c18-394acff0ac97`. Every building stayed in place.

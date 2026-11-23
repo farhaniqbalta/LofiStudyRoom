@@ -177,7 +177,7 @@ Open, in no fixed order; start one only with the user's go-ahead:
 - Art set A stand-ins still left: day rooms and day city views (PixelLab generations needed). More cat animation (the user asked to keep it for later).
 - M4: energy measurement on the iPad (never done; no power claims until it is), power tuning, polish.
 - Not tried on the device: Low Power Mode, VoiceOver, airplane-mode launch, Spotify signed out or not installed.
-- Art direction B/C/D (`docs/ART_SETS.md`). Set D next: day art, girl.
+- Art direction B/C/D (`docs/ART_SETS.md`). Set D next: the girl.
 - Idea, not started: move the music player into a room object (cassette deck or radio on the sill or shelf) that opens the readable player when tapped (`docs/logs/art-A-lofi.md`, "Idea for later").
 
 Building needs `DEVELOPMENT_TEAM` and `SPOTIFY_CLIENT_ID` in the environment before `xcodegen generate` (values in `CLAUDE.local.md`), and the rain loop at `LoFiRoom/LocalAudio/rain.mp3` for the Sound settings (`docs/AUDIO.md`). All three are optional for a build: without them signing fails / the music card says Spotify is not set up / the Sound settings are hidden.

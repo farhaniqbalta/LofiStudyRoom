@@ -31,6 +31,8 @@ scene_dir = os.path.join(ASSETS, "Scenes", SCENE)
 os.makedirs(scene_dir, exist_ok=True)
 frame("room", os.path.join(scene_dir, "room.png"))
 frame("room_off", os.path.join(scene_dir, "room_off.png"))
+frame("room_day", os.path.join(scene_dir, "room_day.png"))
+frame("room_day_off", os.path.join(scene_dir, "room_day_off.png"))
 frame("chair_front", os.path.join(scene_dir, "chair_front.png"), SEAT)
 pngio.write(os.path.join(scene_dir, "rain.png"), skin.sheet(skin.rain(CITY[2], CITY[3])))
 pngio.write(os.path.join(scene_dir, "music_panel.png"), skin.panel())
@@ -46,7 +48,7 @@ anchors = {"window-rect": window, "window-mask": window, "desk-seat": rect(*SEAT
 with open(os.path.join(scene_dir, "manifest.json"), "w") as f:
     json.dump(dict(id=SCENE.lower(), type="scene", artSet=ART_SET, packVersion=1, perspective=PERSPECTIVE,
                    canvas=dict(w=W, h=H), safe=dict(x=14, y=12, w=452, h=328), anchors=anchors, room="room.png",
-                   rooms={"night-off": "room_off.png", "day-off": "room_off.png"},
+                   rooms={"night-on": "room.png", "night-off": "room_off.png", "day-on": "room_day.png", "day-off": "room_day_off.png"},
                    foreground=[dict(image="chair_front.png", anchor="desk-seat")],
                    rain=dict(sheet="rain.png", frame=dict(w=CITY[2], h=CITY[3]), fps=8, anchor="window-rect"),
                    music=dict(panel="music_panel.png", frame=rect(*PANEL_AT, *skin.PANEL_SIZE),
@@ -60,7 +62,7 @@ with open(os.path.join(scene_dir, "manifest.json"), "w") as f:
                               "ArtLab/type-d-capsule/cut_layers.py; layers held in ArtLab/type-d-capsule/CapsuleDesk01.aseprite.",
                    source="ArtLab/type-d-capsule/CapsuleDesk01.aseprite"), f, indent=2)
 
-for name in ("CapsuleBoy", "CapsuleCat", "CapsuleCityNight"):
+for name in ("CapsuleBoy", "CapsuleCat", "CapsuleCity01"):
     aseprite_export.export(os.path.join(HERE, name + ".aseprite"), ASSETS)
 
 # The clock skin has no .aseprite source yet: reuse set A's under set D's perspective tag.

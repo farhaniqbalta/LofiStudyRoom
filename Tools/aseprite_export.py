@@ -5,7 +5,8 @@ Run: python3 Tools/aseprite_export.py ArtLab/aseprite/OrangeCatAse.aseprite [out
 Aseprite gives the sheet (one row, every frame, in order), the frame size and one animation per tag
 (frames = the tag's range, fps = 1000 / frame duration). Everything Aseprite cannot hold comes from the
 sidecar <Name>.pack.json next to the source: category, type, perspective, anchor, fallbackAnimation, provenance,
-and per-animation fields (routine, onTap, loop, safeExits, or explicit frames / fps, which win over the tag)."""
+and per-animation fields (routine, onTap, loop, safeExits, or explicit frames / fps, which win over the tag),
+and for scenery `phases` (day/night to animation)."""
 import json, os, subprocess, sys, tempfile
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
@@ -48,6 +49,7 @@ def export(source, out_root=None):
     if anchor is None: problems.append(f"unknown anchor '{side['anchor']}'")
     elif "w" in anchor and (anchor["w"], anchor["h"]) != (w, h): problems.append(f"canvas {w}x{h} is not the anchor's {anchor['w']}x{anchor['h']}")
     if side["fallbackAnimation"] not in animations: problems.append("fallbackAnimation is not a tag or sidecar animation")
+    problems += [f"phase '{p}' plays unknown animation '{a}'" for p, a in side.get("phases", {}).items() if a not in animations]
     for anim, a in animations.items():
         if not a.get("frames") or a.get("fps", 0) <= 0: problems.append(f"'{anim}' needs frames and one positive fps (uneven tag durations? set fps in the sidecar)")
         problems += [f"'{anim}' uses frame {i} of {len(frames)}" for i in a.get("frames", []) if not 0 <= i < len(frames)]
@@ -57,6 +59,7 @@ def export(source, out_root=None):
     with open(manifest_path, "w") as f:
         json.dump(dict(id=name.lower(), type=side["type"], packVersion=1, perspective=side["perspective"], anchor=side["anchor"],
                        sheet="sheet.png", frame=dict(w=w, h=h), animations=animations, fallbackAnimation=side["fallbackAnimation"],
+                       **({"phases": side["phases"]} if "phases" in side else {}),
                        provenance=side.get("provenance", ""), source=rel_source), f, indent=2)
     print(f"{folder}: {len(frames)} frames of {w}x{h}, animations: {', '.join(animations)}")
 

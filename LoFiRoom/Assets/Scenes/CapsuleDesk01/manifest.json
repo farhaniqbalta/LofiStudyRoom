@@ -60,8 +60,10 @@
   },
   "room": "room.png",
   "rooms": {
+    "night-on": "room.png",
     "night-off": "room_off.png",
-    "day-off": "room_off.png"
+    "day-on": "room_day.png",
+    "day-off": "room_day_off.png"
   },
   "foreground": [
     {
