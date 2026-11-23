@@ -72,3 +72,11 @@ The chair is drawn three-quarter, turned toward the desk. In the scene it is roo
 - **Boy** (`raw/boy-rest.png`): a good side-profile seated figure (headphones, hoodie, typing), but PixelLab drew a chair, desk, monitor, bottle and keyboard despite "only the boy". They are separate shapes, so they are removed by hand (the user's "removing is easier than generating"). His chair is side-on while the room's chair is three-quarter; fitting him to the room's chair is the next decision.
 - **City** (`raw/city-night.png`): fits the window very well at offset (2, 14): teal sky, amber windows, neon signs, train. Preview with the room: `build/art/d-room-city-3x.png`.
 - **Lamp off** (`raw/lamp-off-crop.png`): the lamp is off, but the edit also darkened the whole crop (plants, curtain, shelf), so pasting it as a block would leave a dark square. It is used only inside the lamp's glow area, blended at the edges.
+
+## Boy from the user's image (2026-11-24)
+
+The PixelLab boy (`raw/boy-rest.png`) was rejected. The user supplied `raw/boy-source-user.png` instead: room 3a re-rendered with a seated side-profile boy on a side-on chair, approved for use. Only the boy and his chair are taken from it; the room stays ours. Details and job ids in `prompts.md`.
+
+Pose tests (`edit_image_pixen` from the study crop, 3 generations): **drink** and **rest** are consistent with the study pose; **stretch** is not (he turned to face the camera). Retry stretch later with "keep the exact side profile facing left, only the arms rise above the head", or swap it for a smaller routine.
+
+Next: cut the boy and his chair into separate layers (chair behind, near armrest as a foreground piece), clean the edges in Aseprite, build the scene for `-artSet D`.
