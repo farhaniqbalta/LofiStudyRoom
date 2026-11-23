@@ -6,13 +6,15 @@
   "anchor": "pet-spot",
   "fallbackAnimation": "sleep",
   "animations": {
+    "sleep": {
+      "fps": 1
+    },
     "idle": {
       "frames": [
-        5,
-        6,
-        5
+        2,
+        0
       ],
-      "fps": 4,
+      "fps": 0.5,
       "loop": false,
       "routine": {
         "weight": 1,
@@ -21,15 +23,15 @@
     },
     "react": {
       "frames": [
-        7,
-        8,
-        7,
+        2,
+        2,
+        2,
         0
       ],
-      "fps": 4,
+      "fps": 2,
       "loop": false,
       "onTap": true
     }
   },
-  "provenance": "Copy of set A's ArtLab/type-a-lofi/OrangeCat.aseprite under set D's perspective. PixelLab create_image_pixen job 23ddd82d-29af-4643-8629-8d9adee3e747 (sleeping cat) with a breathing frame; ear-twitch frames (idle) and eyes-open frames (tap reaction) drawn in Aseprite through aseprite-mcp. Frames 3-5 are unused leftovers of the stand-in tail twitch and hop."
+  "provenance": "PixelLab create_image_pixen job 0e9c5471-99c6-4756-bdd3-812b35e0e67d (sleeping orange tabby, 32x32) and edit_image_pixen job c9ffdf94-5738-4441-9fdb-f6b7f074674a (awake); stray pixels removed, breathing frame and crop by cut_layers.py. Under PixelLab's Terms of Service."
 }

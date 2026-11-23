@@ -38,3 +38,11 @@ Room 3's prompt with two changes: the chair is "an empty office chair seen exact
 | `raw/boy-drink-crop.png` | lifts a coffee mug to his mouth | `3a578091-a711-4eef-bfa1-c45fc50b3b08` | 17 | consistent |
 | `raw/boy-stretch-crop.png` | both arms straight up, eyes closed | `1ca07d59-9356-4be6-beb4-b82c72c3eae3` | 72 | **not consistent**: turned to face the camera; retry later |
 | `raw/boy-rest-crop.png` | arms folded on the desk, head down | `53fc1b98-e7c3-40d0-af09-e78b7e7b9d16` | 24 | consistent |
+
+## Stretch retry and cat — 2026-11-24 (4 generations)
+
+| File | Tool | Job | Result |
+|---|---|---|---|
+| `raw/boy-stretch2-crop.png` | `edit_image_pixen` on `boy-study-crop.png`, seed 11: "Keep the exact side profile facing left ... only his arms change: he stretches both arms straight up above his head ... Do not turn him toward the camera." | `ccc75fe0-cf56-4fda-8a20-9066bc3c7cde` | **Rejected**: turned to face the camera again, new shoes and chair (drift 47) |
+| `raw/cat-sleep.png` 32×32 | `create_image_pixen`, `no_background`, `view: side`, `direction: west`, black outline: orange tabby curled asleep, amber key light, teal rim | `0e9c5471-99c6-4756-bdd3-812b35e0e67d` | used |
+| `raw/cat-awake.png` 32×32 | `edit_image_pixen` on the sleeping cat, seed 5: same pose, eyes open, head lifted | `c9ffdf94-5738-4441-9fdb-f6b7f074674a` | used as the tap reaction (face turns a little toward the viewer) |

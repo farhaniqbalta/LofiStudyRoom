@@ -100,9 +100,15 @@ An automatic cut by difference doesn't work: the user's image is a re-render, so
 
 ## Open for set D
 
-1. Stretch pose: retry with "keep the exact side profile facing left, only the arms rise above the head" (1 generation), then cut it (1).
-2. The cat is set A's, drawn for another light; a teal-lit recolour would fit better.
+1. Stretch pose: two PixelLab tries failed (both turned him front-on); needs hand drawing or a different routine.
+2. ~~The cat is set A's~~: replaced by a cat drawn for this room (2026-11-24).
 3. No rain sheet, day room, day city or music skin yet (rain and skin can be drawn by script in the room's palette, free).
 4. Study is one frame: a 1 px head-bob or typing frame would make it breathe.
 5. Lamp-off fade on the desk could be smoothed in Aseprite.
 6. Girl character: same method (supplied image or PixelLab), not started.
+
+## Stretch retry and a cat for this room (2026-11-24, 4 generations)
+
+- **Stretch, second try: rejected.** Even with "keep the exact side profile, do not turn him toward the camera", `edit_image_pixen` turned him front-on (legs and chair drift 47, noise about 20). Two tries, same failure: this tool doesn't raise both arms in profile. Options: draw the arms by hand in Aseprite from the study frame, pick a profile-safe routine instead (head tilt back, neck roll, sip already exists), or try the pricier `edit_image` (10+ generations).
+- **Cat:** a new orange tabby drawn for this room's light (amber key, teal rim), 24×20, replacing set A's copy. `cut_layers.py` keeps only its main shape (drops stray specks) and adds a breathing frame. Animations: `sleep` (2-frame breath, 1 fps), `idle` (a short peek, routine), `react` (awake face on tap). It sits on the desk front in front of the plant (`pet-spot` 116, top 258).
+- `Executed 133 tests, with 0 failures` on the iPad after the change.

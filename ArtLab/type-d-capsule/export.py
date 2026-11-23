@@ -28,7 +28,7 @@ os.makedirs(scene_dir, exist_ok=True)
 frame("room", os.path.join(scene_dir, "room.png"))
 frame("room_off", os.path.join(scene_dir, "room_off.png"))
 frame("chair_front", os.path.join(scene_dir, "chair_front.png"), SEAT)
-pet, window = rect(104, 254, 37, 28), rect(*CITY)
+pet, window = rect(116, 258, 24, 20), rect(*CITY)
 anchors = {"window-rect": window, "window-mask": window, "desk-seat": rect(*SEAT), "pet-spot": pet,
            "clock-slot": rect(216, 207, 23, 15), "lamp": dict(x=262, y=H - 185), "computer": dict(x=200, y=H - 220)}
 with open(os.path.join(scene_dir, "manifest.json"), "w") as f:

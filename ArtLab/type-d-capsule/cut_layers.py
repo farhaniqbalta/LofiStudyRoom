@@ -166,6 +166,36 @@ CITY = (14, 14, 220, 224)        # x, top, w, h in the room
 city_src = pngio.read(os.path.join(RAW, "city-night.png"))   # 232x224, drawn for the window from x 2
 city = [row[CITY[0] - 2:CITY[0] - 2 + CITY[2]] for row in city_src]
 
+# The cat: PixelLab sleeping and awake sprites (32x32). Keep only the largest connected shape (drops stray specks),
+# crop both to one box, and add a breathing frame (the upper body one row higher).
+def main_shape(img):
+    n, best = len(img), set()
+    seen = set()
+    for y0 in range(n):
+        for x0 in range(n):
+            if img[y0][x0][3] > 127 and (x0, y0) not in seen:
+                part, stack = set(), [(x0, y0)]
+                while stack:
+                    x, y = stack.pop()
+                    if (x, y) in seen or not (0 <= x < n and 0 <= y < n) or img[y][x][3] <= 127:
+                        continue
+                    seen.add((x, y)); part.add((x, y))
+                    stack += [(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)]
+                best = max(best, part, key=len)
+    return [[(*img[y][x][:3], 255) if (x, y) in best else CLEAR for x in range(n)] for y in range(n)]
+cats = [main_shape(pngio.read(os.path.join(RAW, f))) for f in ("cat-sleep.png", "cat-awake.png")]
+pts = [(x, y) for c in cats for y, row in enumerate(c) for x, p in enumerate(row) if p[3]]
+cx0, cy0 = min(x for x, _ in pts), min(y for _, y in pts) - 1          # one spare row on top for the breath
+cx1, cy1 = max(x for x, _ in pts) + 1, max(y for _, y in pts) + 1
+sleep, awake = ([row[cx0:cx1] for row in c[cy0:cy1]] for c in cats)
+mid = len(sleep) // 2 + 2
+breath = [list(r) for r in sleep[1:mid]] + [list(sleep[mid - 1])] + [list(r) for r in sleep[mid:]]
+assert len(breath) == len(sleep)
+os.makedirs(OUT, exist_ok=True)
+for name, img in (("cat-sleep", sleep), ("cat-breath", breath), ("cat-awake", awake)):
+    pngio.write(os.path.join(OUT, name + ".png"), img)
+print("cat frame", cx1 - cx0, "x", cy1 - cy0)
+
 os.makedirs(OUT, exist_ok=True)
 pngio.write(os.path.join(OUT, "room-off.png"), room_off)
 pngio.write(os.path.join(OUT, "room.png"), room)
