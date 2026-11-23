@@ -1,0 +1,23 @@
+{
+  "id": "capsulecitynight",
+  "type": "scenery",
+  "packVersion": 1,
+  "perspective": "capsule-desk-side-v1",
+  "anchor": "window-rect",
+  "sheet": "sheet.png",
+  "frame": {
+    "w": 220,
+    "h": 224
+  },
+  "animations": {
+    "night": {
+      "frames": [
+        0
+      ],
+      "fps": 10.0
+    }
+  },
+  "fallbackAnimation": "night",
+  "provenance": "PixelLab create_image_pixen job 3e194c73-a2e5-447d-884f-1b2ae4d2a128, left 12 columns cropped to the safe area.",
+  "source": "ArtLab/type-d-capsule/CapsuleCityNight.aseprite"
+}

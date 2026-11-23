@@ -1,8 +1,8 @@
 # Art set D — room exploration
 
-**Status:** Room 3a chosen; the user's chair-free edit and separate chair are in and cut into layers (2026-11-21). Next: character rest pose, city, lamp off. Nothing is in the app yet.
+**Status:** First pass runs on the iPad with `-artSet D` (2026-11-24). 133 tests pass. Not the default.
 **Plan:** [`docs/plans/2026-11-17-art-set-d.md`](../plans/2026-11-17-art-set-d.md)
-**Sources:** `ArtLab/type-d-violetdesk/raw/room-1.png` … `room-5.png`; prompts and job ids in `ArtLab/type-d-violetdesk/prompts.md`.
+**Sources:** `ArtLab/type-d-capsule/raw/room-1.png` … `room-5.png`; prompts and job ids in `ArtLab/type-d-capsule/prompts.md`.
 
 ## Decisions so far (user, 2026-11-17)
 
@@ -10,7 +10,7 @@
 - Character: generate the full seated body and cut it ourselves.
 - **Room 3 chosen**, then **variant 3a** (2026-11-20). The user edits out the chair by hand instead of spending generations on more rooms.
 - **Keep every generated room** (`room-1` … `room-5`, `room-3a/b/c`) in `raw/`; none are deleted.
-- The names `VioletDesk01` / `violet-*` are placeholders until a room is chosen.
+- Names (2026-11-24): scene `CapsuleDesk01`, perspective `capsule-desk-side-v1`, packs `Capsule*`; sources in `ArtLab/type-d-capsule/`.
 
 ## Room options (5 generations, 2026-11-17)
 
@@ -47,15 +47,15 @@ What we learned: pixen ignores "seen exactly from the side" in this layout and s
 
 **Decided (user): room 3 (2026-11-17), then variant 3a (2026-11-20), edited by the user.** No more room generations. The user removes the chair from room 3 by hand and supplies it as a separate asset. Handoff format:
 
-- `ArtLab/type-d-violetdesk/raw/room-3a-nochair.png`: room 3a (480×352) with the chair painted out (wall, desk legs and floor filled in behind it).
-- `ArtLab/type-d-violetdesk/raw/chair.png`: the chair alone on transparency, in the same 480×352 canvas and the same position, so it lines up with no offsets. Side-on if possible, so a profile character works.
+- `ArtLab/type-d-capsule/raw/room-3a-nochair.png`: room 3a (480×352) with the chair painted out (wall, desk legs and floor filled in behind it).
+- `ArtLab/type-d-capsule/raw/chair.png`: the chair alone on transparency, in the same 480×352 canvas and the same position, so it lines up with no offsets. Side-on if possible, so a profile character works.
 - Optional: glass glare and moon painted out, or left in; the window is keyed by polygon either way.
 
 With a separate chair the layering is chosen per pose: the chair back sits behind the body (room layer), and any part in front of it (near armrest, seat edge) becomes a foreground piece cut from `chair.png`. After that comes plan Task 2: character rest pose, city, lamp off. The names are renamed from `Violet*` at that point.
 
 ## The user's edit (2026-11-21)
 
-`raw/room-3a-nochair.png` and `raw/chair.png`, both 480×352. The editor re-rendered the whole picture (71 colours became about 50,000, slightly soft), so `python3 ArtLab/type-d-violetdesk/cut_layers.py` builds clean layers in `layers/` (git-ignored) and leaves the user's files untouched:
+`raw/room-3a-nochair.png` and `raw/chair.png`, both 480×352. The editor re-rendered the whole picture (71 colours became about 50,000, slightly soft), so `python3 ArtLab/type-d-capsule/cut_layers.py` builds clean layers in `layers/` (git-ignored) and leaves the user's files untouched:
 
 - `layers/room.png`: the original PixelLab pixels everywhere, except the area the user painted (chair, its floor shadow, relit floor), which takes the user's fill snapped to the original 71-colour palette. The area is the connected patch of real changes touching the chair.
 - `layers/chair.png`: the original pixels under the user's chair mask, hard alpha.
@@ -88,3 +88,21 @@ Next: cut the boy and his chair into separate layers (chair behind, near armrest
 ## Cutting out the boy: blocked
 
 An automatic cut by difference doesn't work: the user's image is a re-render, so its background differs from our room everywhere, and the dark trousers and chair match the dark floor. Hand-tracing each pose at 160×200 is unreliable. PixelLab `remove_background` (1 generation per image) was refused by the session's permission check. Options for the user: allow it, or cut the boy and his chair by hand as was done for the room chair.
+
+## Boy cut out, scene built (2026-11-24, 3 generations)
+
+- PixelLab `remove_background` on the study, drink and rest crops (jobs in the boy's sidecar). It kept his chair with him, but removed the room cleanly.
+- `cut_layers.py` splits the chair off: the chair back (right of a slanted line behind his back), the seat and base, and the armrest go into the room picture; the armrest and its post also go into `chair_front.png`, a foreground piece, so they cross his hip. The rest is the boy: three 132×181 frames at `desk-seat` (206, top 157).
+- `make_source.lua` built `CapsuleDesk01.aseprite` (frames room, room_off, chair_front), `CapsuleBoy.aseprite` (study, drink, rest) and `CapsuleCityNight.aseprite` once from `layers/`; `CapsuleCat.aseprite` is set A's orange cat. Edit these from now on; `export.py` writes the scene and packs.
+- The city frame starts at x 14 (the safe area), so its left 12 columns are cropped and the glass left of x 14 keeps the room's own pixels.
+- Routines: drink and rest with set A's timings. No stretch yet.
+- Checks: `testArtSetDRunsTheEngineUnchanged`; `Executed 133 tests, with 0 failures` on the iPad; launched with `-artSet D -time night -weather clear -lamp on`, screenshot `build/shots/d-ipad.png`.
+
+## Open for set D
+
+1. Stretch pose: retry with "keep the exact side profile facing left, only the arms rise above the head" (1 generation), then cut it (1).
+2. The cat is set A's, drawn for another light; a teal-lit recolour would fit better.
+3. No rain sheet, day room, day city or music skin yet (rain and skin can be drawn by script in the room's palette, free).
+4. Study is one frame: a 1 px head-bob or typing frame would make it breathe.
+5. Lamp-off fade on the desk could be smoothed in Aseprite.
+6. Girl character: same method (supplied image or PixelLab), not started.

@@ -1,0 +1,9 @@
+{
+  "category": "Scenery",
+  "type": "scenery",
+  "scene": "CapsuleDesk01",
+  "perspective": "capsule-desk-side-v1",
+  "anchor": "window-rect",
+  "fallbackAnimation": "night",
+  "provenance": "PixelLab create_image_pixen job 3e194c73-a2e5-447d-884f-1b2ae4d2a128, left 12 columns cropped to the safe area."
+}

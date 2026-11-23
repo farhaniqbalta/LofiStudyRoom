@@ -8,6 +8,7 @@ An **art set** is one complete look for the room: a scene plus the characters, p
 |---|---|---|---|---|---|---|---|
 | **A** | Lo-fi room (three-quarter view from behind) | **Active.** PixelLab art with drawn poses; day rooms and day cities still stand-ins | `StudyRoom01` | `study-room-back-3q-v1` | `ArtSource/`, `ArtLab/type-a-lofi/` (cats) | `python3 Tools/build_art.py` (needs Aseprite) | [M1](logs/M1.md), [engine-first](logs/M2-engine.md), [sprite pass](logs/art-A-lofi.md) |
 | **B** | Cyberpunk side desk | Experimental spike, saved. Closer to the reference board; not cleaned up | `CyberDesk01` | `cyber-desk-side-v1` | `ArtLab/type-b-cyberdesk/` | `python3 ArtLab/type-b-cyberdesk/export.py` | [art-B](logs/art-B-cyberdesk.md) |
+| **D** | Capsule desk (cozy cyberpunk, side profile) | First pass, runs with `-artSet D`; not the default | `CapsuleDesk01` | `capsule-desk-side-v1` | `ArtLab/type-d-capsule/` | `python3 ArtLab/type-d-capsule/cut_layers.py` (needs the git-ignored `layers/` only to rebuild sources), then `python3 ArtLab/type-d-capsule/export.py` | [art-D](logs/art-D-capsule.md) |
 
 What each set contains (folders under `LoFiRoom/Assets/`):
 
@@ -15,10 +16,11 @@ What each set contains (folders under `LoFiRoom/Assets/`):
 |---|---|---|---|---|---|
 | A | `Boy01`, `Girl01` | `OrangeCat`, `BlackCat` | `NeonCity01`, `NeonCity02` | `RetroDigital01` | Routines, tap reaction, rain, day/night, lamp on/off, hotspots, music skin (wall player and floating notes) |
 | B | `CyberBoy` | `CyberCat` (A's orange cat reused) | `CyberCity01` | `CyberClock` (A's clock reused) | Hotspots only. No routines for the character, no rain, day or lamp-off art, no music skin (falls back to the plain card) |
+| D | `CapsuleBoy` (study, drink, rest) | `CapsuleCat` (A's orange cat reused) | `CapsuleCityNight` | `CapsuleClock` (A's clock reused) | Hotspots, lamp-off room, chair armrest in front of the boy. No stretch pose yet, no rain, day art or music skin |
 
 ## How to switch
 
-- **For one launch:** add the launch argument `-artSet B` (or `-artSet A`).
+- **For one launch:** add the launch argument `-artSet B`, `-artSet D` (or `-artSet A`).
 - **As the default:** change `"active"` in `LoFiRoom/Assets/art-sets.json`, then rebuild. This is the only place the default is decided.
 - **To check which set a scene belongs to:** its `manifest.json` has `"artSet"`.
 
@@ -29,7 +31,8 @@ What each set contains (folders under `LoFiRoom/Assets/`):
   "active": "A",
   "sets": {
     "A": { "name": "Lo-fi room (three-quarter view from behind)", "scene": "StudyRoom01" },
-    "B": { "name": "Cyberpunk side desk (experimental)", "scene": "CyberDesk01" }
+    "B": { "name": "Cyberpunk side desk (experimental)", "scene": "CyberDesk01" },
+    "D": { "name": "Capsule desk (cozy cyberpunk, side profile)", "scene": "CapsuleDesk01" }
   }
 }
 ```

@@ -1,0 +1,96 @@
+{
+  "id": "capsuledesk01",
+  "type": "scene",
+  "artSet": "D",
+  "packVersion": 1,
+  "perspective": "capsule-desk-side-v1",
+  "canvas": {
+    "w": 480,
+    "h": 352
+  },
+  "safe": {
+    "x": 14,
+    "y": 12,
+    "w": 452,
+    "h": 328
+  },
+  "anchors": {
+    "window-rect": {
+      "x": 14,
+      "y": 114,
+      "w": 220,
+      "h": 224
+    },
+    "window-mask": {
+      "x": 14,
+      "y": 114,
+      "w": 220,
+      "h": 224
+    },
+    "desk-seat": {
+      "x": 206,
+      "y": 14,
+      "w": 132,
+      "h": 181
+    },
+    "pet-spot": {
+      "x": 104,
+      "y": 70,
+      "w": 37,
+      "h": 28
+    },
+    "clock-slot": {
+      "x": 216,
+      "y": 130,
+      "w": 23,
+      "h": 15
+    },
+    "lamp": {
+      "x": 262,
+      "y": 167
+    },
+    "computer": {
+      "x": 200,
+      "y": 132
+    }
+  },
+  "room": "room.png",
+  "rooms": {
+    "night-off": "room_off.png",
+    "day-off": "room_off.png"
+  },
+  "foreground": [
+    {
+      "image": "chair_front.png",
+      "anchor": "desk-seat"
+    }
+  ],
+  "hotspots": {
+    "pet": {
+      "x": 104,
+      "y": 70,
+      "w": 37,
+      "h": 28
+    },
+    "window": {
+      "x": 14,
+      "y": 114,
+      "w": 220,
+      "h": 224
+    },
+    "lamp": {
+      "x": 238,
+      "y": 132,
+      "w": 48,
+      "h": 60
+    },
+    "computer": {
+      "x": 163,
+      "y": 105,
+      "w": 75,
+      "h": 52
+    }
+  },
+  "provenance": "Art set D, first pass. Room: PixelLab create_image_pixen job 50537b9f-f1dc-4160-a134-397bc933d340 (room 3a), chair painted out by the user, glass keyed out, the user's boy image's chair added and lamp-off from edit_image_pixen job 65b3e775-34f4-429d-94d5-f31c6c97d965, all by ArtLab/type-d-capsule/cut_layers.py; layers held in ArtLab/type-d-capsule/CapsuleDesk01.aseprite.",
+  "source": "ArtLab/type-d-capsule/CapsuleDesk01.aseprite"
+}

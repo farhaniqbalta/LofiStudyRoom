@@ -1,0 +1,35 @@
+{
+  "category": "Pets",
+  "type": "pet",
+  "scene": "CapsuleDesk01",
+  "perspective": "capsule-desk-side-v1",
+  "anchor": "pet-spot",
+  "fallbackAnimation": "sleep",
+  "animations": {
+    "idle": {
+      "frames": [
+        5,
+        6,
+        5
+      ],
+      "fps": 4,
+      "loop": false,
+      "routine": {
+        "weight": 1,
+        "cooldown": 120
+      }
+    },
+    "react": {
+      "frames": [
+        7,
+        8,
+        7,
+        0
+      ],
+      "fps": 4,
+      "loop": false,
+      "onTap": true
+    }
+  },
+  "provenance": "Copy of set A's ArtLab/type-a-lofi/OrangeCat.aseprite under set D's perspective. PixelLab create_image_pixen job 23ddd82d-29af-4643-8629-8d9adee3e747 (sleeping cat) with a breathing frame; ear-twitch frames (idle) and eyes-open frames (tap reaction) drawn in Aseprite through aseprite-mcp. Frames 3-5 are unused leftovers of the stand-in tail twitch and hop."
+}

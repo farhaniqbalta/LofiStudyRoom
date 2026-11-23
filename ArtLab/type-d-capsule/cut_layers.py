@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Art set D: turns the user's hand edit of room 3a into clean layer PNGs (stdlib only).
-Run from the repo root: python3 ArtLab/type-d-violetdesk/cut_layers.py
+Run from the repo root: python3 ArtLab/type-d-capsule/cut_layers.py
 
 The edited file (raw/room-3a-nochair.png) came back re-rendered: ~50,000 colours instead of 71, slightly soft.
 So the clean room keeps the original PixelLab pixels everywhere except where the chair was, and there uses the
@@ -57,7 +57,7 @@ assert {p[3] for row in chair for p in row} <= {0, 255}
 # Window glass: the drawn city is removed so the scenery pack shows through (layering rule: room glass is transparent).
 # Inside each pane polygon, sky, building and window-light colours go; then leftover specks (building outlines) that are
 # not part of a larger object (curtain, plant, cords) go too. The laptop's box is kept whole.
-PANES = [[(4, 15), (92, 33), (92, 238), (4, 238)],          # left, its left edge is the curtain (kept by colour)
+PANES = [[(14, 17), (92, 33), (92, 238), (14, 238)],        # left; starts at the safe area's x 14, where the city starts
          [(104, 38), (186, 60), (186, 238), (104, 238)],    # middle
          [(193, 62), (232, 70), (232, 206), (193, 206)]]    # right, its right edge is the curtain
 KEEP_BOX = (163, 196, 207, 238)                             # laptop: x0, top, x1, bottom
@@ -132,8 +132,53 @@ for y in range(LAMP_CROP[1], LAMP_CROP[1] + len(off_crop)):
             room_off[y][x] = lit_to_off[room[y][x]]
 assert sum(a != b for ra, rb in zip(room, room_off) for a, b in zip(ra, rb)) > 3000, "the lamp area should change"
 
+# The boy and his chair, from the user's image cut out by PixelLab (raw/boy-<pose>-cut.png, 160x200, top-left at
+# CUT_AT in the room). The chair is furniture, so it goes into the room picture; its near armrest and post cross the
+# boy's hip, so they also become a foreground piece. What is left is the boy, one frame per pose.
+CUT_AT = (200, 150)
+POSES = ["study", "drink", "rest"]
+def chair_part(x, y):            # crop coordinates
+    back = 58 <= y < 127 and x >= 126 - (y - 58) * 12 / 60   # behind his back, front edge slanting 126 -> 114
+    seat_base = y >= 127 and x >= 52                         # under his thighs, right of his calves
+    return back or seat_base or armrest(x, y)
+def armrest(x, y):
+    return (66 <= x < 114 and 101 <= y < 111) or (89 <= x < 98 and 111 <= y < 127)
+cuts = {p: pngio.read(os.path.join(RAW, f"boy-{p}-cut.png")) for p in POSES}
+CW, CH = len(cuts["study"][0]), len(cuts["study"])
+ax, ay = CUT_AT
+chair_px = {(x, y): (*snap(cuts["study"][y][x][:3]), 255) for y in range(CH) for x in range(CW)
+            if cuts["study"][y][x][3] > 127 and chair_part(x, y)}
+for r in (room, room_off):
+    for (x, y), p in chair_px.items():
+        r[ay + y][ax + x] = p
+boy = {p: [[(*snap(c[y][x][:3]), 255) if c[y][x][3] > 127 and not chair_part(x, y) else CLEAR for x in range(CW)] for y in range(CH)]
+       for p, c in cuts.items()}
+opaque = [(x, y) for b in boy.values() for y in range(CH) for x in range(CW) if b[y][x][3]]
+bx0, by0 = min(x for x, _ in opaque), min(y for _, y in opaque)
+bx1, by1 = max(x for x, _ in opaque) + 1, max(y for _, y in opaque) + 1
+SEAT = (ax + bx0, ay + by0, bx1 - bx0, by1 - by0)          # x, top, w, h in the room: the character frame
+front = [[chair_px.get((x, y), CLEAR) if armrest(x, y) else CLEAR for x in range(bx0, bx1)] for y in range(by0, by1)]
+assert sum(p[3] > 0 for row in front for p in row) > 100, "the armrest should be in the foreground piece"
+assert all(sum(p[3] > 0 for row in b for p in row) > 3000 for b in boy.values()), "each pose should keep the boy"
+
+# The city frame starts at the safe area (x 14): the glass left of it keeps the original room pixels.
+CITY = (14, 14, 220, 224)        # x, top, w, h in the room
+city_src = pngio.read(os.path.join(RAW, "city-night.png"))   # 232x224, drawn for the window from x 2
+city = [row[CITY[0] - 2:CITY[0] - 2 + CITY[2]] for row in city_src]
+
 os.makedirs(OUT, exist_ok=True)
 pngio.write(os.path.join(OUT, "room-off.png"), room_off)
 pngio.write(os.path.join(OUT, "room.png"), room)
 pngio.write(os.path.join(OUT, "chair.png"), chair)
+# Full canvas, so the scene source holds every room layer at one size; export.py crops it to the seat.
+pngio.write(os.path.join(OUT, "chair_front.png"),
+            [[front[y - SEAT[1]][x - SEAT[0]] if SEAT[0] <= x < SEAT[0] + SEAT[2] and SEAT[1] <= y < SEAT[1] + SEAT[3] else CLEAR
+              for x in range(W)] for y in range(H)])
+pngio.write(os.path.join(OUT, "city-night.png"), city)
+for p, b in boy.items():
+    pngio.write(os.path.join(OUT, f"boy-{p}.png"), [row[bx0:bx1] for row in b[by0:by1]])
+with open(os.path.join(OUT, "geometry.json"), "w") as f:
+    import json
+    json.dump(dict(seat=SEAT, city=CITY), f)
+print("seat", SEAT, "city", CITY)
 print("room.png and chair.png written to", OUT, "| filled px:", sum(map(sum, near)), "| chair px:", sum(map(sum, mask)))

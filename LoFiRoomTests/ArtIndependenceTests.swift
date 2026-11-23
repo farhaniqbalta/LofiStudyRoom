@@ -90,6 +90,21 @@ final class ArtIndependenceTests: XCTestCase {
         XCTAssertEqual(coordinator.config.character, "CyberBoy", "the saved Type A name falls back to Type B's character")
     }
 
+    func testArtSetDRunsTheEngineUnchanged() throws {
+        let repository = try SpriteAssetRepository(artSet: "D")
+        XCTAssertEqual(repository.scene.id, "capsuledesk01")
+        XCTAssertEqual(repository.folders(in: "Characters"), ["CapsuleBoy"])
+        XCTAssertEqual(repository.folders(in: "Pets"), ["CapsuleCat"])
+        XCTAssertEqual(repository.folders(in: "Scenery"), ["CapsuleCityNight"])
+        XCTAssertEqual(repository.folders(in: "Clocks"), ["CapsuleClock"])
+        let scene = try LoFiSKScene(repository: repository, showAnchors: false)
+        let coordinator = SceneCoordinator(repository: repository, store: RoomStateStore(defaults: defaults), scene: scene)
+        coordinator.start(clockDriver: ClockDriver { scene.clock.show($0) })
+        XCTAssertEqual(scene.character.pack?.manifest.id, "capsuleboy")
+        XCTAssertEqual(scene.character.currentAnimation, "study")
+        XCTAssertEqual(coordinator.config.character, "CapsuleBoy", "a name from another set falls back to Type D's character")
+    }
+
     func testRestingAnimationComesFromTheManifest() throws {
         let repository = try SpriteAssetRepository()
         let scene = try LoFiSKScene(repository: repository, showAnchors: false)
