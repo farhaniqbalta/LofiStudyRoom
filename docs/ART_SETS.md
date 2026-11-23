@@ -16,7 +16,7 @@ What each set contains (folders under `LoFiRoom/Assets/`):
 |---|---|---|---|---|---|
 | A | `Boy01`, `Girl01` | `OrangeCat`, `BlackCat` | `NeonCity01`, `NeonCity02` | `RetroDigital01` | Routines, tap reaction, rain, day/night, lamp on/off, hotspots, music skin (wall player and floating notes) |
 | B | `CyberBoy` | `CyberCat` (A's orange cat reused) | `CyberCity01` | `CyberClock` (A's clock reused) | Hotspots only. No routines for the character, no rain, day or lamp-off art, no music skin (falls back to the plain card) |
-| D | `CapsuleBoy` (study, drink, rest) | `CapsuleCat` (drawn for this room) | `CapsuleCityNight` | `CapsuleClock` (A's clock reused) | Hotspots, lamp-off room, chair armrest in front of the boy. No stretch pose yet, no rain, day art or music skin |
+| D | `CapsuleBoy` (study, drink, rest, lean) | `CapsuleCat` (drawn for this room) | `CapsuleCityNight` | `CapsuleClock` (A's clock reused) | Hotspots, lamp-off room, chair armrest in front of the boy. No rain, day art or music skin |
 
 ## How to switch
 

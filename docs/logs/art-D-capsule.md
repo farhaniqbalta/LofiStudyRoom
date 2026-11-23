@@ -100,7 +100,7 @@ An automatic cut by difference doesn't work: the user's image is a re-render, so
 
 ## Open for set D
 
-1. Stretch pose: two PixelLab tries failed (both turned him front-on); needs hand drawing or a different routine.
+1. ~~Stretch~~: replaced by a lean-back routine (2026-11-24).
 2. ~~The cat is set A's~~: replaced by a cat drawn for this room (2026-11-24).
 3. No rain sheet, day room, day city or music skin yet (rain and skin can be drawn by script in the room's palette, free).
 4. Study is one frame: a 1 px head-bob or typing frame would make it breathe.
@@ -112,3 +112,9 @@ An automatic cut by difference doesn't work: the user's image is a re-render, so
 - **Stretch, second try: rejected.** Even with "keep the exact side profile, do not turn him toward the camera", `edit_image_pixen` turned him front-on (legs and chair drift 47, noise about 20). Two tries, same failure: this tool doesn't raise both arms in profile. Options: draw the arms by hand in Aseprite from the study frame, pick a profile-safe routine instead (head tilt back, neck roll, sip already exists), or try the pricier `edit_image` (10+ generations).
 - **Cat:** a new orange tabby drawn for this room's light (amber key, teal rim), 24×20, replacing set A's copy. `cut_layers.py` keeps only its main shape (drops stray specks) and adds a breathing frame. Animations: `sleep` (2-frame breath, 1 fps), `idle` (a short peek, routine), `react` (awake face on tap). It sits on the desk front in front of the plant (`pet-spot` 116, top 258).
 - `Executed 133 tests, with 0 failures` on the iPad after the change.
+
+## Lean-back routine and a sharper boy (2026-11-24, 2.1 generations)
+
+- **Lean** replaces stretch: leaning back, head tilted up, hands on his lap. He stays in profile (drift 12). Routine weight 1, cooldown 900 s, 3 s long, like set A's stretch. The armrest (foreground) passes in front of his hand.
+- **Sharpness** (the user: "the boy is not that sharp"): the source image is high-resolution art that was scaled down with blending. PixelLab `correct_pixelart` barely helped. Shrinking the original by majority colour per 3×3 block instead gives dark outlines and clear eyes and hands, so the study frame and the chair now come from that (free). Drink, rest and lean were generated from the soft crop and stay softer; regenerating them from the sharp crop would cost about 6 generations (3 edits, 3 cut-outs).
+- `Executed 133 tests, with 0 failures` on the iPad.

@@ -6,7 +6,7 @@
   "anchor": "desk-seat",
   "sheet": "sheet.png",
   "frame": {
-    "w": 132,
+    "w": 141,
     "h": 181
   },
   "animations": {
@@ -39,9 +39,21 @@
         "weight": 2,
         "cooldown": 600
       }
+    },
+    "lean": {
+      "frames": [
+        3
+      ],
+      "fps": 0.3333333333333333,
+      "loop": false,
+      "safeExits": [],
+      "routine": {
+        "weight": 1,
+        "cooldown": 900
+      }
     }
   },
   "fallbackAnimation": "study",
-  "provenance": "Boy and chair from the user's image raw/boy-source-user.png (supplied by the user, approved for use), scaled to the room and snapped to room 3a's palette; drink and rest poses by PixelLab edit_image_pixen (jobs 3a578091-a711-4eef-bfa1-c45fc50b3b08, 53fc1b98-e7c3-40d0-af09-e78b7e7b9d16); backgrounds removed by PixelLab remove_background (jobs 21a109e6-446a-43b7-8747-6002180872ea, e454d585-cccc-4cf7-a6c2-1bff8f0037c6, 82197235-16cf-4e82-85f2-ed9d6f0b2550); chair split off by cut_layers.py. Under PixelLab's Terms of Service.",
+  "provenance": "Boy and chair from the user's image raw/boy-source-user.png (supplied by the user, approved for use), scaled to the room and snapped to room 3a's palette; study frame re-shrunk from the full-size image by majority colour; drink, rest and lean poses by PixelLab edit_image_pixen (jobs 3a578091-a711-4eef-bfa1-c45fc50b3b08, 53fc1b98-e7c3-40d0-af09-e78b7e7b9d16, 25c2abd0-fe2f-439b-84ae-48f70142d748); backgrounds removed by PixelLab remove_background (jobs 21a109e6-446a-43b7-8747-6002180872ea, e454d585-cccc-4cf7-a6c2-1bff8f0037c6, 82197235-16cf-4e82-85f2-ed9d6f0b2550, 80d48a35-6469-441f-ab7e-0bd49c277c24); chair split off by cut_layers.py. Under PixelLab's Terms of Service.",
   "source": "ArtLab/type-d-capsule/CapsuleBoy.aseprite"
 }

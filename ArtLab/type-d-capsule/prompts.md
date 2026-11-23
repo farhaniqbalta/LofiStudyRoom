@@ -46,3 +46,12 @@ Room 3's prompt with two changes: the chair is "an empty office chair seen exact
 | `raw/boy-stretch2-crop.png` | `edit_image_pixen` on `boy-study-crop.png`, seed 11: "Keep the exact side profile facing left ... only his arms change: he stretches both arms straight up above his head ... Do not turn him toward the camera." | `ccc75fe0-cf56-4fda-8a20-9066bc3c7cde` | **Rejected**: turned to face the camera again, new shoes and chair (drift 47) |
 | `raw/cat-sleep.png` 32×32 | `create_image_pixen`, `no_background`, `view: side`, `direction: west`, black outline: orange tabby curled asleep, amber key light, teal rim | `0e9c5471-99c6-4756-bdd3-812b35e0e67d` | used |
 | `raw/cat-awake.png` 32×32 | `edit_image_pixen` on the sleeping cat, seed 5: same pose, eyes open, head lifted | `c9ffdf94-5738-4441-9fdb-f6b7f074674a` | used as the tap reaction (face turns a little toward the viewer) |
+
+## Lean-back routine and sharpening — 2026-11-24 (2.1 generations)
+
+| File | Tool | Job | Result |
+|---|---|---|---|
+| `raw/boy-lean-crop.png` | `edit_image_pixen` on `boy-study-crop.png`, seed 13: "Keep the exact side profile facing left ... he leans back against the chair back, head tilted back looking up at the ceiling, eyes closed, both hands resting on his lap. Do not turn him toward the camera." | `25c2abd0-fe2f-439b-84ae-48f70142d748` | used (legs+chair drift 12) |
+| `raw/boy-lean-cut.png` | `remove_background`, complex | `80d48a35-6469-441f-ab7e-0bd49c277c24` | used |
+| `raw/boy-sharp-0..3.png` | `correct_pixelart`, strength 0.25, on the four boy frames | `bd24f30d-8c05-4d24-9984-3fa77350796c` | not used: barely changed, added ~3,000 near-duplicate colours |
+| `raw/boy-study-crop-sharp.png` | none (free): the user's full-size image shrunk by majority colour per block, snapped to room 3a's palette | — | used for the study frame and the chair |

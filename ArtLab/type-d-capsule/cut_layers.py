@@ -136,7 +136,7 @@ assert sum(a != b for ra, rb in zip(room, room_off) for a, b in zip(ra, rb)) > 3
 # CUT_AT in the room). The chair is furniture, so it goes into the room picture; its near armrest and post cross the
 # boy's hip, so they also become a foreground piece. What is left is the boy, one frame per pose.
 CUT_AT = (200, 150)
-POSES = ["study", "drink", "rest"]
+POSES = ["study", "drink", "rest", "lean"]
 def chair_part(x, y):            # crop coordinates
     back = 58 <= y < 127 and x >= 126 - (y - 58) * 12 / 60   # behind his back, front edge slanting 126 -> 114
     seat_base = y >= 127 and x >= 52                         # under his thighs, right of his calves
@@ -144,6 +144,10 @@ def chair_part(x, y):            # crop coordinates
 def armrest(x, y):
     return (66 <= x < 114 and 101 <= y < 111) or (89 <= x < 98 and 111 <= y < 127)
 cuts = {p: pngio.read(os.path.join(RAW, f"boy-{p}-cut.png")) for p in POSES}
+# The study pose has a sharper source: the user's full-size image shrunk by majority colour per block
+# (raw/boy-study-crop-sharp.png, same 160x200 crop). Use its colours under the cut's shape.
+sharp = pngio.read(os.path.join(RAW, "boy-study-crop-sharp.png"))
+cuts["study"] = [[(*sharp[y][x][:3], c[3]) for x, c in enumerate(row)] for y, row in enumerate(cuts["study"])]
 CW, CH = len(cuts["study"][0]), len(cuts["study"])
 ax, ay = CUT_AT
 chair_px = {(x, y): (*snap(cuts["study"][y][x][:3]), 255) for y in range(CH) for x in range(CW)

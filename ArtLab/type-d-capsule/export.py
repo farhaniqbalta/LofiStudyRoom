@@ -12,7 +12,7 @@ import aseprite_export
 ASSETS = os.path.join(ROOT, "LoFiRoom", "Assets")
 ART_SET, SCENE, PERSPECTIVE = "D", "CapsuleDesk01", "capsule-desk-side-v1"
 W, H = 480, 352
-SEAT = (206, 157, 132, 181)      # x, top, w, h: the boy's frame; must match cut_layers.py (layers/geometry.json)
+SEAT = (206, 157, 141, 181)      # x, top, w, h: the boy's frame; must match cut_layers.py (layers/geometry.json)
 CITY = (14, 14, 220, 224)        # the city frame behind the glass; must match cut_layers.py
 
 def rect(x, top, w, h):          # top-left image pixels -> manifest (origin bottom-left)
