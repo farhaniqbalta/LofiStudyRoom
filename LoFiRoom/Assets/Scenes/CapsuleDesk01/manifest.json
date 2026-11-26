@@ -71,6 +71,20 @@
       "anchor": "desk-seat"
     }
   ],
+  "actorTints": {
+    "night-off": {
+      "color": "#5A5C8C",
+      "amount": 0.45
+    },
+    "day-on": {
+      "color": "#FFE6C0",
+      "amount": 0.25
+    },
+    "day-off": {
+      "color": "#FFE6C0",
+      "amount": 0.25
+    }
+  },
   "rain": {
     "sheet": "rain.png",
     "frame": {

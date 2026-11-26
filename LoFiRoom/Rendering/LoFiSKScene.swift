@@ -207,6 +207,12 @@ final class LoFiSKScene: SKScene {
         applied = resolved
         self.reduceMotion = reduceMotion
         roomSprite.texture = roomTextures[manifest.roomImage(for: resolved)]
+        let tint = manifest.actorTint(for: resolved)
+        let rgb = tint?.rgb ?? (255, 255, 255)
+        for actor in [character, pet] {   // the colour is multiplied in; pack swaps leave it alone
+            actor.color = SKColor(red: CGFloat(rgb.r) / 255, green: CGFloat(rgb.g) / 255, blue: CGFloat(rgb.b) / 255, alpha: 1)
+            actor.colorBlendFactor = CGFloat(tint?.amount ?? 0)
+        }
         if let rain = manifest.rain, let rainSprite, resolved.sky == .rain {
             rainFramesPerSecond = reduceMotion ? rain.fps / 2 : rain.fps
             rainSprite.isHidden = false

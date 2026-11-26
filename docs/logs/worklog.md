@@ -14,3 +14,4 @@ One line per checkpoint. Detail lives in the linked file.
 | Art set A — sprite pass | Character poses, cat reactions and lamp-off room replaced; day rooms, day cities and rain still stand-ins | [art-A-lofi.md](art-A-lofi.md) |
 | Polish: app icon, Spotify logo, animation frequency, rain sound, docs | Done, merged (PR #4); 132 tests | [polish-and-audio.md](polish-and-audio.md) |
 | Art set D — capsule desk | First pass runs on the iPad with `-artSet D`: room 3a, city, boy (study, drink, rest), lamp off; 133 tests | [art-D-capsule.md](art-D-capsule.md) |
+| Actor tint by room state | Done; characters and pets take a manifest tint per room state (sets A and D) | [actor-tint.md](actor-tint.md) |

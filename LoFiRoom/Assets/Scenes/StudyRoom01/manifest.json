@@ -77,6 +77,20 @@
     "rain",
     "music"
   ],
+  "actorTints": {
+    "night-off": {
+      "color": "#5A5C8C",
+      "amount": 0.45
+    },
+    "day-on": {
+      "color": "#FFE6C8",
+      "amount": 0.2
+    },
+    "day-off": {
+      "color": "#FFE6C8",
+      "amount": 0.2
+    }
+  },
   "music": {
     "panel": "music_panel.png",
     "frame": {
