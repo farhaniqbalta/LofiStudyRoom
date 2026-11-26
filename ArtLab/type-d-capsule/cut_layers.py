@@ -181,35 +181,37 @@ def daylight(img):
     return [[(*(round(c + (t - c) * 0.22) for c, t in zip(p[:3], (255, 226, 180))), 255) if p[3] and (x, y) not in chair_room else p
              for x, p in enumerate(row)] for y, row in enumerate(img)]
 
-# The cat: PixelLab sleeping and awake sprites (32x32). Keep only the largest connected shape (drops stray specks),
-# crop both to one box, and add a breathing frame (the upper body one row higher).
-def main_shape(img):
-    n, best = len(img), set()
-    seen = set()
-    for y0 in range(n):
-        for x0 in range(n):
-            if img[y0][x0][3] > 127 and (x0, y0) not in seen:
-                part, stack = set(), [(x0, y0)]
-                while stack:
-                    x, y = stack.pop()
-                    if (x, y) in seen or not (0 <= x < n and 0 <= y < n) or img[y][x][3] <= 127:
-                        continue
-                    seen.add((x, y)); part.add((x, y))
-                    stack += [(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)]
-                best = max(best, part, key=len)
-    return [[(*img[y][x][:3], 255) if (x, y) in best else CLEAR for x in range(n)] for y in range(n)]
-cats = [main_shape(pngio.read(os.path.join(RAW, f))) for f in ("cat-sleep.png", "cat-awake.png")]
-pts = [(x, y) for c in cats for y, row in enumerate(c) for x, p in enumerate(row) if p[3]]
-cx0, cy0 = min(x for x, _ in pts), min(y for _, y in pts) - 1          # one spare row on top for the breath
-cx1, cy1 = max(x for x, _ in pts) + 1, max(y for _, y in pts) + 1
-sleep, awake = ([row[cx0:cx1] for row in c[cy0:cy1]] for c in cats)
-mid = len(sleep) // 2 + 2
-breath = [list(r) for r in sleep[1:mid]] + [list(sleep[mid - 1])] + [list(r) for r in sleep[mid:]]
-assert len(breath) == len(sleep)
+# The cat: a 48x48 PixelLab sleeping cat (raw/cat2-sleep.png) that came with a teal cushion rim behind its back.
+# The cushion is furniture, so its pixels go into the room under the cat (both layers draw together, so a pixel
+# put on the wrong side looks the same). The sprite keeps the cat, plus a breathing frame (upper body one row up)
+# and a startle-hop frame (whole cat one row up) for the tap reaction until an awake frame is drawn.
+CAT_AT = (100, 247)              # top-left of the 48x48 source in the room; must match export.py's pet-spot
+def is_teal(p):
+    r, g, b = p[:3]
+    return p[3] > 127 and g > r + 15 and b > r
+cat_src = pngio.read(os.path.join(RAW, "cat2-sleep.png"))
+n = len(cat_src)
+def beside(x, y, test):
+    return any(0 <= x + dx < n and 0 <= y + dy < n and test(cat_src[y + dy][x + dx]) for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)))
+fur = lambda p: p[3] > 127 and not is_teal(p) and sum(p[:3]) > 120
+cushion = {(x, y) for y in range(n) for x in range(n) if y <= 22 and cat_src[y][x][3] > 127 and (
+    is_teal(cat_src[y][x]) or y <= 6 or (sum(cat_src[y][x][:3]) <= 120 and beside(x, y, is_teal) and not beside(x, y, fur)))}
+for (x, y) in cushion:
+    for r in (room, room_off):
+        r[CAT_AT[1] + y][CAT_AT[0] + x] = (*snap(cat_src[y][x][:3]), 255)
+cat = [[(*p[:3], 255) if p[3] > 127 and (x, y) not in cushion else CLEAR for x, p in enumerate(row)] for y, row in enumerate(cat_src)]
+pts = [(x, y) for y, row in enumerate(cat) for x, p in enumerate(row) if p[3]]
+cx0, cy0, cx1, cy1 = min(x for x, _ in pts), min(y for _, y in pts) - 1, max(x for x, _ in pts) + 1, max(y for _, y in pts) + 1
+sleep = [row[cx0:cx1] for row in cat[cy0:cy1]]
+mid = len(sleep) // 2
+breath = sleep[1:mid] + [sleep[mid - 1]] + sleep[mid:]
+hop = sleep[1:] + [[CLEAR] * len(sleep[0])]
+assert len(breath) == len(hop) == len(sleep) and len(cushion) > 40
 os.makedirs(OUT, exist_ok=True)
-for name, img in (("cat-sleep", sleep), ("cat-breath", breath), ("cat-awake", awake)):
+for name, img in (("cat-sleep", sleep), ("cat-breath", breath), ("cat-hop", hop)):
     pngio.write(os.path.join(OUT, name + ".png"), img)
-print("cat frame", cx1 - cx0, "x", cy1 - cy0)
+CAT_FRAME = (CAT_AT[0] + cx0, CAT_AT[1] + cy0, cx1 - cx0, cy1 - cy0)
+print("cat frame", CAT_FRAME)
 
 os.makedirs(OUT, exist_ok=True)
 pngio.write(os.path.join(OUT, "room-off.png"), room_off)

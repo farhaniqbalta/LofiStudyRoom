@@ -139,3 +139,7 @@ The user asked for a way to swap the scene in the app and chose "applies on reop
 - **Day city:** an edit of the night city into a golden late afternoon, same skyline. The scenery pack is renamed `CapsuleCity01` (it now holds both) with `phases` night → `night`, day → `day`. `Tools/aseprite_export.py` now passes a sidecar's `phases` through and checks that each names a real animation.
 - **Day rooms:** `cut_layers.py` tints room and lamp-off room with a mild warm light (22 %), as set A does with script-made day rooms. The chair is left untinted so it matches its armrest, which is a foreground piece shared by day and night (and the boy, who is never tinted). The scene now has all four rooms.
 - `Executed 134 tests, with 0 failures` on the iPad. Preview: `build/art/d-day.png`.
+
+## Bigger cat (2026-11-24, 1 generation)
+
+From the cohesion review: the 24×20 cat read as a kitten and its orange was too saturated. The new one is 43×33, muted orange with chunky clusters. PixelLab drew a teal cushion behind it; furniture can't be in a pet sprite, so `cut_layers.py` moves the cushion pixels into the room under the cat. Frames: sleep, breath, and a one-row startle hop. The tap reaction is the hop until an awake frame is drawn (1 generation, an edit of this cat). `pet-spot` 103, top 256, 43×33. The 32×32 cat is kept in `raw/` but unused. Tests not yet re-run: the iPad was locked.

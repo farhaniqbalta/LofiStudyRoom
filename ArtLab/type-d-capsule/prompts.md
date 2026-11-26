@@ -69,3 +69,7 @@ Same prompts as before, plus "Keep the crisp pixel art with dark outlines", on `
 ## Day city — 2026-11-24 (1 generation)
 
 - `raw/city-day.png` 232×224: `edit_image_pixen` on the night city (job `3e194c73-…`), seed 3: "Same city skyline, same buildings, same framing and size, but in late afternoon daylight: soft bright sky with pale clouds, warm golden sunlight on the building faces, window lights off, neon signs dim." Job `140d68af-e91f-4b7a-8c18-394acff0ac97`. Every building stayed in place.
+
+## Bigger cat — 2026-11-24 (1 generation)
+
+- `raw/cat2-sleep.png` 48×48: `create_image_pixen`, `no_background`, `view: side`, `direction: west`, black outline: "orange tabby cat curled up asleep ... muted warm orange fur, not too saturated, soft cream chest, chunky pixel clusters with a dark single-colour outline ...". Job `0102d300-c285-4afb-95b3-0e1bcc2c228b`. It came with a teal cushion rim behind its back.

@@ -11,7 +11,8 @@
     },
     "idle": {
       "frames": [
-        2,
+        1,
+        1,
         0
       ],
       "fps": 0.5,
@@ -24,14 +25,14 @@
     "react": {
       "frames": [
         2,
-        2,
+        0,
         2,
         0
       ],
-      "fps": 2,
+      "fps": 4,
       "loop": false,
       "onTap": true
     }
   },
-  "provenance": "PixelLab create_image_pixen job 0e9c5471-99c6-4756-bdd3-812b35e0e67d (sleeping orange tabby, 32x32) and edit_image_pixen job c9ffdf94-5738-4441-9fdb-f6b7f074674a (awake); stray pixels removed, breathing frame and crop by cut_layers.py. Under PixelLab's Terms of Service."
+  "provenance": "PixelLab create_image_pixen job 0102d300-c285-4afb-95b3-0e1bcc2c228b (sleeping orange tabby, 48x48); the teal cushion it came with is moved into the room by cut_layers.py, which also makes the breathing and startle-hop frames. The earlier 32x32 cat (raw/cat-sleep.png, raw/cat-awake.png) is kept but unused. Under PixelLab's Terms of Service."
 }

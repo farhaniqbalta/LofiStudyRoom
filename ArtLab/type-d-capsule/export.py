@@ -41,7 +41,7 @@ pngio.write(os.path.join(scene_dir, "music_notes.png"), skin.sheet(skin.notes())
 def slot(name):
     x, y, w, h = skin.SLOTS[name]
     return rect(PANEL_AT[0] + x, PANEL_AT[1] + y, w, h)
-pet, window = rect(116, 258, 24, 20), rect(*CITY)
+pet, window = rect(103, 256, 43, 33), rect(*CITY)   # pet: must match cut_layers.py's CAT_FRAME
 anchors = {"window-rect": window, "window-mask": window, "desk-seat": rect(*SEAT), "pet-spot": pet,
            "clock-slot": rect(216, 207, 23, 15), "lamp": dict(x=262, y=H - 185), "computer": dict(x=200, y=H - 220),
            "music-notes": dict(x=NOTES_AT[0], y=H - NOTES_AT[1] - 24)}
