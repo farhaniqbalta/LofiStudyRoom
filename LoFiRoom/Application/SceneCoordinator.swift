@@ -40,15 +40,19 @@ final class SceneCoordinator: ObservableObject {
     private let characterDirector: ActorDirector
     private let petDirector: ActorDirector
     private let ambient: AmbientAudio?
+    private let roomAudio: AmbientAudio?
     var hasRainSound: Bool { ambient != nil }
+    /// The scene's own sound, when it has one and its file is in the bundle.
+    var roomSound: ScenePack.Ambient? { roomAudio == nil ? nil : repository.scene.ambient }
 
     init(repository: SpriteAssetRepository, store: RoomStateStore, scene: LoFiSKScene,
          timers: TimerScheduling = LiveTimers(), clock: @escaping () -> TimeInterval = CACurrentMediaTime,
          routineSpeed: Double? = nil, now: @escaping () -> Date = Date.init,
          weather: WeatherProviding = OpenMeteoProvider(), weatherCacheURL: URL = SceneCoordinator.defaultWeatherCacheURL(),
-         music: MusicRemote? = nil, ambient: AmbientPlayer? = nil) {
+         music: MusicRemote? = nil, ambient: AmbientPlayer? = nil, roomSound: AmbientPlayer? = nil) {
         musicRemote = music
         self.ambient = ambient.map { AmbientAudio(player: $0, timers: timers) }
+        roomAudio = roomSound.map { AmbientAudio(player: $0, timers: timers) }
         self.now = now
         self.timers = timers
         self.weather = weather
@@ -104,6 +108,8 @@ final class SceneCoordinator: ObservableObject {
     func chooseArtSet(_ key: String) { update { $0.artSet = key } }
     func setRainSound(_ mode: RainSoundMode) { update { $0.rainSound = mode }; applyAmbient() }
     func setRainVolume(_ volume: Double) { update { $0.rainVolume = volume }; applyAmbient() }
+    func setRoomSound(_ on: Bool) { update { $0.roomSoundOn = on }; applyAmbient() }
+    func setRoomSoundVolume(_ volume: Double) { update { $0.roomSoundVolume = volume }; applyAmbient() }
 
     func setRoutineFrequency(_ value: Double) {
         update { $0.routineFrequency = value }
@@ -282,6 +288,7 @@ final class SceneCoordinator: ObservableObject {
     private func applyAmbient() {
         ambient?.update(play: AmbientSound.shouldPlay(mode: config.rainSound, sky: scene.applied?.sky ?? .clear, active: isActive),
                         volume: config.rainVolume)
+        roomAudio?.update(play: config.roomSoundOn && isActive, volume: config.roomSoundVolume)
     }
 
     /// Swaps one pack and saves the choice. Returns false, leaving the scene as it was, if the pack is unusable.

@@ -1,0 +1,37 @@
+{
+  "id": "seasideclock",
+  "type": "clock",
+  "packVersion": 1,
+  "perspective": "seaside-hut-back-v1",
+  "anchor": "clock-slot",
+  "sheet": "sheet.png",
+  "frame": {
+    "w": 3,
+    "h": 5
+  },
+  "glyphs": "0123456789:",
+  "bezel": "bezel.png",
+  "slots": [
+    {
+      "x": 3,
+      "y": 5
+    },
+    {
+      "x": 7,
+      "y": 5
+    },
+    {
+      "x": 10,
+      "y": 5
+    },
+    {
+      "x": 13,
+      "y": 5
+    },
+    {
+      "x": 17,
+      "y": 5
+    }
+  ],
+  "provenance": "Copy of Clocks/RetroDigital01 for art set E."
+}

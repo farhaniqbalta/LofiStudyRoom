@@ -12,6 +12,10 @@
     "D": {
       "name": "Capsule desk (cozy cyberpunk, side profile)",
       "scene": "CapsuleDesk01"
+    },
+    "E": {
+      "name": "Seaside hut (lo-fi, from behind)",
+      "scene": "SeasideHut01"
     }
   }
 }

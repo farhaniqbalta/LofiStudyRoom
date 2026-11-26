@@ -15,3 +15,4 @@ One line per checkpoint. Detail lives in the linked file.
 | Polish: app icon, Spotify logo, animation frequency, rain sound, docs | Done, merged (PR #4); 132 tests | [polish-and-audio.md](polish-and-audio.md) |
 | Art set D — capsule desk | First pass runs on the iPad with `-artSet D`: room 3a, city, boy (study, drink, rest), lamp off; 133 tests | [art-D-capsule.md](art-D-capsule.md) |
 | Actor tint by room state | Done; characters and pets take a manifest tint per room state (sets A and D) | [actor-tint.md](actor-tint.md) |
+| Art set E — seaside hut | First pass runs on the iPad with `-artSet E`: room and sea (day, night) from the user's concept image, boy in two outfits, sea shimmer, rain, waves sound beside the rain; 136 tests | [art-E-seaside.md](art-E-seaside.md) |

@@ -105,10 +105,27 @@ final class ArtIndependenceTests: XCTestCase {
         XCTAssertEqual(coordinator.config.character, "CapsuleBoy", "a name from another set falls back to Type D's character")
     }
 
+    func testArtSetERunsTheEngineUnchanged() throws {
+        let repository = try SpriteAssetRepository(artSet: "E")
+        XCTAssertEqual(repository.scene.id, "seasidehut01")
+        XCTAssertEqual(repository.folders(in: "Characters"), ["SeasideBoy", "SeasideBoyShirtless"])
+        XCTAssertEqual(repository.folders(in: "Pets"), [], "set E has no cat yet")
+        XCTAssertEqual(repository.folders(in: "Scenery"), ["SeasideView01"])
+        XCTAssertEqual(repository.folders(in: "Clocks"), ["SeasideClock"])
+        let scene = try LoFiSKScene(repository: repository, showAnchors: false)
+        let coordinator = SceneCoordinator(repository: repository, store: RoomStateStore(defaults: defaults), scene: scene)
+        coordinator.start(clockDriver: ClockDriver { scene.clock.show($0) })
+        XCTAssertEqual(scene.character.pack?.manifest.id, "seasideboy")
+        XCTAssertEqual(scene.character.currentAnimation, "study")
+        XCTAssertNil(scene.pet.pack, "no pet pack: the room runs without one")
+        XCTAssertEqual(repository.scene.ambient, ScenePack.Ambient(file: "ocean-waves", name: "Waves"))
+        XCTAssertEqual(scene.clock.text.count, 5)
+    }
+
     func testArtSetChoiceIsListedAndSavedForNextLaunch() throws {
         let repository = try SpriteAssetRepository()
         XCTAssertEqual(repository.artSets["D"], "Capsule desk (cozy cyberpunk, side profile)")
-        XCTAssertEqual(Set(repository.artSets.keys), ["A", "B", "D"])
+        XCTAssertEqual(Set(repository.artSets.keys), ["A", "B", "D", "E"])
         XCTAssertEqual(repository.artSet, "A", "the registry's active set")
         XCTAssertNil(try SpriteAssetRepository(sceneName: "CyberDesk01").artSet, "a scene chosen by name is no set")
         XCTAssertNil(try JSONDecoder().decode(RoomConfig.self, from: Data("{}".utf8)).artSet)

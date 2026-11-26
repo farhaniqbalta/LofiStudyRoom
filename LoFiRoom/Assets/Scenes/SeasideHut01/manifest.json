@@ -1,0 +1,98 @@
+{
+  "id": "seasidehut01",
+  "type": "scene",
+  "artSet": "E",
+  "packVersion": 1,
+  "perspective": "seaside-hut-back-v1",
+  "canvas": {
+    "w": 320,
+    "h": 240
+  },
+  "safe": {
+    "x": 11,
+    "y": 16,
+    "w": 298,
+    "h": 208
+  },
+  "anchors": {
+    "window-rect": {
+      "x": 57,
+      "y": 68,
+      "w": 205,
+      "h": 140
+    },
+    "window-mask": {
+      "x": 57,
+      "y": 68,
+      "w": 205,
+      "h": 140
+    },
+    "desk-seat": {
+      "x": 100,
+      "y": 22,
+      "w": 56,
+      "h": 70
+    },
+    "pet-spot": {
+      "x": 178,
+      "y": 22,
+      "w": 32,
+      "h": 24
+    },
+    "clock-slot": {
+      "x": 272,
+      "y": 93,
+      "w": 23,
+      "h": 15
+    },
+    "lamp": {
+      "x": 112,
+      "y": 75
+    },
+    "computer": {
+      "x": 150,
+      "y": 60
+    }
+  },
+  "room": "room_night.png",
+  "rooms": {
+    "night-on": "room_night.png",
+    "night-off": "room_night.png",
+    "day-on": "room_day.png",
+    "day-off": "room_day.png"
+  },
+  "foreground": [],
+  "ambient": {
+    "file": "ocean-waves",
+    "name": "Waves"
+  },
+  "rain": {
+    "sheet": "rain.png",
+    "frame": {
+      "w": 205,
+      "h": 140
+    },
+    "fps": 8,
+    "anchor": "window-rect"
+  },
+  "actorTints": {
+    "night-on": {
+      "color": "#6C74B0",
+      "amount": 0.35
+    },
+    "night-off": {
+      "color": "#5A5C8C",
+      "amount": 0.45
+    },
+    "day-on": {
+      "color": "#FFC896",
+      "amount": 0.15
+    },
+    "day-off": {
+      "color": "#FFC896",
+      "amount": 0.15
+    }
+  },
+  "provenance": "Art set E, first pass. Room: the user's concept image (kept local, not in the repo), sunset and night panels converted by PixelLab image_to_pixelart (faithful), sea opening cut by ArtLab/type-e-seaside/cut_rooms.py. Under PixelLab's Terms of Service; job ids in ArtLab/type-e-seaside/prompts.md.",
+  "source": "ArtLab/type-e-seaside/raw/"
+}

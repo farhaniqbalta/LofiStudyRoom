@@ -19,14 +19,14 @@ final class PolishAudioTests: XCTestCase {
 
     override func tearDown() async throws { try? FileManager.default.removeItem(at: root) }
 
-    private func coordinator(ambient: AmbientPlayer? = nil) throws -> SceneCoordinator {
+    private func coordinator(ambient: AmbientPlayer? = nil, roomSound: AmbientPlayer? = nil) throws -> SceneCoordinator {
         let repository = try SpriteAssetRepository(root: root)
         let scene = try LoFiSKScene(repository: repository, showAnchors: false)
         let fake = timers!
         let c = SceneCoordinator(repository: repository, store: RoomStateStore(defaults: defaults), scene: scene,
                                  timers: fake, clock: { fake.now },
                                  weather: FakeWeather(.success(WeatherSnapshot(sky: .clear, sunrise: nil, sunset: nil, fetched: Date()))),
-                                 weatherCacheURL: root.appendingPathComponent("weather.json"), ambient: ambient)
+                                 weatherCacheURL: root.appendingPathComponent("weather.json"), ambient: ambient, roomSound: roomSound)
         c.start(clockDriver: ClockDriver { scene.clock.show($0) })
         return c
     }
@@ -106,6 +106,32 @@ final class PolishAudioTests: XCTestCase {
                 XCTAssertEqual(AmbientSound.shouldPlay(mode: mode, sky: sky, active: true), expected, "\(mode) \(sky)")
             }
         }
+    }
+
+    func testRoomSoundPlaysBesideTheRain() throws {
+        XCTAssertNil(try coordinator(roomSound: FakeAmbientPlayer()).roomSound, "a scene without an ambient entry has no room sound")
+        let url = root.appendingPathComponent("Scenes/\(FixtureScene.name)/manifest.json")
+        var manifest = try JSONSerialization.jsonObject(with: Data(contentsOf: url)) as! [String: Any]
+        manifest["ambient"] = ["file": "surf", "name": "Surf"]
+        try JSONSerialization.data(withJSONObject: manifest).write(to: url)
+        let rain = FakeAmbientPlayer(), surf = FakeAmbientPlayer()
+        let c = try coordinator(ambient: rain, roomSound: surf)
+        XCTAssertEqual(c.roomSound, ScenePack.Ambient(file: "surf", name: "Surf"))
+        c.setWeather(.manual(.clear))
+        XCTAssertTrue(surf.isPlaying, "the room sound ignores the weather")
+        XCTAssertFalse(rain.isPlaying)
+        c.setWeather(.manual(.rain))
+        XCTAssertTrue(surf.isPlaying && rain.isPlaying, "rain plays beside it")
+        c.setRoomSoundVolume(2)
+        XCTAssertEqual(c.config.roomSoundVolume, 1)
+        c.setRoomSound(false)
+        timers.advance(by: 1.5)
+        XCTAssertFalse(surf.isPlaying)
+        XCTAssertTrue(rain.isPlaying)
+        XCTAssertFalse(saved().roomSoundOn)
+        c.setActive(false)
+        timers.advance(by: 1.5)
+        XCTAssertFalse(rain.isPlaying)
     }
 
     func testUpdateFadesInAndOutWithOneTimer() {

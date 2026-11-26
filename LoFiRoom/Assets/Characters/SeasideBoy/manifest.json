@@ -1,0 +1,58 @@
+{
+  "id": "seasideboy",
+  "type": "character",
+  "packVersion": 1,
+  "perspective": "seaside-hut-back-v1",
+  "sheet": "sheet.png",
+  "frame": {
+    "w": 56,
+    "h": 70
+  },
+  "anchor": "desk-seat",
+  "animations": {
+    "study": {
+      "frames": [
+        0
+      ],
+      "fps": 1
+    },
+    "drink": {
+      "frames": [
+        1
+      ],
+      "fps": 0.4,
+      "loop": false,
+      "safeExits": [],
+      "routine": {
+        "weight": 3,
+        "cooldown": 300
+      }
+    },
+    "stretch": {
+      "frames": [
+        2
+      ],
+      "fps": 0.33,
+      "loop": false,
+      "safeExits": [],
+      "routine": {
+        "weight": 2,
+        "cooldown": 600
+      }
+    },
+    "rest": {
+      "frames": [
+        3
+      ],
+      "fps": 0.125,
+      "loop": false,
+      "safeExits": [],
+      "routine": {
+        "weight": 1,
+        "cooldown": 900
+      }
+    }
+  },
+  "fallbackAnimation": "study",
+  "provenance": "PixelLab create_image_pixen (desk erased by hand) and edit_image_pixen poses recoloured to its palette. Under PixelLab's Terms of Service; job ids in ArtLab/type-e-seaside/prompts.md."
+}
