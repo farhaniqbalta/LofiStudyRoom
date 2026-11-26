@@ -42,10 +42,9 @@ Use them for composition, palette (warm amber lamp vs cyan/violet city) and anch
 The room can be drawn in several complete looks, lettered A, B, C. **`docs/ART_SETS.md` is the registry**: what each set contains, where its sources are, how to build, switch, add or remove one.
 
 - **A** — lo-fi room, the active set (`StudyRoom01`, built by `Tools/build_art.py`).
-- **B** — cyberpunk side desk, an experimental spike saved for later (`CyberDesk01`, sources in `ArtLab/type-b-cyberdesk/`).
 - **D** — capsule desk, cozy cyberpunk with a side-profile boy; first pass, runs with `-artSet D` (`CapsuleDesk01`, sources in `ArtLab/type-d-capsule/`). C is a plan only (`docs/plans/2026-11-17-art-set-c.md`, branch `art/type-c`).
 - **E** — seaside hut, lo-fi from behind, from the user's concept image; first pass, runs with `-artSet E` (`SeasideHut01`, sources in `ArtLab/type-e-seaside/`). Its own sound (ocean waves) plays beside the rain.
-- The default is `"active"` in `LoFiRoom/Assets/art-sets.json` (the one hand-edited file there). Settings → Art set saves a choice for the next launch (`RoomConfig.artSet`); `-artSet B` wins for one launch.
+- The default is `"active"` in `LoFiRoom/Assets/art-sets.json` (the one hand-edited file there). Settings → Art set saves a choice for the next launch (`RoomConfig.artSet`); `-artSet E` wins for one launch.
 - A set is a scene plus packs sharing its `perspective` tag; sets never mix. Pack folder names are unique across sets.
 - A new set is a new `ArtLab/type-<letter>-<name>/` folder, a new scene, a registry row and a log `docs/logs/art-<letter>-<name>.md`. No Swift changes.
 
@@ -85,7 +84,7 @@ xcrun devicectl device process launch --terminate-existing --device $IPAD com.lo
 xcrun devicectl device capture screenshot --device $IPAD --destination build/shots/shot.png
 ```
 
-Launch switches: `-fps N`, `-paused YES`, `-debugAnchors YES` (anchor overlay + FPS counter), `-artSet <A|B|D|E>`, `-scene <folder>`, `-character <folder>`, `-pet <folder>`, `-scenery <folder>`, `-time auto|day|night`, `-weather auto|clear|rain`, `-lamp on|off` (choices are saved), `-routineSpeed N` (shortens routine delays for watching), `-showPanel YES`, `-showMusic YES`. The tests hang if the iPad is locked: check `xcrun devicectl device info lockState` first.
+Launch switches: `-fps N`, `-paused YES`, `-debugAnchors YES` (anchor overlay + FPS counter), `-artSet <A|D|E>`, `-scene <folder>`, `-character <folder>`, `-pet <folder>`, `-scenery <folder>`, `-time auto|day|night`, `-weather auto|clear|rain`, `-lamp on|off` (choices are saved), `-routineSpeed N` (shortens routine delays for watching), `-showPanel YES`, `-showMusic YES`. The tests hang if the iPad is locked: check `xcrun devicectl device info lockState` first.
 
 ## Code layout
 
@@ -178,7 +177,7 @@ Open, in no fixed order; start one only with the user's go-ahead:
 - Art set A stand-ins still left: day rooms and day city views (PixelLab generations needed). More cat animation (the user asked to keep it for later).
 - M4: energy measurement on the iPad (never done; no power claims until it is), power tuning, polish.
 - Not tried on the device: Low Power Mode, VoiceOver, airplane-mode launch, Spotify signed out or not installed.
-- Art direction B/C/D/E (`docs/ART_SETS.md`). Set D next: the girl. Set E next: shirtless poses, a cat, lamp-off rooms (`docs/logs/art-E-seaside.md`).
+- Art direction C/D/E (`docs/ART_SETS.md`). Set B (cyberpunk side desk spike) was removed on 2026-11-27. Set D next: the girl. Set E next: shirtless poses, a cat, lamp-off rooms (`docs/logs/art-E-seaside.md`).
 - Idea, not started: move the music player into a room object (cassette deck or radio on the sill or shelf) that opens the readable player when tapped (`docs/logs/art-A-lofi.md`, "Idea for later").
 
 Building needs `DEVELOPMENT_TEAM` and `SPOTIFY_CLIENT_ID` in the environment before `xcodegen generate` (values in `CLAUDE.local.md`), and the rain loop at `LoFiRoom/LocalAudio/rain.mp3` for the Sound settings (`docs/AUDIO.md`). All three are optional for a build: without them signing fails / the music card says Spotify is not set up / the Sound settings are hidden.

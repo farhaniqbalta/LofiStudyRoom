@@ -90,7 +90,7 @@ final class MusicSkinTests: XCTestCase {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         _ = try FixtureScene.make(in: root)
         defer { try? FileManager.default.removeItem(at: root) }
-        for repository in [try SpriteAssetRepository(artSet: "B"), try SpriteAssetRepository(root: root)] {
+        for repository in [try SpriteAssetRepository(root: root)] {   // every bundled set has a skin; the fixture has none
             let scene = try LoFiSKScene(repository: repository, showAnchors: false)
             XCTAssertFalse(scene.hasMusicSkin)
             let count = nodeCount(scene)

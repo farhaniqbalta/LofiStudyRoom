@@ -5,10 +5,6 @@
       "name": "Lo-fi room (three-quarter view from behind)",
       "scene": "StudyRoom01"
     },
-    "B": {
-      "name": "Cyberpunk side desk (experimental)",
-      "scene": "CyberDesk01"
-    },
     "D": {
       "name": "Capsule desk (cozy cyberpunk, side profile)",
       "scene": "CapsuleDesk01"

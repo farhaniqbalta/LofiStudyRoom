@@ -54,7 +54,7 @@ In the app: tap the cat, lamp, window or monitor; tap empty room to reveal the s
 | `LoFiRoom/Assets/` | Generated sprite packs (do not edit by hand) |
 | `LoFiRoomTests/` | Unit tests |
 | `ArtSource/` | Raw generated images art set A is built from |
-| `ArtLab/` | Aseprite sources: art set A's cats (`type-a-lofi`), art set B (`type-b-cyberdesk`) and the pipeline proof of concept (`aseprite`) |
+| `ArtLab/` | Aseprite sources: art set A's cats (`type-a-lofi`), art sets D (`type-d-capsule`) and E (`type-e-seaside`), and the pipeline proof of concept (`aseprite`) |
 | `ArtLab/aseprite/` | Editable `.aseprite` sources and their exported packs (pipeline proof of concept, see `docs/ASEPRITE_WORKFLOW.md`) |
 | `Tools/` | `build_art.py` builds art set A; `aseprite_export.py` exports Aseprite sources; `preview.py` composites the layers without a device; `make_icon.py` makes the app icon |
 | `docs/spec/` | The locked MVP specification, design brief and review report |
@@ -69,7 +69,7 @@ The room is a stack of independent sprite layers: scenery behind the window, the
 
 ## Art sets
 
-The room has more than one look. Set A (lo-fi room) is the default; set B (cyberpunk side desk) is an experiment you can see with the launch option `-artSet B`. The registry is in [`docs/ART_SETS.md`](docs/ART_SETS.md).
+The room has more than one look. Set A (lo-fi room) is the default; set D (capsule desk) and set E (seaside hut) are first passes you can see with the launch option `-artSet D` or `-artSet E`, or in Settings → Art set. The registry is in [`docs/ART_SETS.md`](docs/ART_SETS.md).
 
 ## Art credits
 
