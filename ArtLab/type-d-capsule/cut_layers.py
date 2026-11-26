@@ -57,7 +57,7 @@ assert {p[3] for row in chair for p in row} <= {0, 255}
 # Window glass: the drawn city is removed so the scenery pack shows through (layering rule: room glass is transparent).
 # Inside each pane polygon, sky, building and window-light colours go; then leftover specks (building outlines) that are
 # not part of a larger object (curtain, plant, cords) go too. The laptop's box is kept whole.
-PANES = [[(14, 17), (92, 33), (92, 238), (14, 238)],        # left; starts at the safe area's x 14, where the city starts
+PANES = [[(14, 17), (92, 33), (92, 244), (14, 244)],        # left; starts at the safe area's x 14, where the city starts
          [(104, 38), (186, 60), (186, 238), (104, 238)],    # middle
          [(193, 62), (232, 70), (232, 206), (193, 206)]]    # right, its right edge is the curtain
 KEEP_BOX = (163, 196, 207, 238)                             # laptop: x0, top, x1, bottom
@@ -96,6 +96,12 @@ for y in range(H):
             if not edge and len(patch) < SPECK:
                 for i, j in patch:
                     room[j][i] = CLEAR
+# Left of the safe area (x < 14) the city frame can't reach; the drawn city there would peek past the curtain, so it
+# becomes the curtain's shadow colour.
+for y in range(15, 245):
+    for x in range(4, 14):
+        if room[y][x][3] and room[y][x][:3] in SCENERY:
+            room[y][x] = (47, 38, 59, 255)
 assert sum(1 for row in room for p in row if not p[3]) > 20000, "the glass should be mostly transparent"
 
 # Lamp off: PixelLab's edit darkened its whole 128x128 crop (plants and curtain too), so it is used only where the
@@ -192,10 +198,13 @@ assert sum(p[3] > 0 for row in front for p in row) > 100, "the armrest should be
 assert all(sum(p[3] > 0 for row in b for p in row) > 3000 for b in boy.values()), "each pose should keep the boy"
 
 # The city frame starts at the safe area (x 14): the glass left of it keeps the original room pixels.
-CITY = (14, 14, 220, 224)        # x, top, w, h in the room
+CITY = (14, 14, 220, 230)        # x, top, w, h in the room; 6 rows taller than the PixelLab city to reach the glass bottom
 city_src = pngio.read(os.path.join(RAW, "city-night.png"))   # 232x224, drawn for the window from x 2
-city = [row[CITY[0] - 2:CITY[0] - 2 + CITY[2]] for row in city_src]
-city_day = [row[CITY[0] - 2:CITY[0] - 2 + CITY[2]] for row in pngio.read(os.path.join(RAW, "city-day.png"))]
+def fit_city(src):   # crop to the frame's columns; extra rows at the bottom repeat the last row of buildings
+    rows = [row[CITY[0] - 2:CITY[0] - 2 + CITY[2]] for row in src]
+    return rows + [list(rows[-1]) for _ in range(CITY[3] - len(rows))]
+city = fit_city(city_src)
+city_day = fit_city(pngio.read(os.path.join(RAW, "city-day.png")))
 
 # Day rooms: a mild warm tint, as set A does. The actors and the armrest (a foreground piece shared by day and night)
 # are not tinted, so the chair is left untinted too and they stay matched. Glass stays clear.

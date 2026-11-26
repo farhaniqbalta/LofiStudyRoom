@@ -154,3 +154,7 @@ From the screenshot review: he was drawn finer than the room (noisy clusters, pa
 - **Tablet:** black outline like the room's objects, a faint brushed texture, the lantern's warm light on its top edge. 136×66 at (328, top 116): clear of the lantern above and the boy's hair to the left. The action slot is 12 px tall so its font (0.6 × height) fits "Resume in Spotify" in 78 px; no more "Spoti…". Notes moved to (292, 136).
 - **Day room:** a soft sunlight patch from the window across the desk and floor (+12 % warm light, dithered on every edge). A first try at +45 % with a hard top edge looked pasted on and was dropped.
 - `Executed 134 tests, with 0 failures`. Screenshots: `build/shots/d-day3.png`, `build/shots/d-music4.png`.
+
+## Window bottom-left filled (2026-11-26, no generations)
+
+The user saw the city cut off at the window's bottom-left. Two causes: the left pane's glass runs to y 243 but was keyed only to 238, so a strip of the old drawn window showed under the city; and left of x 14 (outside the safe area, where the city frame can't go) the old drawn city peeked past the curtain. Fixes in `cut_layers.py`: the left pane is keyed down to 244; the city frame is 230 tall (the last row of buildings repeated 6 times) so it reaches the glass bottom; city-coloured pixels left of x 14 become the curtain's shadow colour. `Executed 134 tests, with 0 failures`. Screenshot pair: `build/shots/d-win-pair.png`.

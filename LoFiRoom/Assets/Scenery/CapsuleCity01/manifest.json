@@ -7,7 +7,7 @@
   "sheet": "sheet.png",
   "frame": {
     "w": 220,
-    "h": 224
+    "h": 230
   },
   "animations": {
     "night": {
