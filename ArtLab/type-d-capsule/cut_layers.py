@@ -184,7 +184,7 @@ def daylight(img):
 # The cat: a 48x48 PixelLab sleeping cat (raw/cat2-sleep.png) that came with a teal cushion rim behind its back.
 # The cushion is furniture, so its pixels go into the room under the cat (both layers draw together, so a pixel
 # put on the wrong side looks the same). The sprite keeps the cat, plus a breathing frame (upper body one row up)
-# and a startle-hop frame (whole cat one row up) for the tap reaction until an awake frame is drawn.
+# a startle-hop frame (whole cat one row up) and an awake frame for the tap reaction.
 CAT_AT = (100, 237)              # top-left of the 48x48 source in the room; must match export.py's pet-spot
 def is_teal(p):
     r, g, b = p[:3]
@@ -206,9 +206,13 @@ sleep = [row[cx0:cx1] for row in cat[cy0:cy1]]
 mid = len(sleep) // 2
 breath = sleep[1:mid] + [sleep[mid - 1]] + sleep[mid:]
 hop = sleep[1:] + [[CLEAR] * len(sleep[0])]
+# Awake: an edit of the same 48x48 cat (raw/cat2-awake.png), same shape; the same cushion pixels are left out.
+awake_src = pngio.read(os.path.join(RAW, "cat2-awake.png"))
+awake = [[(*p[:3], 255) if p[3] > 127 and (x, y) not in cushion else CLEAR for x, p in enumerate(row)][cx0:cx1]
+         for y, row in enumerate(awake_src)][cy0:cy1]
 assert len(breath) == len(hop) == len(sleep) and len(cushion) > 40
 os.makedirs(OUT, exist_ok=True)
-for name, img in (("cat-sleep", sleep), ("cat-breath", breath), ("cat-hop", hop)):
+for name, img in (("cat-sleep", sleep), ("cat-breath", breath), ("cat-hop", hop), ("cat-awake", awake)):
     pngio.write(os.path.join(OUT, name + ".png"), img)
 CAT_FRAME = (CAT_AT[0] + cx0, CAT_AT[1] + cy0, cx1 - cx0, cy1 - cy0)
 print("cat frame", CAT_FRAME)

@@ -73,3 +73,4 @@ Same prompts as before, plus "Keep the crisp pixel art with dark outlines", on `
 ## Bigger cat — 2026-11-24 (1 generation)
 
 - `raw/cat2-sleep.png` 48×48: `create_image_pixen`, `no_background`, `view: side`, `direction: west`, black outline: "orange tabby cat curled up asleep ... muted warm orange fur, not too saturated, soft cream chest, chunky pixel clusters with a dark single-colour outline ...". Job `0102d300-c285-4afb-95b3-0e1bcc2c228b`. It came with a teal cushion rim behind its back.
+- `raw/cat2-awake.png` 48×48: `edit_image_pixen` on the sleeping cat, seed 5: "same curled pose ... on the same teal cushion, but awake: eyes open, head lifted a little, ears up, looking left". Job `4f8058b1-9229-4235-a027-4a465ee27abe` (2026-11-26). Shape identical (3 outline px differ).
