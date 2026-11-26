@@ -15,6 +15,9 @@ struct RoomConfig: Codable, Equatable {
     var routineFrequency = 1.0 { didSet { routineFrequency = Self.clamp(routineFrequency, Self.routineFrequencyRange) } }
     var rainSound = RainSoundMode.whenRaining
     var rainVolume = 0.4 { didSet { rainVolume = Self.clamp(rainVolume, 0...1) } }
+    /// The room's own sound (waves in set E), when the scene has one.
+    var roomSoundOn = true
+    var roomSoundVolume = 0.5 { didSet { roomSoundVolume = Self.clamp(roomSoundVolume, 0...1) } }
     /// The art set to open with next launch (nil: the registry's active set). A launch argument wins over it.
     var artSet: String?
 
@@ -42,6 +45,8 @@ struct RoomConfig: Codable, Equatable {
         routineFrequency = Self.clamp(try c.decodeIfPresent(Double.self, forKey: .routineFrequency) ?? d.routineFrequency, Self.routineFrequencyRange)
         rainSound = try c.decodeIfPresent(RainSoundMode.self, forKey: .rainSound) ?? d.rainSound
         rainVolume = Self.clamp(try c.decodeIfPresent(Double.self, forKey: .rainVolume) ?? d.rainVolume, 0...1)
+        roomSoundOn = try c.decodeIfPresent(Bool.self, forKey: .roomSoundOn) ?? d.roomSoundOn
+        roomSoundVolume = Self.clamp(try c.decodeIfPresent(Double.self, forKey: .roomSoundVolume) ?? d.roomSoundVolume, 0...1)
         artSet = try c.decodeIfPresent(String.self, forKey: .artSet)
     }
 }

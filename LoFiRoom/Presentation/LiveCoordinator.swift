@@ -21,7 +21,8 @@ extension SceneCoordinator {
             let speed = defaults.double(forKey: "routineSpeed")
             let coordinator = SceneCoordinator(repository: repository, store: saved, scene: room,
                                            routineSpeed: speed > 0 ? speed : nil, music: SpotifyRemoteAdapter(),
-                                           ambient: RainSoundPlayer.make())
+                                           ambient: RainSoundPlayer.make(file: "rain"),
+                                           roomSound: repository.scene.ambient.flatMap { RainSoundPlayer.make(file: $0.file) })
             let store = coordinator.store
             switch defaults.string(forKey: "time") {
             case "auto": store.config.time = .automatic

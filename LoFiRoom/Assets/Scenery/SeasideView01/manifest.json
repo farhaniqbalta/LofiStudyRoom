@@ -1,0 +1,38 @@
+{
+  "id": "seasideview01",
+  "type": "scenery",
+  "packVersion": 1,
+  "perspective": "seaside-hut-back-v1",
+  "sheet": "sheet.png",
+  "frame": {
+    "w": 205,
+    "h": 140
+  },
+  "anchor": "window-rect",
+  "animations": {
+    "night": {
+      "frames": [
+        0,
+        1,
+        0,
+        2
+      ],
+      "fps": 1.5
+    },
+    "day": {
+      "frames": [
+        3,
+        4,
+        3,
+        5
+      ],
+      "fps": 1.5
+    }
+  },
+  "fallbackAnimation": "night",
+  "phases": {
+    "night": "night",
+    "day": "day"
+  },
+  "provenance": "The sea, town and sky from the same converted panels as the room (cut_rooms.py). Under PixelLab's Terms of Service; job ids in ArtLab/type-e-seaside/prompts.md."
+}

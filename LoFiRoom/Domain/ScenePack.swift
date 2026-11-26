@@ -34,6 +34,9 @@ struct ScenePack: Codable, Equatable {
             return (v >> 16 & 255, v >> 8 & 255, v & 255)
         }
     }
+    /// A room's own looping sound (waves), `LocalAudio/<file>.mp3` (git-ignored, see docs/AUDIO.md), played beside
+    /// the rain loop with its own on/off and volume. `name` labels the setting.
+    struct Ambient: Codable, Equatable { var file: String; var name: String }
 
     var id: String
     var perspective: String
@@ -50,6 +53,7 @@ struct ScenePack: Codable, Equatable {
     var music: MusicSkin?
     /// "<phase>-<on|off>" to an actor tint; a missing key means no tint.
     var actorTints: [String: Tint]?
+    var ambient: Ambient?
 
     static let requiredAnchors = ["desk-seat", "pet-spot", "clock-slot", "lamp", "computer", "window-rect", "window-mask"]
 

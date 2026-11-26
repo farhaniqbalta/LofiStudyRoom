@@ -75,20 +75,32 @@ struct CustomizationSheet: View {
                     .accessibilityValue("\(Self.frequencyText(coordinator.config.routineFrequency)) times as often")
                     Text(Self.frequencyText(coordinator.config.routineFrequency) + "×").foregroundStyle(.secondary)
                 }
-                if coordinator.hasRainSound {
+                if coordinator.hasRainSound || coordinator.roomSound != nil {
                     Section {
-                        Picker("Rain sound", selection: Binding(get: { coordinator.config.rainSound }, set: { coordinator.setRainSound($0) })) {
-                            Text("Off").tag(RainSoundMode.off)
-                            Text("When raining").tag(RainSoundMode.whenRaining)
-                            Text("Always").tag(RainSoundMode.always)
-                        }.pickerStyle(.segmented)
-                        HStack {
-                            Image(systemName: "speaker.wave.2.fill").accessibilityHidden(true)
-                            Slider(value: Binding(get: { coordinator.config.rainVolume }, set: { coordinator.setRainVolume($0) }), in: 0...1) {
-                                Text("Rain volume")
+                        if coordinator.hasRainSound {
+                            Picker("Rain sound", selection: Binding(get: { coordinator.config.rainSound }, set: { coordinator.setRainSound($0) })) {
+                                Text("Off").tag(RainSoundMode.off)
+                                Text("When raining").tag(RainSoundMode.whenRaining)
+                                Text("Always").tag(RainSoundMode.always)
+                            }.pickerStyle(.segmented)
+                            HStack {
+                                Image(systemName: "speaker.wave.2.fill").accessibilityHidden(true)
+                                Slider(value: Binding(get: { coordinator.config.rainVolume }, set: { coordinator.setRainVolume($0) }), in: 0...1) {
+                                    Text("Rain volume")
+                                }
                             }
+                            .disabled(coordinator.config.rainSound == .off)
                         }
-                        .disabled(coordinator.config.rainSound == .off)
+                        if let sound = coordinator.roomSound {
+                            Toggle("\(sound.name) sound", isOn: Binding(get: { coordinator.config.roomSoundOn }, set: { coordinator.setRoomSound($0) }))
+                            HStack {
+                                Image(systemName: "speaker.wave.2.fill").accessibilityHidden(true)
+                                Slider(value: Binding(get: { coordinator.config.roomSoundVolume }, set: { coordinator.setRoomSoundVolume($0) }), in: 0...1) {
+                                    Text("\(sound.name) volume")
+                                }
+                            }
+                            .disabled(!coordinator.config.roomSoundOn)
+                        }
                     } header: { Text("Sound") } footer: { Text("Plays on top of Spotify.") }
                 }
                 Section("Display") {

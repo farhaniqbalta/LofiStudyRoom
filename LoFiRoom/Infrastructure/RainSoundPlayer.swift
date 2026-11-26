@@ -1,6 +1,6 @@
 import AVFoundation
 
-/// Looping rain from the optional `LocalAudio/rain.mp3`. Mixes with Spotify: never interrupts or ducks it.
+/// The room's looping sound from the optional `LocalAudio/<file>.mp3` (rain by default). Mixes with Spotify: never interrupts or ducks it.
 @MainActor
 final class RainSoundPlayer: AmbientPlayer {
     private let player: AVAudioPlayer
@@ -9,8 +9,8 @@ final class RainSoundPlayer: AmbientPlayer {
     private init(_ player: AVAudioPlayer) { self.player = player }
 
     /// nil when the file is not in the bundle (fresh clone) or cannot be read.
-    static func make() -> RainSoundPlayer? {
-        guard let url = Bundle.main.url(forResource: "rain", withExtension: "mp3", subdirectory: "LocalAudio"),
+    static func make(file: String) -> RainSoundPlayer? {
+        guard let url = Bundle.main.url(forResource: file, withExtension: "mp3", subdirectory: "LocalAudio"),
               let player = try? AVAudioPlayer(contentsOf: url) else { return nil }
         player.numberOfLoops = -1
         player.prepareToPlay()
