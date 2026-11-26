@@ -15,7 +15,7 @@ ASSETS = os.path.join(ROOT, "LoFiRoom", "Assets")
 ART_SET, SCENE, PERSPECTIVE = "D", "CapsuleDesk01", "capsule-desk-side-v1"
 W, H = 480, 352
 SEAT = (205, 156, 143, 183)      # x, top, w, h: the boy's frame; must match cut_layers.py (layers/geometry.json)
-CITY = (14, 14, 220, 230)        # the city frame behind the glass; must match cut_layers.py
+CITY = (14, 14, 220, 238)        # the city frame behind the glass; must match cut_layers.py
 PANEL_AT = (328, 116)            # the music tablet on the right wall, over the blank poster, clear of the boy's head
 NOTES_AT = (292, 136)            # top-left of the floating notes, just above the boy's head
 
