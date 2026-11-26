@@ -50,6 +50,9 @@ with open(os.path.join(scene_dir, "manifest.json"), "w") as f:
                    canvas=dict(w=W, h=H), safe=dict(x=14, y=12, w=452, h=328), anchors=anchors, room="room.png",
                    rooms={"night-on": "room.png", "night-off": "room_off.png", "day-on": "room_day.png", "day-off": "room_day_off.png"},
                    foreground=[dict(image="chair_front.png", anchor="desk-seat")],
+                   # The boy and cat are drawn under the lamp at night; tint them to match the other rooms.
+                   actorTints={"night-off": dict(color="#5A5C8C", amount=0.45), "day-on": dict(color="#FFE6C0", amount=0.25),
+                               "day-off": dict(color="#FFE6C0", amount=0.25)},
                    rain=dict(sheet="rain.png", frame=dict(w=CITY[2], h=CITY[3]), fps=8, anchor="window-rect"),
                    music=dict(panel="music_panel.png", frame=rect(*PANEL_AT, *skin.PANEL_SIZE),
                               icons=dict(sheet="music_icons.png", frame=dict(w=16, h=16), names=["previous", "play", "pause", "next", "close"]),

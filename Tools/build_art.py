@@ -398,6 +398,9 @@ write_manifest(scene_dir, id="studyroom01", type="scene", artSet="A", packVersio
                provenance="PixelLab create_image_pixen job 0c085c34-7866-4ce7-813f-002ac93c9d1b; glass keyed out and "
                           "chair-front occluder traced by Tools/build_art.py. Lamp-off room: PixelLab edit_image_pixen job 1caa32ca-cc50-4c08-95f8-89f9b91583ea on a crop around the lamp, patched in. Stand-in frames: day rooms, rain.",
                rooms=files, standIns=["rooms", "rain", "music"],
+               # The characters and cats are drawn under the lamp at night; tint them to match the other rooms.
+               actorTints={"night-off": dict(color="#5A5C8C", amount=0.45), "day-on": dict(color="#FFE6C8", amount=0.2),
+                           "day-off": dict(color="#FFE6C8", amount=0.2)},
                music=dict(panel="music_panel.png", frame=rect(*PANEL_AT, *PANEL_SIZE),
                           icons=dict(sheet="music_icons.png", frame=dict(w=16, h=16), names=["previous", "play", "pause", "next", "close"]),
                           slots={name: panel_slot(name) for name in MUSIC_SLOTS},

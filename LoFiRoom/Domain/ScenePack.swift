@@ -24,6 +24,16 @@ struct ScenePack: Codable, Equatable {
     struct Foreground: Codable, Equatable { var image: String, anchor: String }
     /// A looping one-row sheet drawn behind the room's glass (rain).
     struct Effect: Codable, Equatable { var sheet: String; var frame: PixelSize; var fps: Double; var anchor: String }
+    /// How much the character and pet take on a colour (multiplied in), so actors drawn under one light match the room.
+    struct Tint: Codable, Equatable {
+        var color: String
+        var amount: Double
+        /// `#RRGGBB` as 0...255 components; nil when malformed.
+        var rgb: (r: Int, g: Int, b: Int)? {
+            guard color.count == 7, color.hasPrefix("#"), let v = Int(color.dropFirst(), radix: 16) else { return nil }
+            return (v >> 16 & 255, v >> 8 & 255, v & 255)
+        }
+    }
 
     var id: String
     var perspective: String
@@ -38,12 +48,16 @@ struct ScenePack: Codable, Equatable {
     var rain: Effect?
     var hotspots: [String: Anchor]?
     var music: MusicSkin?
+    /// "<phase>-<on|off>" to an actor tint; a missing key means no tint.
+    var actorTints: [String: Tint]?
 
     static let requiredAnchors = ["desk-seat", "pet-spot", "clock-slot", "lamp", "computer", "window-rect", "window-mask"]
 
-    func roomImage(for scene: ResolvedScene) -> String {
-        rooms?["\(scene.phase.rawValue)-\(scene.lampOn ? "on" : "off")"] ?? room
-    }
+    static func stateKey(_ scene: ResolvedScene) -> String { "\(scene.phase.rawValue)-\(scene.lampOn ? "on" : "off")" }
+
+    func roomImage(for scene: ResolvedScene) -> String { rooms?[Self.stateKey(scene)] ?? room }
+
+    func actorTint(for scene: ResolvedScene) -> Tint? { actorTints?[Self.stateKey(scene)] }
 
     /// Human-readable problems; empty means valid.
     func problems() -> [String] {
@@ -74,6 +88,12 @@ struct ScenePack: Codable, Equatable {
                 if notes.fps <= 0 { problems.append("music notes need a positive fps") }
             }
             if let notes = music.notes, anchors[notes.anchor] == nil { problems.append("music notes use unknown anchor '\(notes.anchor)'") }
+        }
+        let stateKeys = Set(["day", "night"].flatMap { p in ["on", "off"].map { "\(p)-\($0)" } })
+        for (key, tint) in actorTints ?? [:] {
+            if !stateKeys.contains(key) { problems.append("actor tint '\(key)' is not <day|night>-<on|off>") }
+            if tint.rgb == nil { problems.append("actor tint '\(key)' color must be #RRGGBB") }
+            if !(0...1).contains(tint.amount) { problems.append("actor tint '\(key)' amount must be between 0 and 1") }
         }
         problems += foreground.filter { anchors[$0.anchor] == nil }.map { "foreground '\($0.image)' uses unknown anchor '\($0.anchor)'" }
         return problems.sorted()

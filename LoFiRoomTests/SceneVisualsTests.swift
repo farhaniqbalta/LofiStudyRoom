@@ -129,6 +129,47 @@ final class SceneVisualsTests: XCTestCase {
         ])
     }
 
+    func testActorTintFollowsRoomState() throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: root) }
+        _ = try FixtureScene.make(in: root)
+        let url = root.appendingPathComponent("Scenes/\(FixtureScene.name)/manifest.json")
+        var json = try JSONSerialization.jsonObject(with: Data(contentsOf: url)) as! [String: Any]
+        json["actorTints"] = ["night-off": ["color": "#204080", "amount": 0.5]]
+        try JSONSerialization.data(withJSONObject: json).write(to: url)
+        let fixture = try SpriteAssetRepository(root: root)
+        let scene = try LoFiSKScene(repository: fixture, showAnchors: false)
+        scene.show(try fixture.load("Characters", "Typist"))
+        scene.show(try fixture.load("Pets", "Nappy"))
+        let before = nodeCount(scene)
+
+        scene.apply(ResolvedScene(phase: .night, sky: .clear, lampOn: false), reduceMotion: false)
+        for node in [scene.character, scene.pet] {
+            XCTAssertEqual(node.colorBlendFactor, 0.5, accuracy: 0.001)
+            var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
+            node.color.getRed(&r, green: &g, blue: &b, alpha: &a)
+            XCTAssertEqual([r, g, b].map { Int(($0 * 255).rounded()) }, [0x20, 0x40, 0x80])
+        }
+        scene.show(try fixture.load("Characters", "Typist"))
+        XCTAssertEqual(scene.character.colorBlendFactor, 0.5, accuracy: 0.001, "a pack swap keeps the room's tint")
+
+        scene.apply(ResolvedScene(phase: .night, sky: .clear, lampOn: true), reduceMotion: false)
+        XCTAssertEqual(scene.character.colorBlendFactor, 0, "a state without a tint clears it")
+        XCTAssertEqual(scene.pet.colorBlendFactor, 0)
+        XCTAssertEqual(nodeCount(scene), before)
+    }
+
+    func testActorTintProblems() {
+        var scene = repository.scene
+        scene.actorTints = ["night-off": ScenePack.Tint(color: "#12345", amount: 0.3), "day-on": ScenePack.Tint(color: "#FFFFFF", amount: 1.5),
+                            "noon-on": ScenePack.Tint(color: "#000000", amount: 0.2)]
+        XCTAssertEqual(scene.problems(), [
+            "actor tint 'day-on' amount must be between 0 and 1",
+            "actor tint 'night-off' color must be #RRGGBB",
+            "actor tint 'noon-on' is not <day|night>-<on|off>",
+        ])
+    }
+
     func testFixtureWithoutExtrasApplies() throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: root) }
