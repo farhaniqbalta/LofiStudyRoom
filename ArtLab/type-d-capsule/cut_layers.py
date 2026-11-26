@@ -200,9 +200,24 @@ city_day = [row[CITY[0] - 2:CITY[0] - 2 + CITY[2]] for row in pngio.read(os.path
 # Day rooms: a mild warm tint, as set A does. The actors and the armrest (a foreground piece shared by day and night)
 # are not tinted, so the chair is left untinted too and they stay matched. Glass stays clear.
 chair_room = {(ax + x, ay + y) for x, y in chair_px}
+# The afternoon sun through the window lands as a soft slanted patch on the desk top and the floor: a little more warm
+# light there, dithered 1-in-2 along every edge so it has no hard line.
+SUN = [(80, 246), (214, 238), (338, 352), (150, 352)]
+SUN_EDGE = 6
+def sun_amount(x, y):
+    if not inside(x + .5, y + .5, SUN):
+        return 0
+    left = x - (80 + (y - 246) * 70 / 106)
+    right = (214 + (y - 238) * 124 / 114) - x
+    top = y - (246 - (x - 80) * 8 / 134)
+    if min(left, right, top) > SUN_EDGE or (x + y) % 2 == 0:
+        return 0.12
+    return 0
 def daylight(img):
-    return [[(*(round(c + (t - c) * 0.22) for c, t in zip(p[:3], (255, 226, 180))), 255) if p[3] and (x, y) not in chair_room else p
-             for x, p in enumerate(row)] for y, row in enumerate(img)]
+    def lit(p, x, y):
+        t = 0.22 + sun_amount(x, y)
+        return (*(round(c + (w - c) * t) for c, w in zip(p[:3], (255, 226, 180))), 255)
+    return [[lit(p, x, y) if p[3] and (x, y) not in chair_room else p for x, p in enumerate(row)] for y, row in enumerate(img)]
 
 # The cat: a 48x48 PixelLab sleeping cat (raw/cat2-sleep.png) that came with a teal cushion rim behind its back.
 # The cushion is furniture, so its pixels go into the room under the cat (both layers draw together, so a pixel

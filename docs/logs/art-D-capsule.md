@@ -148,3 +148,9 @@ From the cohesion review: the 24×20 cat read as a kitten and its orange was too
 ## Cohesion pass on the boy (2026-11-26, no generations)
 
 From the screenshot review: he was drawn finer than the room (noisy clusters, patchy outlines) and kept a warm lamp-lit fringe that glowed when the lamp was off. `cut_layers.py` now merges lone pixels into their neighbours (a pixel whose 3 of 4 neighbours share another colour) and adds a 1 px black outline outside his silhouette, the colour the room uses for its objects. The frame grows by 1 px each side: `desk-seat` 205, top 156, 143×183. His face stays warm with the lamp off; that reads as the paper lantern's light. Preview: `build/art/d-boy-outline.png` (lamp on / off). `Executed 134 tests, with 0 failures`.
+
+## Tablet and day sunlight (2026-11-26, no generations)
+
+- **Tablet:** black outline like the room's objects, a faint brushed texture, the lantern's warm light on its top edge. 136×66 at (328, top 116): clear of the lantern above and the boy's hair to the left. The action slot is 12 px tall so its font (0.6 × height) fits "Resume in Spotify" in 78 px; no more "Spoti…". Notes moved to (292, 136).
+- **Day room:** a soft sunlight patch from the window across the desk and floor (+12 % warm light, dithered on every edge). A first try at +45 % with a hard top edge looked pasted on and was dropped.
+- `Executed 134 tests, with 0 failures`. Screenshots: `build/shots/d-day3.png`, `build/shots/d-music4.png`.

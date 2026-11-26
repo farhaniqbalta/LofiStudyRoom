@@ -35,19 +35,21 @@ def rain(w, h):
     return frames
 
 # ---------- music skin: a small wall tablet, indigo casing with a teal edge like the room's neon tube
-CASING = (118, 66)
+CASING = (136, 66)
 SHADOW = 2
 PANEL_SIZE = (CASING[0] + SHADOW, CASING[1] + SHADOW)
-OUTLINE, BODY, BODY_HI, BODY_LO = (20, 18, 37, 255), (47, 38, 59, 255), (73, 88, 113, 255), (26, 22, 43, 255)
+OUTLINE, BODY, BODY_HI, BODY_LO = (0, 0, 0, 255), (47, 38, 59, 255), (73, 88, 113, 255), (26, 22, 43, 255)  # black like the room's outlines
+LANTERN = (233, 193, 136, 255)   # the paper lantern, up and to the left, catches the top edge
 GLOW, AMBER = (107, 213, 211, 255), (233, 193, 136, 255)
 WELL, SCREEN, SCAN = (15, 13, 27, 255), (26, 22, 43, 255), (32, 28, 52, 255)
 SHADOW_C = (0, 0, 0, 90)
 ICON_C, ICON_SHADOW_C = (220, 246, 244, 255), (15, 13, 27, 255)
 TEXT_HEX, DIM_HEX = "#DCF6F4", "#6BD5D3"
 # x, y, w, h inside the panel, top-left based
-SLOTS = dict(artwork=(5, 5, 44, 44), attribution=(5, 51, 42, 12), title=(54, 5, 48, 12), artist=(54, 18, 58, 10),
-             previous=(54, 33, 16, 16), toggle=(73, 33, 16, 16), next=(92, 33, 16, 16), close=(105, 4, 8, 8),
-             message=(54, 5, 58, 26), action=(54, 33, 58, 16))
+# The action label's font scales with the slot height, so a 12 px slot fits "Resume in Spotify" in 78 px.
+SLOTS = dict(artwork=(5, 5, 44, 44), attribution=(5, 51, 42, 12), title=(54, 5, 66, 12), artist=(54, 18, 76, 10),
+             previous=(54, 33, 16, 16), toggle=(74, 33, 16, 16), next=(94, 33, 16, 16), close=(123, 4, 8, 8),
+             message=(54, 5, 76, 26), action=(54, 35, 78, 12))
 
 def panel():
     cw, ch = CASING
@@ -60,7 +62,13 @@ def panel():
     fill(SHADOW, SHADOW, pw - 1, ph - 1, SHADOW_C)
     fill(0, 0, cw - 1, ch - 1, OUTLINE)
     fill(1, 1, cw - 2, ch - 2, BODY)
+    for x in range(3, cw - 3, 4):                                           # faint brushed texture
+        for y in range(3, ch - 3):
+            if (x + y) % 7 == 0:
+                img[y][x] = BODY_LO
     fill(1, 1, cw - 2, 1, BODY_HI); fill(1, 1, 1, ch - 2, BODY_HI)          # raised: light top-left
+    for x in range(2, cw // 2, 2):                                          # lantern light on the top edge, fading right
+        img[1][x] = LANTERN
     fill(1, ch - 2, cw - 2, ch - 2, BODY_LO); fill(cw - 2, 1, cw - 2, ch - 2, BODY_LO)
     for x in range(8, cw - 8, 2):                                           # teal neon strip along the bottom
         img[ch - 1][x] = GLOW
