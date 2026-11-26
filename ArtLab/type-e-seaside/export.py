@@ -21,11 +21,11 @@ SAFE = (11, 16, 298, 208)        # x, top, w, h: 298x208 is an exact 8x on the i
 SEAT = (100, 148, 56, 70)        # the boy at the round table, a little right of centre, hands on its front edge
 BOY_H = 70                       # frame height: room above his head for the stretch's raised arms
 VIEW = (57, 32, 205, 140)        # the sea opening; must match cut_rooms.py's scenery crop
-CLOCK = (272, 132, 23, 15)       # on the right-hand counter, left of the lantern
+CLOCK = (269, 128, 23, 15)       # standing on the right-hand counter (top at row 143), left of the lantern
 PET = (178, 194, 32, 24)         # on the rug right of the table (no cat yet)
-RADIO_AT = (232, 145)            # top-left of the radio on the chest (legs on the chest top, row 155)
+CHEST = (224, 150, 40, 32)       # the wooden chest: tapping it opens the music player
 PANEL_AT = (218, 60)             # the player panel, upper right over the curtain and headland
-NOTES_AT = (237, 130)            # top-left of the rising notes, just above the radio
+NOTES_AT = (238, 136)            # top-left of the rising notes, just above the chest
 PROV = "Under PixelLab's Terms of Service; job ids in ArtLab/type-e-seaside/prompts.md."
 
 def rect(x, top, w, h):          # top-left image pixels -> manifest (origin bottom-left)
@@ -70,24 +70,20 @@ def rain(w, h):
 # Scene. Lamp-off rooms are stand-ins (the lit rooms) until they are drawn.
 scene_dir = os.path.join(ASSETS, "Scenes", SCENE)
 os.makedirs(scene_dir, exist_ok=True)
-for phase in ("day", "night"):  # the room plus the radio on the chest
-    room = read(f"room-{phase}.png")
-    for j, row in enumerate(skin.radio(phase == "night")):
-        for i, c in enumerate(row):
-            if c[3]: room[RADIO_AT[1] + j][RADIO_AT[0] + i] = c
-    pngio.write(os.path.join(scene_dir, f"room_{phase}.png"), room)
+for phase in ("day", "night"):
+    shutil.copyfile(os.path.join(RAW, f"room-{phase}.png"), os.path.join(scene_dir, f"room_{phase}.png"))
 pngio.write(os.path.join(scene_dir, "music_panel.png"), skin.panel())
 pngio.write(os.path.join(scene_dir, "music_icons.png"), skin.sheet(skin.icons()))
 pngio.write(os.path.join(scene_dir, "music_notes.png"), skin.sheet(skin.notes()))
 def slot(name):
     x, y, w, h = skin.SLOTS[name]
     return rect(PANEL_AT[0] + x, PANEL_AT[1] + y, w, h)
-radio_rect = rect(RADIO_AT[0] - 2, RADIO_AT[1] - 2, len(skin.RADIO[0]) + 4, len(skin.RADIO) + 4)
+
 drops = rain(VIEW[2], VIEW[3])
 pngio.write(os.path.join(scene_dir, "rain.png"), [sum((f[y] for f in drops), []) for y in range(VIEW[3])])
 window = rect(*VIEW)
 anchors = {"window-rect": window, "window-mask": window, "desk-seat": rect(*SEAT), "pet-spot": rect(*PET),
-           "clock-slot": rect(*CLOCK), "lamp": dict(x=112, y=H - 165), "computer": dict(x=RADIO_AT[0], y=H - RADIO_AT[1]),
+           "clock-slot": rect(*CLOCK), "lamp": dict(x=112, y=H - 165), "computer": dict(x=CHEST[0], y=H - CHEST[1]),
            "music-notes": rect(*NOTES_AT, 12, 15)}
 json.dump(dict(id=SCENE.lower(), type="scene", artSet=ART_SET, packVersion=1, perspective=PERSPECTIVE,
                canvas=dict(w=W, h=H), safe=rect(*SAFE), anchors=anchors, room="room_night.png",
@@ -97,12 +93,12 @@ json.dump(dict(id=SCENE.lower(), type="scene", artSet=ART_SET, packVersion=1, pe
                # waves beside the rain loop: LocalAudio/ocean-waves.mp3, git-ignored (licence in docs/AUDIO.md)
                ambient=dict(file="ocean-waves", name="Waves"),
                rain=dict(sheet="rain.png", frame=dict(w=VIEW[2], h=VIEW[3]), fps=8, anchor="window-rect"),
-               # Spotify player: tap the radio ("computer" is the engine's tap role for the music player)
+               # Spotify player: tap the chest ("computer" is the engine's tap role for the music player)
                music=dict(panel="music_panel.png", frame=rect(*PANEL_AT, *skin.PANEL_SIZE),
                           icons=dict(sheet="music_icons.png", frame=dict(w=10, h=10), names=["previous", "play", "pause", "next", "close"]),
                           slots={name: slot(name) for name in skin.SLOTS}, textColor=skin.TEXT_HEX, dimColor=skin.DIM_HEX,
                           notes=dict(sheet="music_notes.png", frame=dict(w=12, h=15), fps=2, anchor="music-notes")),
-               hotspots={"computer": radio_rect},
+               hotspots={"computer": rect(*CHEST)},
                # the boy is drawn in neutral light: cool him at night, warm him in the sunset
                actorTints={"night-on": dict(color="#6C74B0", amount=0.35), "night-off": dict(color="#5A5C8C", amount=0.45),
                            "day-on": dict(color="#FFC896", amount=0.15), "day-off": dict(color="#FFC896", amount=0.15)},
@@ -169,10 +165,14 @@ pack("Characters", "SeasideBoyShirtless", [boy("boy-shirtless.png")], dict(
     animations={"study": dict(frames=[0], fps=1)}, fallbackAnimation="study",
     provenance="PixelLab edit_image_pixen of the shirt boy. Poses not drawn yet. " + PROV))
 
-# The clock has no art of its own yet: reuse set A's under set E's perspective tag (as set D does).
+# The clock: set A's digit shapes in lantern amber on a teak bezel drawn by skin.py (same 23x15 size and slots).
 src, dst = os.path.join(ASSETS, "Clocks", "RetroDigital01"), os.path.join(ASSETS, "Clocks", "SeasideClock")
-shutil.copytree(src, dst, dirs_exist_ok=True)
-manifest = json.load(open(os.path.join(dst, "manifest.json")))
-manifest.update(id="seasideclock", perspective=PERSPECTIVE, provenance="Copy of Clocks/RetroDigital01 for art set E.")
+os.makedirs(dst, exist_ok=True)
+manifest = json.load(open(os.path.join(src, "manifest.json")))
+glyphs = [[skin.AMBER_LIT if p[3] else p for p in row] for row in pngio.read(os.path.join(src, "sheet.png"))]
+pngio.write(os.path.join(dst, "sheet.png"), glyphs)
+pngio.write(os.path.join(dst, "bezel.png"), skin.clock_bezel())
+manifest.update(id="seasideclock", perspective=PERSPECTIVE,
+                provenance="Set A's RetroDigital01 digit shapes recoloured amber; teak bezel drawn by ArtLab/type-e-seaside/skin.py.")
 json.dump(manifest, open(os.path.join(dst, "manifest.json"), "w"), indent=2)
 print("exported scene", SCENE)

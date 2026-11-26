@@ -1,5 +1,5 @@
-"""Art set E's script-drawn music player (stdlib only): a wooden radio on the chest that opens a small teak panel,
-plus its icons and notes. Colours from the hut: teak wood, lantern amber, cream linen. The layout is set D's
+"""Art set E's script-drawn extras (stdlib only): the teak music panel (opened by tapping the chest), its icons and
+notes, and the in-world clock's bezel. Colours from the hut: teak wood, lantern amber, cream linen. The layout is set D's
 (ArtLab/type-d-capsule/skin.py) at 0.625 scale: set E shows at 8x on the iPad against D's 5x, so the text comes
 out the same size on screen. Used by export.py."""
 
@@ -12,30 +12,24 @@ CREAM, AMBER = (243, 226, 196, 255), (217, 160, 102, 255)
 SHADOW_C = (0, 0, 0, 90)
 TEXT_HEX, DIM_HEX = "#F3E2C4", "#D9A066"
 
-# ---------- the radio in the room (drawn into both room images by export.py)
-RADIO = [
-    "..oooooooooooooooooo..",
-    ".ohhhhhhhhhhhhhhhhhho.",
-    "ohwwwwwwwwwwwwwwwwwwlo",
-    "ohwgagagagwwsssssssslo",
-    "ohwagagagawwsaaayaaslo",
-    "ohwgagagagwwsssssssslo",
-    "ohwagagagawwwwwwwwwwlo",
-    "ohwgagagagwwwkwwwkwwlo",
-    "ohwwwwwwwwwwwwwwwwwwlo",
-    "ollllllllllllllllllllo",
-    ".oo................oo.",
-]
-RADIO_COLOURS = {"o": OUTLINE, "h": WOOD_HI, "w": WOOD, "l": WOOD_LO, "g": (58, 40, 34, 255), "a": (96, 66, 48, 255),
-                 "s": (92, 70, 52, 255), "y": AMBER, "k": CREAM}
+# ---------- the in-world clock: a raised teak frame, dark warm screen, amber digits (23x15, set A's slots)
+AMBER_LIT = (255, 186, 92, 255)
 
-def radio(night):
-    """22x11: speaker grille left, a lit tuning dial right. At night the wood takes the room's blue, the dial stays lit."""
-    def shade(c, ch):
-        if not night or ch in "yk": return c
-        r, g, b, a = c
-        return (int(r * 0.62), int(g * 0.62), int(b * 0.8), a)
-    return [[shade(RADIO_COLOURS[ch], ch) if ch != "." else CLEAR for ch in row] for row in RADIO]
+def clock_bezel():
+    w, h = 23, 15
+    img = [[OUTLINE] * w for _ in range(h)]
+    for y in range(1, h - 1):
+        for x in range(1, w - 1):
+            img[y][x] = WOOD
+    for x in range(1, w - 1): img[1][x] = WOOD_HI; img[h - 2][x] = WOOD_LO    # lit top, shaded bottom
+    for y in range(1, h - 1): img[y][1] = WOOD_HI; img[y][w - 2] = WOOD_LO
+    for x in range(2, w // 2, 2): img[1][x] = LANTERN                          # lantern glint, as on the panel
+    for y in range(3, h - 3):                                                  # screen behind the digits (rows 3-11)
+        for x in range(2, w - 2):
+            img[y][x] = SCREEN
+    for x, y in ((0, 0), (w - 1, 0), (0, h - 1), (w - 1, h - 1)):            # rounded corners
+        img[y][x] = CLEAR
+    return img
 
 # ---------- the player panel
 CASING = (86, 42)
@@ -100,7 +94,7 @@ def icons():
     prev = _icon([""] * 2 + [row[::-1] for row in NEXT])
     return [prev, _icon(["." + r for r in PLAY]), _icon([""] + [".." + r for r in PAUSE]), nxt, _icon(CLOSE)]  # previous, play, pause, next, close
 
-# ---------- notes rising from the radio, 12x15
+# ---------- notes rising from the chest, 12x15
 def _note(canvas, x, y, colour):
     for j, row in enumerate(("..XX", "..X.", "..X.", ".XX.", "XXX.", ".X..")):
         for i, c in enumerate(row):
@@ -119,4 +113,4 @@ def notes():
 def sheet(frames):
     return [sum((f[y] for f in frames), []) for y in range(len(frames[0]))]
 
-assert all(len(r) == 22 for r in RADIO), [len(r) for r in RADIO]
+assert len(clock_bezel()) == 15 and len(clock_bezel()[0]) == 23

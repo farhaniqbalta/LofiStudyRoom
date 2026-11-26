@@ -33,13 +33,13 @@ Packs are written straight from `raw/` (no `.aseprite` sources yet). The waves f
 ## Scene `SeasideHut01`
 
 - Canvas 320×240, safe area 298×208 at (11, 16): an exact 8× on the iPad Pro 11" (2388×1668). Perspective `seaside-hut-back-v1`.
-- Anchors, top-left image pixels: seat (100, 148) 56×70, at the table a little right of centre; view (57, 32) 205×140; clock (272, 132) 23×15 on the right counter; pet spot (178, 194) 32×24 on the rug.
+- Anchors, top-left image pixels: seat (100, 148) 56×70, at the table a little right of centre; view (57, 32) 205×140; clock (269, 128) 23×15 standing on the right counter, left of the lantern; pet spot (178, 194) 32×24 on the rug.
 - `foreground` is empty: the boy sits in front of the table, so nothing covers him.
 - Rooms: day and night. The lamp-off rooms are the lit rooms (stand-ins).
 - `actorTints`: cooler boy at night, warmer at sunset (`#6C74B0` 0.35 at night, `#5A5C8C` 0.45 at night with the lamp off, `#FFC896` 0.15 by day).
 - `ambient`: `ocean-waves`, "Waves". `rain`: `rain.png`, 4 frames at 8 fps, two layers of slanted streaks over the opening, no drops on glass (the hut is open). It sits in the scenery group, so the post, chime and plant stay in front.
-- Music player (Spotify): a 22×11 wooden radio drawn by `skin.py` onto the chest in both rooms (dial lit at night); tapping it (hotspot `computer`) opens an 87×43 teak panel at (218, 60) with set D's layout at 0.625 scale, so the text is the same size on screen at 8× as D's at 5×. 10×10 icons; amber and cream notes rise above the radio while a song plays. Lamp, window and pet tap spots are left out: no lamp-off art, one sea view, no cat.
-- Packs: `SeasideView01` (scenery), `SeasideBoy` (study, drink, stretch, rest), `SeasideBoyShirtless` (study only), `SeasideClock` (set A's clock, as set D does). No cat yet: the engine logs "No usable pack in Pets" and runs on.
+- Music player (Spotify): tapping the chest (hotspot `computer`, (224, 150) 40×32) opens an 87×43 teak panel at (218, 60) with set D's layout at 0.625 scale, so the text is the same size on screen at 8× as D's at 5×. 10×10 icons; amber and cream notes rise above the chest while a song plays. (A script-drawn radio on the chest was tried and dropped: it looked off.) Lamp, window and pet tap spots are left out: no lamp-off art, one sea view, no cat.
+- Packs: `SeasideView01` (scenery), `SeasideBoy` (study, drink, stretch, rest), `SeasideBoyShirtless` (study only), `SeasideClock` (set A's digit shapes in lantern amber on a teak bezel from `skin.py`; set A's cyan LCD looked out of place). No cat yet: the engine logs "No usable pack in Pets" and runs on.
 
 ## How the art was made
 
@@ -54,7 +54,7 @@ Packs are written straight from `raw/` (no `.aseprite` sources yet). The waves f
 
 ## Checks
 
-`Executed 136 tests, with 0 failures` on the iPad (2026-11-26): `testArtSetERunsTheEngineUnchanged` (packs, resting animation, no pet, clock, room sound) and `testRoomSoundPlaysBesideTheRain` (fixture). Watched on the device in day, night and rain. No energy measured.
+`Executed 136 tests, with 0 failures` on the iPad (2026-11-26): `testArtSetERunsTheEngineUnchanged` (packs, resting animation, no pet, clock, room sound, player, chest tap spot) and `testRoomSoundPlaysBesideTheRain` (fixture). Watched on the device in day, night and rain. No energy measured.
 
 ## Known limits and next
 
