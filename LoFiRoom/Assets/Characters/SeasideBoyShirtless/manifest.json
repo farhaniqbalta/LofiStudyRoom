@@ -12,9 +12,10 @@
   "animations": {
     "study": {
       "frames": [
-        0
+        0,
+        1
       ],
-      "fps": 1
+      "fps": 0.5
     }
   },
   "fallbackAnimation": "study",

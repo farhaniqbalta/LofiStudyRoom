@@ -52,6 +52,8 @@ Packs are written straight from `raw/` (no `.aseprite` sources yet). The waves f
 
 **Boy.** One `create_image_pixen`, 56×56, seen from behind. PixelLab drew a desk under his arms despite the prompt; it is erased by hand. The poses are `edit_image_pixen` edits, recoloured to the base palette because PixelLab lightened the shirt. The stretch came out about 1.2× too small (legs 33 px wide against 39), so it is scaled back up: EPX 2×, then nearest-neighbour to 1.2×, hips and feet lined up with the base pose. Every boy frame is padded to 56×70 for the raised arms; the bottom-left anchor keeps him in place.
 
+**Idle.** The resting `study` animation breathes: frames [out, in] at 0.5 fps (2 s each). The in-breath frame is made by `export.py` (`breathe_in`): everything above the waist (row 34 of the 56×56 pose) rises 1 px and the waist row is doubled, so the shirt stretches; the crossed legs never move. Same for both outfits. A head nod to the music was tried and dropped at the user's request.
+
 ## Checks
 
 `Executed 136 tests, with 0 failures` on the iPad (2026-11-26): `testArtSetERunsTheEngineUnchanged` (packs, resting animation, no pet, clock, room sound, player, chest tap spot) and `testRoomSoundPlaysBesideTheRain` (fixture). Watched on the device in day, night and rain. No energy measured.

@@ -12,13 +12,14 @@
   "animations": {
     "study": {
       "frames": [
-        0
+        0,
+        1
       ],
-      "fps": 1
+      "fps": 0.5
     },
     "drink": {
       "frames": [
-        1
+        2
       ],
       "fps": 0.4,
       "loop": false,
@@ -30,7 +31,7 @@
     },
     "stretch": {
       "frames": [
-        2
+        3
       ],
       "fps": 0.33,
       "loop": false,
@@ -42,7 +43,7 @@
     },
     "rest": {
       "frames": [
-        3
+        4
       ],
       "fps": 0.125,
       "loop": false,

@@ -152,17 +152,30 @@ def boy(name):                   # 56x56 poses padded on top to BOY_H; the botto
     im = read(name)
     return [[(0, 0, 0, 0)] * len(im[0]) for _ in range(BOY_H - len(im))] + im
 
-# boy-shirt-stretch-big.png: PixelLab drew the stretch about 1.2x too small to fit the raised arms in 56x56;
-# it is scaled back up (EPX 2x, then nearest down to 1.2x), its hips lined up with the base pose, on a 56x70 frame.
-pack("Characters", "SeasideBoy", [boy(f) for f in ("boy-shirt.png", "boy-shirt-drink.png", "boy-shirt-stretch-big.png", "boy-shirt-rest.png")], dict(
+WAIST = 34                       # row in the 56x56 pose: above it the body rises on a breath in; the crossed legs stay
+
+def breathe_in(frame):
+    """Head, shoulders, arms and chest rise 1 px; the row at the waist is doubled, so the shirt stretches instead of tearing."""
+    top = BOY_H - 56
+    out = [row[:] for row in frame]
+    for y in range(top - 1, top + WAIST):
+        out[y] = frame[y + 1][:]
+    return out
+
+def idle_frames(name):           # the idle: breathe out, breathe in, 2 s each
+    base = boy(name)
+    return [base, breathe_in(base)]
+
+pack("Characters", "SeasideBoy", idle_frames("boy-shirt.png") + [boy(f) for f in ("boy-shirt-drink.png", "boy-shirt-stretch-big.png", "boy-shirt-rest.png")], dict(
     type="character", anchor="desk-seat",
-    animations={"study": dict(frames=[0], fps=1), "drink": once(1, 0.4, 3, 300),
-                "stretch": once(2, 0.33, 2, 600), "rest": once(3, 0.125, 1, 900)},
+    # resting: slow breathing
+    animations={"study": dict(frames=[0, 1], fps=0.5), "drink": once(2, 0.4, 3, 300),
+                "stretch": once(3, 0.33, 2, 600), "rest": once(4, 0.125, 1, 900)},
     fallbackAnimation="study",
     provenance="PixelLab create_image_pixen (desk erased by hand) and edit_image_pixen poses recoloured to its palette. " + PROV))
-pack("Characters", "SeasideBoyShirtless", [boy("boy-shirtless.png")], dict(
+pack("Characters", "SeasideBoyShirtless", idle_frames("boy-shirtless.png"), dict(
     type="character", anchor="desk-seat",
-    animations={"study": dict(frames=[0], fps=1)}, fallbackAnimation="study",
+    animations={"study": dict(frames=[0, 1], fps=0.5)}, fallbackAnimation="study",
     provenance="PixelLab edit_image_pixen of the shirt boy. Poses not drawn yet. " + PROV))
 
 # The clock: set A's digit shapes in lantern amber on a teak bezel drawn by skin.py (same 23x15 size and slots).
