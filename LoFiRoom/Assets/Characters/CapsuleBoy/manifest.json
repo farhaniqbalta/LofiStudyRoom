@@ -6,8 +6,8 @@
   "anchor": "desk-seat",
   "sheet": "sheet.png",
   "frame": {
-    "w": 141,
-    "h": 181
+    "w": 143,
+    "h": 183
   },
   "animations": {
     "study": {

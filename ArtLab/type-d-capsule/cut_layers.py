@@ -160,6 +160,29 @@ for r in (room, room_off):
         r[ay + y][ax + x] = p
 boy = {p: [[(*snap(c[y][x][:3]), 255) if c[y][x][3] > 127 and not chair_part(x, y) else CLEAR for x in range(CW)] for y in range(CH)]
        for p, c in cuts.items()}
+# Cohesion pass (the boy was drawn in a finer style than the room): merge lone pixels into their neighbours, then
+# add a 1 px black outline outside the silhouette, like the room's objects have. Outside, so face and hands keep detail.
+OUTLINE = (0, 0, 0, 255)
+def tidy(img):
+    h, w = len(img), len(img[0])
+    def at(x, y):
+        return img[y][x] if 0 <= x < w and 0 <= y < h else CLEAR
+    out = [list(row) for row in img]
+    for y in range(h):
+        for x in range(w):
+            if img[y][x][3]:
+                ns = [at(x + dx, y + dy) for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1))]
+                common = max(set(ns), key=ns.count)
+                if common[3] and common != img[y][x] and ns.count(common) >= 3:
+                    out[y][x] = common
+    lined = [list(row) for row in out]
+    for y in range(h):
+        for x in range(w):
+            if not out[y][x][3] and any((0 <= x + dx < w and 0 <= y + dy < h) and out[y + dy][x + dx][3]
+                                        for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1))):
+                lined[y][x] = OUTLINE
+    return lined
+boy = {p: tidy(b) for p, b in boy.items()}
 opaque = [(x, y) for b in boy.values() for y in range(CH) for x in range(CW) if b[y][x][3]]
 bx0, by0 = min(x for x, _ in opaque), min(y for _, y in opaque)
 bx1, by1 = max(x for x, _ in opaque) + 1, max(y for _, y in opaque) + 1
