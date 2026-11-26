@@ -1,0 +1,59 @@
+{
+  "id": "capsuleboy",
+  "type": "character",
+  "packVersion": 1,
+  "perspective": "capsule-desk-side-v1",
+  "anchor": "desk-seat",
+  "sheet": "sheet.png",
+  "frame": {
+    "w": 143,
+    "h": 183
+  },
+  "animations": {
+    "study": {
+      "frames": [
+        0
+      ],
+      "fps": 10.0
+    },
+    "drink": {
+      "frames": [
+        1
+      ],
+      "fps": 0.4,
+      "loop": false,
+      "safeExits": [],
+      "routine": {
+        "weight": 3,
+        "cooldown": 300
+      }
+    },
+    "rest": {
+      "frames": [
+        2
+      ],
+      "fps": 0.125,
+      "loop": false,
+      "safeExits": [],
+      "routine": {
+        "weight": 2,
+        "cooldown": 600
+      }
+    },
+    "lean": {
+      "frames": [
+        3
+      ],
+      "fps": 0.3333333333333333,
+      "loop": false,
+      "safeExits": [],
+      "routine": {
+        "weight": 1,
+        "cooldown": 900
+      }
+    }
+  },
+  "fallbackAnimation": "study",
+  "provenance": "Boy and chair from the user's image raw/boy-source-user.png (supplied by the user, approved for use). Study frame: the full-size image shrunk by majority colour per block and snapped to room 3a's palette. Drink, rest and lean: PixelLab edit_image_pixen on that sharp crop (jobs 357a017f-7dd3-4373-b6c3-4dc14f7497ee, 8a3a2039-c051-41c9-b47c-d34d82cc6838, 580cefd9-098d-402b-9600-9d491f7e0034). Backgrounds removed by PixelLab remove_background (jobs 21a109e6-446a-43b7-8747-6002180872ea, 8b283029-b460-42b1-8c5c-37cac51eb1e0, 50134808-af72-4335-b88f-676307e3d02c, 19d4044c-828d-4fff-b6c5-f99a309e1fbb); chair split off by cut_layers.py. Under PixelLab's Terms of Service.",
+  "source": "ArtLab/type-d-capsule/CapsuleBoy.aseprite"
+}

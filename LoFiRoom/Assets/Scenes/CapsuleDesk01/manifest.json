@@ -1,0 +1,207 @@
+{
+  "id": "capsuledesk01",
+  "type": "scene",
+  "artSet": "D",
+  "packVersion": 1,
+  "perspective": "capsule-desk-side-v1",
+  "canvas": {
+    "w": 480,
+    "h": 352
+  },
+  "safe": {
+    "x": 14,
+    "y": 12,
+    "w": 452,
+    "h": 328
+  },
+  "anchors": {
+    "window-rect": {
+      "x": 14,
+      "y": 100,
+      "w": 220,
+      "h": 238
+    },
+    "window-mask": {
+      "x": 14,
+      "y": 100,
+      "w": 220,
+      "h": 238
+    },
+    "desk-seat": {
+      "x": 205,
+      "y": 13,
+      "w": 143,
+      "h": 183
+    },
+    "pet-spot": {
+      "x": 103,
+      "y": 73,
+      "w": 43,
+      "h": 33
+    },
+    "clock-slot": {
+      "x": 216,
+      "y": 130,
+      "w": 23,
+      "h": 15
+    },
+    "lamp": {
+      "x": 262,
+      "y": 167
+    },
+    "computer": {
+      "x": 200,
+      "y": 132
+    },
+    "music-notes": {
+      "x": 292,
+      "y": 192
+    }
+  },
+  "room": "room.png",
+  "rooms": {
+    "night-on": "room.png",
+    "night-off": "room_off.png",
+    "day-on": "room_day.png",
+    "day-off": "room_day_off.png"
+  },
+  "foreground": [
+    {
+      "image": "chair_front.png",
+      "anchor": "desk-seat"
+    }
+  ],
+  "rain": {
+    "sheet": "rain.png",
+    "frame": {
+      "w": 220,
+      "h": 238
+    },
+    "fps": 8,
+    "anchor": "window-rect"
+  },
+  "music": {
+    "panel": "music_panel.png",
+    "frame": {
+      "x": 328,
+      "y": 168,
+      "w": 138,
+      "h": 68
+    },
+    "icons": {
+      "sheet": "music_icons.png",
+      "frame": {
+        "w": 16,
+        "h": 16
+      },
+      "names": [
+        "previous",
+        "play",
+        "pause",
+        "next",
+        "close"
+      ]
+    },
+    "slots": {
+      "artwork": {
+        "x": 333,
+        "y": 187,
+        "w": 44,
+        "h": 44
+      },
+      "attribution": {
+        "x": 333,
+        "y": 173,
+        "w": 42,
+        "h": 12
+      },
+      "title": {
+        "x": 382,
+        "y": 219,
+        "w": 66,
+        "h": 12
+      },
+      "artist": {
+        "x": 382,
+        "y": 208,
+        "w": 76,
+        "h": 10
+      },
+      "previous": {
+        "x": 382,
+        "y": 187,
+        "w": 16,
+        "h": 16
+      },
+      "toggle": {
+        "x": 402,
+        "y": 187,
+        "w": 16,
+        "h": 16
+      },
+      "next": {
+        "x": 422,
+        "y": 187,
+        "w": 16,
+        "h": 16
+      },
+      "close": {
+        "x": 451,
+        "y": 224,
+        "w": 8,
+        "h": 8
+      },
+      "message": {
+        "x": 382,
+        "y": 205,
+        "w": 76,
+        "h": 26
+      },
+      "action": {
+        "x": 382,
+        "y": 189,
+        "w": 78,
+        "h": 12
+      }
+    },
+    "textColor": "#DCF6F4",
+    "dimColor": "#6BD5D3",
+    "notes": {
+      "sheet": "music_notes.png",
+      "frame": {
+        "w": 20,
+        "h": 24
+      },
+      "fps": 2,
+      "anchor": "music-notes"
+    }
+  },
+  "hotspots": {
+    "pet": {
+      "x": 103,
+      "y": 73,
+      "w": 43,
+      "h": 33
+    },
+    "window": {
+      "x": 14,
+      "y": 100,
+      "w": 220,
+      "h": 238
+    },
+    "lamp": {
+      "x": 238,
+      "y": 132,
+      "w": 48,
+      "h": 60
+    },
+    "computer": {
+      "x": 163,
+      "y": 105,
+      "w": 75,
+      "h": 52
+    }
+  },
+  "provenance": "Art set D, first pass. Room: PixelLab create_image_pixen job 50537b9f-f1dc-4160-a134-397bc933d340 (room 3a), chair painted out by the user, glass keyed out, the user's boy image's chair added and lamp-off from edit_image_pixen job 65b3e775-34f4-429d-94d5-f31c6c97d965, all by ArtLab/type-d-capsule/cut_layers.py; layers held in ArtLab/type-d-capsule/CapsuleDesk01.aseprite.",
+  "source": "ArtLab/type-d-capsule/CapsuleDesk01.aseprite"
+}

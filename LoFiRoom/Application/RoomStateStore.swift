@@ -15,6 +15,8 @@ struct RoomConfig: Codable, Equatable {
     var routineFrequency = 1.0 { didSet { routineFrequency = Self.clamp(routineFrequency, Self.routineFrequencyRange) } }
     var rainSound = RainSoundMode.whenRaining
     var rainVolume = 0.4 { didSet { rainVolume = Self.clamp(rainVolume, 0...1) } }
+    /// The art set to open with next launch (nil: the registry's active set). A launch argument wins over it.
+    var artSet: String?
 
     /// How many times as often routines run; 1 is the manifest pacing.
     static let routineFrequencyRange: ClosedRange<Double> = 0.5...20
@@ -40,6 +42,7 @@ struct RoomConfig: Codable, Equatable {
         routineFrequency = Self.clamp(try c.decodeIfPresent(Double.self, forKey: .routineFrequency) ?? d.routineFrequency, Self.routineFrequencyRange)
         rainSound = try c.decodeIfPresent(RainSoundMode.self, forKey: .rainSound) ?? d.rainSound
         rainVolume = Self.clamp(try c.decodeIfPresent(Double.self, forKey: .rainVolume) ?? d.rainVolume, 0...1)
+        artSet = try c.decodeIfPresent(String.self, forKey: .artSet)
     }
 }
 

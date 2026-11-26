@@ -43,7 +43,8 @@ The room can be drawn in several complete looks, lettered A, B, C. **`docs/ART_S
 
 - **A** — lo-fi room, the active set (`StudyRoom01`, built by `Tools/build_art.py`).
 - **B** — cyberpunk side desk, an experimental spike saved for later (`CyberDesk01`, sources in `ArtLab/type-b-cyberdesk/`).
-- The default is `"active"` in `LoFiRoom/Assets/art-sets.json` (the one hand-edited file there). For one launch use `-artSet B`.
+- **D** — capsule desk, cozy cyberpunk with a side-profile boy; first pass, runs with `-artSet D` (`CapsuleDesk01`, sources in `ArtLab/type-d-capsule/`). C is a plan only (`docs/plans/2026-11-17-art-set-c.md`, branch `art/type-c`).
+- The default is `"active"` in `LoFiRoom/Assets/art-sets.json` (the one hand-edited file there). Settings → Art set saves a choice for the next launch (`RoomConfig.artSet`); `-artSet B` wins for one launch.
 - A set is a scene plus packs sharing its `perspective` tag; sets never mix. Pack folder names are unique across sets.
 - A new set is a new `ArtLab/type-<letter>-<name>/` folder, a new scene, a registry row and a log `docs/logs/art-<letter>-<name>.md`. No Swift changes.
 
@@ -83,7 +84,7 @@ xcrun devicectl device process launch --terminate-existing --device $IPAD com.lo
 xcrun devicectl device capture screenshot --device $IPAD --destination build/shots/shot.png
 ```
 
-Launch switches: `-fps N`, `-paused YES`, `-debugAnchors YES` (anchor overlay + FPS counter), `-artSet <A|B>`, `-scene <folder>`, `-character <folder>`, `-pet <folder>`, `-scenery <folder>`, `-time auto|day|night`, `-weather auto|clear|rain`, `-lamp on|off` (choices are saved), `-routineSpeed N` (shortens routine delays for watching), `-showPanel YES`, `-showMusic YES`. The tests hang if the iPad is locked: check `xcrun devicectl device info lockState` first.
+Launch switches: `-fps N`, `-paused YES`, `-debugAnchors YES` (anchor overlay + FPS counter), `-artSet <A|B|D>`, `-scene <folder>`, `-character <folder>`, `-pet <folder>`, `-scenery <folder>`, `-time auto|day|night`, `-weather auto|clear|rain`, `-lamp on|off` (choices are saved), `-routineSpeed N` (shortens routine delays for watching), `-showPanel YES`, `-showMusic YES`. The tests hang if the iPad is locked: check `xcrun devicectl device info lockState` first.
 
 ## Code layout
 
@@ -176,7 +177,7 @@ Open, in no fixed order; start one only with the user's go-ahead:
 - Art set A stand-ins still left: day rooms and day city views (PixelLab generations needed). More cat animation (the user asked to keep it for later).
 - M4: energy measurement on the iPad (never done; no power claims until it is), power tuning, polish.
 - Not tried on the device: Low Power Mode, VoiceOver, airplane-mode launch, Spotify signed out or not installed.
-- Art direction B/C (`docs/ART_SETS.md`).
+- Art direction B/C/D (`docs/ART_SETS.md`). Set D next: the girl.
 - Idea, not started: move the music player into a room object (cassette deck or radio on the sill or shelf) that opens the readable player when tapped (`docs/logs/art-A-lofi.md`, "Idea for later").
 
 Building needs `DEVELOPMENT_TEAM` and `SPOTIFY_CLIENT_ID` in the environment before `xcodegen generate` (values in `CLAUDE.local.md`), and the rain loop at `LoFiRoom/LocalAudio/rain.mp3` for the Sound settings (`docs/AUDIO.md`). All three are optional for a build: without them signing fails / the music card says Spotify is not set up / the Sound settings are hidden.

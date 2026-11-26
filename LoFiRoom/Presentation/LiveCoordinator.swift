@@ -3,7 +3,7 @@ import Foundation
 extension SceneCoordinator {
     /// Builds the running room from the bundle and launch arguments.
     /// Launch arguments: `-fps 12`, `-paused YES`, `-debugAnchors YES` (anchor overlay + FPS counter), and
-    /// `-artSet <A|B|...>` or `-scene <folder>` (default: the active set in `Assets/art-sets.json`), `-character Girl01`, `-pet BlackCat`, `-scenery NeonCity02` to choose packs (the choice is saved),
+    /// `-artSet <A|B|...>` or `-scene <folder>` (default: the set chosen in Settings, else the active set in `Assets/art-sets.json`), `-character Girl01`, `-pet BlackCat`, `-scenery NeonCity02` to choose packs (the choice is saved),
     /// `-time auto|day|night`, `-weather auto|clear|rain`, `-lamp on|off` (saved too; unknown values are ignored),
     /// `-cityName <text> -cityLat <number> -cityLon <number>` (all three) set the weather city,
     /// `-showPanel YES` opens the settings panel at launch, `-showMusic YES` opens the music panel at launch (debug),
@@ -11,10 +11,15 @@ extension SceneCoordinator {
     static func live() -> SceneCoordinator {
         let defaults = UserDefaults.standard
         do {
-            let repository = try SpriteAssetRepository(sceneName: defaults.string(forKey: "scene"), artSet: defaults.string(forKey: "artSet"))
-            let scene = try LoFiSKScene(repository: repository, showAnchors: defaults.bool(forKey: "debugAnchors"))
+            let saved = RoomStateStore()
+            let sceneName = defaults.string(forKey: "scene")
+            // A launch argument wins; a saved choice that is no longer in the registry falls back to the active set.
+            let repository = try defaults.string(forKey: "artSet").map { try SpriteAssetRepository(sceneName: sceneName, artSet: $0) }
+                ?? (try? SpriteAssetRepository(sceneName: sceneName, artSet: saved.config.artSet))
+                ?? SpriteAssetRepository(sceneName: sceneName)
+            let room = try LoFiSKScene(repository: repository, showAnchors: defaults.bool(forKey: "debugAnchors"))
             let speed = defaults.double(forKey: "routineSpeed")
-            let coordinator = SceneCoordinator(repository: repository, store: RoomStateStore(), scene: scene,
+            let coordinator = SceneCoordinator(repository: repository, store: saved, scene: room,
                                            routineSpeed: speed > 0 ? speed : nil, music: SpotifyRemoteAdapter(),
                                            ambient: RainSoundPlayer.make())
             let store = coordinator.store

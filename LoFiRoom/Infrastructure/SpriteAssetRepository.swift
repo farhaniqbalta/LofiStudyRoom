@@ -18,11 +18,15 @@ struct LoadedPack {
 final class SpriteAssetRepository {
     let root: URL
     let scene: ScenePack
+    /// The registry's art sets, letter to name (empty without a registry), and the letter running now
+    /// (nil when the scene was chosen by name or there is no registry).
+    let artSets: [String: String]
+    let artSet: String?
     private let sceneFolder: URL
 
     /// `art-sets.json` beside the packs: which art sets exist (A, B, ...) and which one is active.
     private struct ArtSets: Decodable {
-        struct Entry: Decodable { var scene: String }
+        struct Entry: Decodable { var name: String?; var scene: String }
         var active: String
         var sets: [String: Entry]
     }
@@ -37,10 +41,13 @@ final class SpriteAssetRepository {
             do { registry = try JSONDecoder().decode(ArtSets.self, from: data) } catch { throw PackError("art-sets.json is invalid (\(error))") }
         }
         var registered: String?
-        if let key = artSet ?? registry?.active {
+        let key = artSet ?? registry?.active
+        if let key {
             guard let entry = registry?.sets[key] else { throw PackError("art-sets.json has no art set '\(key)'") }
             registered = entry.scene
         }
+        artSets = (registry?.sets ?? [:]).mapValues { $0.name ?? $0.scene }
+        self.artSet = sceneName == nil ? key : nil
         let sceneName = try sceneName ?? registered ?? FileManager.default
             .contentsOfDirectory(at: root.appendingPathComponent("Scenes"), includingPropertiesForKeys: nil)
             .filter(\.hasDirectoryPath).map(\.lastPathComponent).min() ?? { throw PackError("Scenes: no scene folder found") }()

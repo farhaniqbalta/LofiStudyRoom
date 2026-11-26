@@ -20,9 +20,26 @@ struct CustomizationSheet: View {
         }
     }
 
+    /// Which art set to open with. The room is built once at launch, so the change waits for the next launch.
+    @ViewBuilder private var artSetSection: some View {
+        let sets = coordinator.repository.artSets
+        if sets.count > 1 {
+            let running = coordinator.repository.artSet
+            let chosen = coordinator.config.artSet ?? running
+            Section {
+                Picker("Art set", selection: Binding(get: { chosen ?? "" }, set: { coordinator.chooseArtSet($0) })) {
+                    ForEach(sets.keys.sorted(), id: \.self) { Text("\($0) · \(sets[$0]!)").tag($0) }
+                }
+            } header: { Text("Art set") } footer: {
+                if let chosen, chosen != running { Text("Close and reopen the app to switch to \(chosen).") }
+            }
+        }
+    }
+
     var body: some View {
         NavigationStack {
             Form {
+                artSetSection
                 packSection("Character", "Characters", \.character)
                 packSection("Pet", "Pets", \.pet)
                 packSection("Scenery", "Scenery", \.scenery)

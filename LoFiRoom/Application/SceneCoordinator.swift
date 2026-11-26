@@ -100,6 +100,8 @@ final class SceneCoordinator: ObservableObject {
     func setWeather(_ setting: WeatherSetting) { update { $0.weather = setting }; environmentSettingsChanged() }
     func setCity(_ city: City) { update { $0.city = city }; environmentSettingsChanged() }
     func setKeepAwake(_ on: Bool) { update { $0.keepAwake = on } }
+    /// Saved for the next launch; the running room is not rebuilt.
+    func chooseArtSet(_ key: String) { update { $0.artSet = key } }
     func setRainSound(_ mode: RainSoundMode) { update { $0.rainSound = mode }; applyAmbient() }
     func setRainVolume(_ volume: Double) { update { $0.rainVolume = volume }; applyAmbient() }
 

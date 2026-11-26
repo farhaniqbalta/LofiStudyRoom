@@ -1,0 +1,39 @@
+{
+  "category": "Pets",
+  "type": "pet",
+  "scene": "CapsuleDesk01",
+  "perspective": "capsule-desk-side-v1",
+  "anchor": "pet-spot",
+  "fallbackAnimation": "sleep",
+  "animations": {
+    "sleep": {
+      "fps": 1
+    },
+    "idle": {
+      "frames": [
+        3,
+        3,
+        0
+      ],
+      "fps": 0.5,
+      "loop": false,
+      "routine": {
+        "weight": 1,
+        "cooldown": 120
+      }
+    },
+    "react": {
+      "frames": [
+        2,
+        3,
+        3,
+        3,
+        0
+      ],
+      "fps": 3,
+      "loop": false,
+      "onTap": true
+    }
+  },
+  "provenance": "PixelLab create_image_pixen job 0102d300-c285-4afb-95b3-0e1bcc2c228b (sleeping orange tabby, 48x48); the teal cushion it came with is moved into the room by cut_layers.py, which also makes the breathing and startle-hop frames. Awake frame: edit_image_pixen job 4f8058b1-9229-4235-a027-4a465ee27abe on the same cat. The earlier 32x32 cat (raw/cat-sleep.png, raw/cat-awake.png) is kept but unused. Under PixelLab's Terms of Service."
+}
