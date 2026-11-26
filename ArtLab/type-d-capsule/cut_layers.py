@@ -185,7 +185,7 @@ def daylight(img):
 # The cushion is furniture, so its pixels go into the room under the cat (both layers draw together, so a pixel
 # put on the wrong side looks the same). The sprite keeps the cat, plus a breathing frame (upper body one row up)
 # and a startle-hop frame (whole cat one row up) for the tap reaction until an awake frame is drawn.
-CAT_AT = (100, 247)              # top-left of the 48x48 source in the room; must match export.py's pet-spot
+CAT_AT = (100, 237)              # top-left of the 48x48 source in the room; must match export.py's pet-spot
 def is_teal(p):
     r, g, b = p[:3]
     return p[3] > 127 and g > r + 15 and b > r
