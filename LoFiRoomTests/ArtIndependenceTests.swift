@@ -119,6 +119,8 @@ final class ArtIndependenceTests: XCTestCase {
         XCTAssertEqual(scene.character.currentAnimation, "study")
         XCTAssertNil(scene.pet.pack, "no pet pack: the room runs without one")
         XCTAssertEqual(repository.scene.ambient, ScenePack.Ambient(file: "ocean-waves", name: "Waves"))
+        XCTAssertTrue(coordinator.hasMusicSkin, "the radio's player")
+        XCTAssertEqual(repository.scene.hotspots?.keys.sorted(), ["computer"], "tapping the radio opens the player")
         XCTAssertEqual(scene.clock.text.count, 5)
     }
 

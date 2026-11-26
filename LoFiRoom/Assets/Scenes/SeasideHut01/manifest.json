@@ -50,8 +50,14 @@
       "y": 75
     },
     "computer": {
-      "x": 150,
-      "y": 60
+      "x": 232,
+      "y": 95
+    },
+    "music-notes": {
+      "x": 237,
+      "y": 95,
+      "w": 12,
+      "h": 15
     }
   },
   "room": "room_night.png",
@@ -74,6 +80,110 @@
     },
     "fps": 8,
     "anchor": "window-rect"
+  },
+  "music": {
+    "panel": "music_panel.png",
+    "frame": {
+      "x": 218,
+      "y": 137,
+      "w": 87,
+      "h": 43
+    },
+    "icons": {
+      "sheet": "music_icons.png",
+      "frame": {
+        "w": 10,
+        "h": 10
+      },
+      "names": [
+        "previous",
+        "play",
+        "pause",
+        "next",
+        "close"
+      ]
+    },
+    "slots": {
+      "artwork": {
+        "x": 221,
+        "y": 149,
+        "w": 28,
+        "h": 28
+      },
+      "attribution": {
+        "x": 221,
+        "y": 141,
+        "w": 27,
+        "h": 7
+      },
+      "title": {
+        "x": 252,
+        "y": 169,
+        "w": 42,
+        "h": 8
+      },
+      "artist": {
+        "x": 252,
+        "y": 163,
+        "w": 48,
+        "h": 6
+      },
+      "previous": {
+        "x": 252,
+        "y": 149,
+        "w": 10,
+        "h": 10
+      },
+      "toggle": {
+        "x": 264,
+        "y": 149,
+        "w": 10,
+        "h": 10
+      },
+      "next": {
+        "x": 276,
+        "y": 149,
+        "w": 10,
+        "h": 10
+      },
+      "close": {
+        "x": 294,
+        "y": 170,
+        "w": 8,
+        "h": 8
+      },
+      "message": {
+        "x": 252,
+        "y": 161,
+        "w": 48,
+        "h": 16
+      },
+      "action": {
+        "x": 252,
+        "y": 150,
+        "w": 49,
+        "h": 8
+      }
+    },
+    "textColor": "#F3E2C4",
+    "dimColor": "#D9A066",
+    "notes": {
+      "sheet": "music_notes.png",
+      "frame": {
+        "w": 12,
+        "h": 15
+      },
+      "fps": 2,
+      "anchor": "music-notes"
+    }
+  },
+  "hotspots": {
+    "computer": {
+      "x": 230,
+      "y": 82,
+      "w": 26,
+      "h": 15
+    }
   },
   "actorTints": {
     "night-on": {
