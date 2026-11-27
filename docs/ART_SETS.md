@@ -16,7 +16,7 @@ What each set contains (folders under `LoFiRoom/Assets/`):
 |---|---|---|---|---|---|
 | A | `Boy01`, `Girl01` | `OrangeCat`, `BlackCat` | `NeonCity01`, `NeonCity02` | `RetroDigital01` | Routines, tap reaction, rain, day/night, lamp on/off, hotspots, music skin (wall player and floating notes) |
 | D | `CapsuleBoy` (study, drink, rest, lean) | `CapsuleCat` (drawn for this room) | `CapsuleCity01` (night, day) | `CapsuleClock` (A's clock reused) | Hotspots, lamp-off room, chair armrest in front of the boy, rain, music skin (wall tablet and notes), day rooms by script tint. No girl yet |
-| E | `SeasideBoy` (study, drink, stretch, rest), `SeasideBoyShirtless` (study only) | none yet | `SeasideView01` (night, day = sunset) | `SeasideClock` (A's digits in amber on a teak bezel) | Day and night rooms, actor tints, sea shimmer, rain, waves sound beside the rain. music skin (tapping the chest opens a teak player). No lamp-off art (lit rooms stand in); only the chest is tappable |
+| E | `SeasideBoy` (breathing idle, drink, stretch, rest), `SeasideBoyShirtless` (breathing idle, drink, stretch, rest) | `SeasideCat` (sitting, tail flick) | `SeasideView01` (night, day = sunset) | `SeasideClock` (A's digits in amber on a teak bezel) | Day and night rooms, actor tints, sea shimmer, rain, waves sound beside the rain. music skin (tapping the chest opens a teak player). No lamp-off art (lit rooms stand in); only the chest is tappable |
 
 ## How to switch
 

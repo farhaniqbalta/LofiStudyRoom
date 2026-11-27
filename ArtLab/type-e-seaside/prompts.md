@@ -54,3 +54,23 @@ Silhouette differs from the shirt version by 60 px (the shirt's sleeves and hem)
 | `raw/boy-shirt-rest.png` | arms folded forward, head lowered onto them, napping | 9 | `d1e1a6e8-274a-4d0f-a2d6-5a38eb42d3a5` | head tilts to the side rather than down; reads as dozing |
 
 PixelLab drew the shirt lighter in all three. The kept files are recoloured to the base sprite: shirt pixels (light, low saturation) are matched to the base shirt's colours by lightness rank, every other pixel snaps to the nearest base colour. The unrecoloured outputs are not kept (download by job id).
+
+## Boy poses (shirtless) — 2026-11-27 (3 generations)
+
+`edit_image_pixen` on `raw/boy-shirtless.png`, the same pose prompts as the shirt boy with "shirtless ... bare back" (the stretch also says "at the same size").
+
+| File | Pose | Seed | Job | Result |
+|---|---|---|---|---|
+| `raw/boy-shirtless-drink.png` | lifting a mug, right arm | 7 | `161b8b39-b30b-4508-8a34-0a78c23f3570` | good |
+| `raw/boy-shirtless-stretch.png` | both arms up | 11 | `e7b6a7c5-bafb-4201-87f7-b90b4d79654e` | drawn about 1.2× too small again (legs 33 px against 39); scaled up to `raw/boy-shirtless-stretch-big.png` |
+| `raw/boy-shirtless-rest.png` | head on folded arms | 9 | `a912653b-cbef-4694-bb68-9a832eda1e80` | head tilts to the side, like the shirt one |
+
+All three are snapped to `boy-shirtless.png`'s palette (nearest colour).
+
+## Cat — 2026-11-27 (1 generation)
+
+| File | Tool | Job | Prompt (short) |
+|---|---|---|---|
+| `raw/cat-sit.png` 32×32 | `create_image_pixen`, `no_background`, `view: low top-down`, `direction: north`, selective outline, seed 5 | `b5facac0-49e8-4c39-b0b3-a251f814a685` | calico cat seen from behind, sitting upright, facing away looking at the sea, ears up, tail curled around its feet; white with orange and black patches; "only the cat: no cushion, no floor, no furniture" |
+
+A pose unlike the other sets' cats (curled up asleep). The tail-lift, tail-sway and ear-twitch frames are made by `export.py`.
