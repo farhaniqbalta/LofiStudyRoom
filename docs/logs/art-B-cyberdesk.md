@@ -1,6 +1,6 @@
 # Art set B — cyberpunk side desk (experimental)
 
-**Status:** Spike, saved for later. Runs on the iPad with `-artSet B`. Not cleaned up, not the default.
+**Status:** Removed on 2026-11-27 at the user's request (assets, sources, registry entry and tests). This log is kept as history; the files are in git history before that date.
 **Date:** 2026-11-15
 **Registry:** [`docs/ART_SETS.md`](../ART_SETS.md)
 
