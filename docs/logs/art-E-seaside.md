@@ -29,18 +29,19 @@ Packs are written straight from `raw/` (no `.aseprite` sources yet). The waves f
 | `boy-shirt.png`, `boy-shirtless.png` | The boy, 56×56, desk erased; the shirtless one is an edit of it (same pose) |
 | `boy-shirt-drink.png`, `boy-shirt-rest.png` | Poses, recoloured to `boy-shirt.png`'s palette |
 | `boy-shirt-stretch.png`, `boy-shirt-stretch-big.png` | The stretch as drawn (about 1.2× too small) and scaled back up, 56×70 (used) |
+| `cat-sit.png` | The cat, 32×32: a calico sitting with its back to us, watching the sea |
 | `boy-shirtless-drink.png`, `-stretch.png`, `-stretch-big.png`, `-rest.png` | The same poses for the shirtless outfit, snapped to `boy-shirtless.png`'s palette; the stretch scaled up the same way |
 
 ## Scene `SeasideHut01`
 
 - Canvas 320×240, safe area 298×208 at (11, 16): an exact 8× on the iPad Pro 11" (2388×1668). Perspective `seaside-hut-back-v1`.
-- Anchors, top-left image pixels: seat (100, 148) 56×70, at the table a little right of centre; view (57, 32) 205×140; clock (269, 128) 23×15 standing on the right counter, left of the lantern; pet spot (178, 194) 32×24 on the rug.
+- Anchors, top-left image pixels: seat (100, 148) 56×70, at the table a little right of centre; view (57, 32) 205×140; clock (269, 128) 23×15 standing on the right counter, left of the lantern; pet spot (178, 189) 32×32 on the rug, right of the boy.
 - `foreground` is empty: the boy sits in front of the table, so nothing covers him.
 - Rooms: day and night. The lamp-off rooms are the lit rooms (stand-ins).
 - `actorTints`: cooler boy at night, warmer at sunset (`#6C74B0` 0.35 at night, `#5A5C8C` 0.45 at night with the lamp off, `#FFC896` 0.15 by day).
 - `ambient`: `ocean-waves`, "Waves". `rain`: `rain.png`, 4 frames at 8 fps, two layers of slanted streaks over the opening, no drops on glass (the hut is open). It sits in the scenery group, so the post, chime and plant stay in front.
 - Music player (Spotify): tapping the chest (hotspot `computer`, (224, 150) 40×32) opens an 87×43 teak panel at (218, 60) with set D's layout at 0.625 scale, so the text is the same size on screen at 8× as D's at 5×. 10×10 icons; amber and cream notes rise above the chest while a song plays. (A script-drawn radio on the chest was tried and dropped: it looked off.) Lamp, window and pet tap spots are left out: no lamp-off art, one sea view, no cat.
-- Packs: `SeasideView01` (scenery), `SeasideBoy` (study, drink, stretch, rest), `SeasideBoyShirtless` (study, drink, stretch, rest), `SeasideClock` (set A's digit shapes in lantern amber on a teak bezel from `skin.py`; set A's cyan LCD looked out of place). No cat yet: the engine logs "No usable pack in Pets" and runs on.
+- Packs: `SeasideView01` (scenery), `SeasideBoy` (study, drink, stretch, rest), `SeasideBoyShirtless` (study, drink, stretch, rest), `SeasideClock` (set A's digit shapes in lantern amber on a teak bezel from `skin.py`; set A's cyan LCD looked out of place)., `SeasideCat` (pet).
 
 ## How the art was made
 
@@ -53,16 +54,18 @@ Packs are written straight from `raw/` (no `.aseprite` sources yet). The waves f
 
 **Boy.** One `create_image_pixen`, 56×56, seen from behind. PixelLab drew a desk under his arms despite the prompt; it is erased by hand. The poses are `edit_image_pixen` edits, recoloured to the base palette because PixelLab lightened the shirt. The stretch came out about 1.2× too small (legs 33 px wide against 39), so it is scaled back up: EPX 2×, then nearest-neighbour to 1.2×, hips and feet lined up with the base pose. Every boy frame is padded to 56×70 for the raised arms; the bottom-left anchor keeps him in place.
 
+**Cat.** One `create_image_pixen`, 32×32: a calico seen from behind, sitting and watching the sea, a different pose from the other sets' sleeping cats. Its idle `sit` is an 8-second loop at 4 fps: a long still sit, a tail flick (tip lifts, then leans right), later a quick ear twitch. The three frames are made by `export.py`; each uses the stretch trick so nothing detaches (tip base row or column doubled). No tap reaction yet.
+
 **Idle.** The resting `study` animation breathes: frames [out, in] at 0.5 fps (2 s each). The in-breath frame is made by `export.py` (`breathe_in`): everything above the waist (row 34 of the 56×56 pose) rises 1 px and the waist row is doubled, so the shirt stretches; the crossed legs never move. Same for both outfits. A head nod to the music was tried and dropped at the user's request.
 
 ## Checks
 
-`Executed 136 tests, with 0 failures` on the iPad (2026-11-26): `testArtSetERunsTheEngineUnchanged` (packs, resting animation, no pet, clock, room sound, player, chest tap spot) and `testRoomSoundPlaysBesideTheRain` (fixture). Watched on the device in day, night and rain. No energy measured.
+`Executed 138 tests, with 0 failures` on the iPad (2026-11-27): `testArtSetERunsTheEngineUnchanged` (packs, resting animation, the cat and its idle, clock, room sound, player, chest tap spot) and `testRoomSoundPlaysBesideTheRain` (fixture). Watched on the device in day, night and rain. No energy measured.
 
 ## Known limits and next
 
 - **Needs PixelLab:**
-  - a cat;
+  - the cat's tap reaction (it looks back over its shoulder);
   - possibly a new rest pose (his head tilts sideways instead of dropping).
 - **Free:**
   - lamp-off rooms;

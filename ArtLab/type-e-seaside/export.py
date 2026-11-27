@@ -22,7 +22,7 @@ SEAT = (100, 148, 56, 70)        # the boy at the round table, a little right of
 BOY_H = 70                       # frame height: room above his head for the stretch's raised arms
 VIEW = (57, 32, 205, 140)        # the sea opening; must match cut_rooms.py's scenery crop
 CLOCK = (269, 128, 23, 15)       # standing on the right-hand counter (top at row 143), left of the lantern
-PET = (178, 194, 32, 24)         # on the rug right of the table (no cat yet)
+PET = (178, 189, 32, 32)         # the cat on the rug right of the boy, its feet on row 218
 CHEST = (224, 150, 40, 32)       # the wooden chest: tapping it opens the music player
 PANEL_AT = (218, 60)             # the player panel, upper right over the curtain and headland
 NOTES_AT = (238, 136)            # top-left of the rising notes, just above the chest
@@ -179,6 +179,36 @@ pack("Characters", "SeasideBoyShirtless", idle_frames("boy-shirtless.png") + [bo
                 "stretch": once(3, 0.33, 2, 600), "rest": once(4, 0.125, 1, 900)},
     fallbackAnimation="study",
     provenance="PixelLab edit_image_pixen of the shirt boy; poses are edits of that, snapped to its palette, the stretch scaled 1.2x. " + PROV))
+
+# The cat sits with its back to us, watching the sea. Idle: a long still sit, a tail flick, later an ear twitch.
+TIP_X, TIP_Y0, TIP_Y1 = 25, 20, 28      # tail tip in the 32x32 cat: columns 25+, rows 20-28
+EAR = (17, 22, 4, 6)                    # right ear: x0, x1, y0, y1
+
+def tail_lift(im):                      # tip up 1 px; its base row is doubled so it stays attached
+    out = [r[:] for r in im]
+    for y in range(TIP_Y0, TIP_Y1):
+        for x in range(TIP_X, len(im[0])): out[y][x] = im[y + 1][x]
+    return out
+
+def tail_sway(im):                      # tip leans 1 px right; column TIP_X is doubled
+    out = [r[:] for r in im]
+    for y in range(TIP_Y0, TIP_Y1 + 2):
+        for x in range(len(im[0]) - 1, TIP_X, -1): out[y][x] = im[y][x - 1]
+    return out
+
+def ear_twitch(im):                     # the right ear's tip flicks 1 px outward
+    x0, x1, y0, y1 = EAR
+    out = [r[:] for r in im]
+    for y in range(y0, y1):
+        for x in range(x1, x0, -1): out[y][x] = im[y][x - 1]
+    return out
+
+cat = read("cat-sit.png")
+SIT = [0] * 12 + [1, 1, 2, 2, 1, 0] + [0] * 8 + [3, 0, 0, 3] + [0] * 2   # 32 steps at 4 fps = 8 s
+pack("Pets", "SeasideCat", [cat, tail_lift(cat), tail_sway(cat), ear_twitch(cat)], dict(
+    type="pet", anchor="pet-spot",
+    animations={"sit": dict(frames=SIT, fps=4)}, fallbackAnimation="sit",
+    provenance="PixelLab create_image_pixen (calico seen from behind, sitting); tail and ear frames made by export.py. " + PROV))
 
 # The clock: set A's digit shapes in lantern amber on a teak bezel drawn by skin.py (same 23x15 size and slots).
 src, dst = os.path.join(ASSETS, "Clocks", "RetroDigital01"), os.path.join(ASSETS, "Clocks", "SeasideClock")

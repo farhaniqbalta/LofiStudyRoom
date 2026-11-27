@@ -66,3 +66,11 @@ PixelLab drew the shirt lighter in all three. The kept files are recoloured to t
 | `raw/boy-shirtless-rest.png` | head on folded arms | 9 | `a912653b-cbef-4694-bb68-9a832eda1e80` | head tilts to the side, like the shirt one |
 
 All three are snapped to `boy-shirtless.png`'s palette (nearest colour).
+
+## Cat — 2026-11-27 (1 generation)
+
+| File | Tool | Job | Prompt (short) |
+|---|---|---|---|
+| `raw/cat-sit.png` 32×32 | `create_image_pixen`, `no_background`, `view: low top-down`, `direction: north`, selective outline, seed 5 | `b5facac0-49e8-4c39-b0b3-a251f814a685` | calico cat seen from behind, sitting upright, facing away looking at the sea, ears up, tail curled around its feet; white with orange and black patches; "only the cat: no cushion, no floor, no furniture" |
+
+A pose unlike the other sets' cats (curled up asleep). The tail-lift, tail-sway and ear-twitch frames are made by `export.py`.
