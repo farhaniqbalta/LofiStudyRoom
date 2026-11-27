@@ -16,8 +16,44 @@
         1
       ],
       "fps": 0.5
+    },
+    "drink": {
+      "frames": [
+        2
+      ],
+      "fps": 0.4,
+      "loop": false,
+      "safeExits": [],
+      "routine": {
+        "weight": 3,
+        "cooldown": 300
+      }
+    },
+    "stretch": {
+      "frames": [
+        3
+      ],
+      "fps": 0.33,
+      "loop": false,
+      "safeExits": [],
+      "routine": {
+        "weight": 2,
+        "cooldown": 600
+      }
+    },
+    "rest": {
+      "frames": [
+        4
+      ],
+      "fps": 0.125,
+      "loop": false,
+      "safeExits": [],
+      "routine": {
+        "weight": 1,
+        "cooldown": 900
+      }
     }
   },
   "fallbackAnimation": "study",
-  "provenance": "PixelLab edit_image_pixen of the shirt boy. Poses not drawn yet. Under PixelLab's Terms of Service; job ids in ArtLab/type-e-seaside/prompts.md."
+  "provenance": "PixelLab edit_image_pixen of the shirt boy; poses are edits of that, snapped to its palette, the stretch scaled 1.2x. Under PixelLab's Terms of Service; job ids in ArtLab/type-e-seaside/prompts.md."
 }

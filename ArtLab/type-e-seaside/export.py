@@ -173,10 +173,12 @@ pack("Characters", "SeasideBoy", idle_frames("boy-shirt.png") + [boy(f) for f in
                 "stretch": once(3, 0.33, 2, 600), "rest": once(4, 0.125, 1, 900)},
     fallbackAnimation="study",
     provenance="PixelLab create_image_pixen (desk erased by hand) and edit_image_pixen poses recoloured to its palette. " + PROV))
-pack("Characters", "SeasideBoyShirtless", idle_frames("boy-shirtless.png"), dict(
+pack("Characters", "SeasideBoyShirtless", idle_frames("boy-shirtless.png") + [boy(f) for f in ("boy-shirtless-drink.png", "boy-shirtless-stretch-big.png", "boy-shirtless-rest.png")], dict(
     type="character", anchor="desk-seat",
-    animations={"study": dict(frames=[0, 1], fps=0.5)}, fallbackAnimation="study",
-    provenance="PixelLab edit_image_pixen of the shirt boy. Poses not drawn yet. " + PROV))
+    animations={"study": dict(frames=[0, 1], fps=0.5), "drink": once(2, 0.4, 3, 300),
+                "stretch": once(3, 0.33, 2, 600), "rest": once(4, 0.125, 1, 900)},
+    fallbackAnimation="study",
+    provenance="PixelLab edit_image_pixen of the shirt boy; poses are edits of that, snapped to its palette, the stretch scaled 1.2x. " + PROV))
 
 # The clock: set A's digit shapes in lantern amber on a teak bezel drawn by skin.py (same 23x15 size and slots).
 src, dst = os.path.join(ASSETS, "Clocks", "RetroDigital01"), os.path.join(ASSETS, "Clocks", "SeasideClock")

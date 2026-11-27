@@ -6,7 +6,7 @@ Decisions (user, 2026-11-26):
 - The character is seen from behind, facing the sea, as in set A.
 - The sunset light is the day look; the engine stays day/night.
 - The layout is free; the layer rules stay.
-- One character in two outfits, shirt and shirtless, instead of a boy and a girl.
+- One character in two outfits, shirt and shirtless, instead of a boy and a girl. Both have the same four poses.
 - Ocean waves play beside the rain, each with its own control.
 
 ## Build
@@ -29,6 +29,7 @@ Packs are written straight from `raw/` (no `.aseprite` sources yet). The waves f
 | `boy-shirt.png`, `boy-shirtless.png` | The boy, 56×56, desk erased; the shirtless one is an edit of it (same pose) |
 | `boy-shirt-drink.png`, `boy-shirt-rest.png` | Poses, recoloured to `boy-shirt.png`'s palette |
 | `boy-shirt-stretch.png`, `boy-shirt-stretch-big.png` | The stretch as drawn (about 1.2× too small) and scaled back up, 56×70 (used) |
+| `boy-shirtless-drink.png`, `-stretch.png`, `-stretch-big.png`, `-rest.png` | The same poses for the shirtless outfit, snapped to `boy-shirtless.png`'s palette; the stretch scaled up the same way |
 
 ## Scene `SeasideHut01`
 
@@ -39,7 +40,7 @@ Packs are written straight from `raw/` (no `.aseprite` sources yet). The waves f
 - `actorTints`: cooler boy at night, warmer at sunset (`#6C74B0` 0.35 at night, `#5A5C8C` 0.45 at night with the lamp off, `#FFC896` 0.15 by day).
 - `ambient`: `ocean-waves`, "Waves". `rain`: `rain.png`, 4 frames at 8 fps, two layers of slanted streaks over the opening, no drops on glass (the hut is open). It sits in the scenery group, so the post, chime and plant stay in front.
 - Music player (Spotify): tapping the chest (hotspot `computer`, (224, 150) 40×32) opens an 87×43 teak panel at (218, 60) with set D's layout at 0.625 scale, so the text is the same size on screen at 8× as D's at 5×. 10×10 icons; amber and cream notes rise above the chest while a song plays. (A script-drawn radio on the chest was tried and dropped: it looked off.) Lamp, window and pet tap spots are left out: no lamp-off art, one sea view, no cat.
-- Packs: `SeasideView01` (scenery), `SeasideBoy` (study, drink, stretch, rest), `SeasideBoyShirtless` (study only), `SeasideClock` (set A's digit shapes in lantern amber on a teak bezel from `skin.py`; set A's cyan LCD looked out of place). No cat yet: the engine logs "No usable pack in Pets" and runs on.
+- Packs: `SeasideView01` (scenery), `SeasideBoy` (study, drink, stretch, rest), `SeasideBoyShirtless` (study, drink, stretch, rest), `SeasideClock` (set A's digit shapes in lantern amber on a teak bezel from `skin.py`; set A's cyan LCD looked out of place). No cat yet: the engine logs "No usable pack in Pets" and runs on.
 
 ## How the art was made
 
@@ -61,7 +62,6 @@ Packs are written straight from `raw/` (no `.aseprite` sources yet). The waves f
 ## Known limits and next
 
 - **Needs PixelLab:**
-  - the shirtless poses (3 generations);
   - a cat;
   - possibly a new rest pose (his head tilts sideways instead of dropping).
 - **Free:**
